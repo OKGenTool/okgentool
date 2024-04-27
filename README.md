@@ -1,5 +1,4 @@
-# OKGenTool
-## OpenAPI Ktor Generation Tool
+# OKGenTool - OpenAPI Ktor Generation Tool
 
 **Tool for the generation of client and server code based on OpenAPI**
 
