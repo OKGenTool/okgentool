@@ -21,3 +21,10 @@ This is a final project of the **Computer Science and Computer Engineering BSc**
 |---------|------------|---------|
 | swagger-parser | https://github.com/swagger-api/swagger-parser | Apache-2.0 license
 | kotlinpoet | https://github.com/square/kotlinpoet | Apache-2.0 license
+
+# How to use OKGenTool
+> [!IMPORTANT]
+> This section is under construction
+
+# Block Diagram
+![OKGenTool Block Diagram](./docs/block_diagram.png)
