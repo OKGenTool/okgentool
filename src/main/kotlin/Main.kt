@@ -10,7 +10,6 @@ fun main(args: Array<String>) {
     val client = getClient(args)
     Parser(client.sourcePath)
     Generator(client.destinationPath)
-    Generator(client.destinationPath)
 
     logger().info("Code generation ends")
 }
