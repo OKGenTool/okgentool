@@ -2,10 +2,10 @@ package generator.builders
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import parser.components
 import datamodel.Component
 import datamodel.ComponentProperties
 import datamodel.DataType
+import parser.components
 import java.nio.file.Paths
 
 fun buildModel(basePath: String) {

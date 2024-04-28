@@ -1,9 +1,9 @@
 package parser.builders
 
-import io.swagger.v3.oas.models.media.Schema
 import datamodel.Component
 import datamodel.ComponentProperties
 import datamodel.DataType
+import io.swagger.v3.oas.models.media.Schema
 import parser.openAPI
 
 fun getComponents(): List<Component> {
