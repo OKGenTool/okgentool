@@ -7,7 +7,19 @@ import io.swagger.v3.oas.models.parameters.RequestBody
 import io.swagger.v3.oas.models.responses.ApiResponses
 import parser.model.*
 import parser.openAPI
+import parser.paths
 
+fun getMethods(): List<Method> {
+    val methods = mutableListOf<Method>()
+
+    for (path in paths) {
+        for (method in path.methods) {
+            methods.add(getMethod(path, method))
+        }
+    }
+
+    return methods
+}
 fun getMethod(path: Path, method: HttpMethods): Method {
     val methodItem = openAPI.paths[path.url]!!
     val operation = getOperation(methodItem, method)
@@ -20,7 +32,7 @@ fun getMethod(path: Path, method: HttpMethods): Method {
     )
 }
 
-fun getResponses(responses: ApiResponses?): List<Response> {
+private fun getResponses(responses: ApiResponses?): List<Response> {
     if (responses == null) return emptyList()
 
     return responses.keys.map {
@@ -33,7 +45,7 @@ fun getResponses(responses: ApiResponses?): List<Response> {
     }
 }
 
-fun getBody(requestBody: RequestBody?): Body? {
+private fun getBody(requestBody: RequestBody?): Body? {
     if (requestBody == null) return null
 
     val returnTypes = requestBody.content.keys.toList()
