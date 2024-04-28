@@ -1,4 +1,4 @@
-package parser.model
+package datamodel
 
 // TODO: Build enum for the camps that have a fixed set of values
 data class Parameter (

@@ -1,4 +1,4 @@
-package parser.model
+package datamodel
 
 enum class In (val value: String) {
     QUERY("query"),

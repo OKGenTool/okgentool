@@ -1,4 +1,4 @@
-package parser.model
+package datamodel
 
 data class Body(
     val schemaName: String,

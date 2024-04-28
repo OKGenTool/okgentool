@@ -1,6 +1,8 @@
-import client.getClient
+import cli.getClient
+import cli.logger
 import generator.Generator
 import parser.Parser
+
 
 fun main(args: Array<String>) {
     logger().info("Start code generation")
