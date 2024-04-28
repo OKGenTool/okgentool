@@ -1,7 +1,7 @@
 package parser.builders
 
-import parser.model.HttpMethods
-import parser.model.Path
+import datamodel.HttpMethods
+import datamodel.Path
 import parser.openAPI
 
 /**

@@ -1,4 +1,4 @@
-package client
+package cli
 
 data class Client(
     val sourcePath: String,
@@ -6,7 +6,7 @@ data class Client(
 )
 
 fun getClient(args: Array<String>): Client {
-    logger().info("Entered in client")
+    logger().info("Entered in cli")
 
     lateinit var sourcePath: String
     lateinit var destinationPath: String

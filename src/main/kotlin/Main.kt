@@ -1,5 +1,5 @@
-import client.getClient
-import client.logger
+import cli.getClient
+import cli.logger
 import generator.Generator
 import parser.Parser
 

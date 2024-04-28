@@ -1,4 +1,4 @@
-package parser.model
+package datamodel
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.asTypeName

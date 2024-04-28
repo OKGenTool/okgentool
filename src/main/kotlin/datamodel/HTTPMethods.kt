@@ -1,4 +1,4 @@
-package parser.model
+package datamodel
 
 enum class HttpMethods(val methodName: String) {
     GET("get"),

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.parameters.RequestBody
 import io.swagger.v3.oas.models.responses.ApiResponses
-import parser.model.*
+import datamodel.*
 import parser.openAPI
 import parser.paths
 
@@ -54,11 +54,11 @@ private fun getBody(requestBody: RequestBody?): Body? {
     return Body(schemaName, returnTypes)
 }
 
-private fun getParameters(parameters: List<Parameter>?): List<parser.model.Parameter> {
+private fun getParameters(parameters: List<Parameter>?): List<datamodel.Parameter> {
     if (parameters.isNullOrEmpty()) return emptyList()
 
     return parameters.map {
-        parser.model.Parameter(
+        Parameter(
             name = it.name,
             `in` = In.fromValue(it.`in`.toString()),
             required = it.required ?: false,

@@ -6,9 +6,9 @@ import io.swagger.v3.parser.core.models.ParseOptions
 import parser.builders.getComponents
 import parser.builders.getMethods
 import parser.builders.getPaths
-import parser.model.Component
-import parser.model.Method
-import parser.model.Path
+import datamodel.Component
+import datamodel.Method
+import datamodel.Path
 
 lateinit var openAPI: OpenAPI
 lateinit var components: List<Component>

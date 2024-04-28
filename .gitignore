@@ -16,7 +16,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .idea
-output
+genOutput
 
 ### Eclipse ###
 .apt_generated
