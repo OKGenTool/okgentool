@@ -1,5 +1,6 @@
 package parser
 
+import cli.logger
 import io.swagger.parser.OpenAPIParser
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.core.models.ParseOptions
@@ -29,8 +30,14 @@ class Parser(sourceFilePath: String) {
         parseOptions.isCamelCaseFlattenNaming = true
         openAPI = OpenAPIParser().readLocation(sourceFilePath, null, parseOptions).openAPI
         val x = openAPI
+
+        logger().info("Reading components")
         components = getComponents()
+
+        logger().info("Reading Paths")
         paths = getPaths()
+
+        logger().info("Reading Methods")
         methods = getMethods()
     }
 }

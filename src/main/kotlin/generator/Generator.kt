@@ -1,11 +1,15 @@
 package generator
 
-import generator.builders.buildDirectory
+import cli.logger
+import output.buildDirectory
 import generator.builders.buildModel
 
 class Generator(destinationPath: String) {
     init {
-        val directories = buildDirectory(destinationPath)
-        buildModel(directories.base)
+        logger().info("Build directory structure")
+        buildDirectory(destinationPath)
+
+        logger().info("Build model files")
+        buildModel(destinationPath)
     }
 }

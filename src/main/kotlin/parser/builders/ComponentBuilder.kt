@@ -1,5 +1,6 @@
 package parser.builders
 
+import cli.logger
 import datamodel.Component
 import datamodel.ComponentProperties
 import datamodel.DataType
@@ -15,12 +16,13 @@ fun getComponents(): List<Component> {
         val requiredProperties = schema.required ?: emptyList()
         val properties = getProperties(schema, requiredProperties)
         val schemaName = "#/components/schemas/" + component.key
+        logger().info("Parsing component: $schemaName")
         res.add(Component(schemaName, properties, component.key.capitalize()))
     }
-    return checkSons(res)
+    return checkChildren(res)
 }
 
-fun checkSons(components: MutableList<Component>): List<Component> {
+private fun checkChildren(components: MutableList<Component>): List<Component> {
     val simplifiedNames = mutableListOf<Pair<String, String>>()
 
     for (component in components) {
@@ -28,20 +30,20 @@ fun checkSons(components: MutableList<Component>): List<Component> {
     }
 
     for ((key, value) in simplifiedNames) {
-        var father = components.find { it.simplifiedName == value }
-        val son = components.find { it.simplifiedName == key }!!
-        if (father != null && key != value && father.parameters == son.parameters) {
-            father.schemaNameSons.add(son.schemaName)
-            father.schemaNameSons.addAll(son.schemaNameSons)
-            components.remove(son)
+        var parent = components.find { it.simplifiedName == value }
+        val child = components.find { it.simplifiedName == key }!!
+        if (parent != null && key != value && parent.parameters == child.parameters) {
+            parent.schemaNameChildren.add(child.schemaName)
+            parent.schemaNameChildren.addAll(child.schemaNameChildren)
+            components.remove(child)
             continue
         }
 
-        father = components.find { it.parameters == son.parameters && it != son }
-        if (father != null && ((key.contains("Body") && key.contains(father.simplifiedName)) || key.contains("Response")) ) {
-            father.schemaNameSons.add(son.schemaName)
-            father.schemaNameSons.addAll(son.schemaNameSons)
-            components.remove(son)
+        parent = components.find { it.parameters == child.parameters && it != child }
+        if (parent != null && ((key.contains("Body") && key.contains(parent.simplifiedName)) || key.contains("Response")) ) {
+            parent.schemaNameChildren.add(child.schemaName)
+            parent.schemaNameChildren.addAll(child.schemaNameChildren)
+            components.remove(child)
         }
     }
 

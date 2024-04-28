@@ -1,19 +1,24 @@
 package generator.builders
 
+import cli.logger
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.Component
 import datamodel.ComponentProperties
 import datamodel.DataType
+import generator.model.Packages
+import output.writeFile
 import parser.components
-import java.nio.file.Paths
 
 fun buildModel(basePath: String) {
-    for (component in components)
-        createModelComponent(component, basePath)
+    logger().info("Start building model")
+    for (component in components) {
+        val fileSpec = createModelComponent(component, basePath)
+        writeFile(fileSpec, basePath)
+    }
 }
 
-private fun createModelComponent(component: Component, basePath: String){
+private fun createModelComponent(component: Component, basePath: String): FileSpec {
     val className = component.simplifiedName
 
     val properties = mutableListOf<PropertySpec>()
@@ -24,7 +29,6 @@ private fun createModelComponent(component: Component, basePath: String){
             .initializer(property.name)
             .build()
         properties.add(propertySpec)
-
     }
 
     val primaryConstructor = FunSpec.constructorBuilder()
@@ -36,19 +40,18 @@ private fun createModelComponent(component: Component, basePath: String){
         .primaryConstructor(primaryConstructor)
         .addProperties(properties)
 
-    val fileSpec = FileSpec.builder("gen.routing.models", className)
+    val fileSpec = FileSpec.builder(Packages.MODEL, className)
         .addType(classBuilder.build())
         .build()
 
-    val modelsDirectory = Paths.get(basePath).toFile()
-    fileSpec.writeTo(modelsDirectory)
+    return fileSpec
 }
 
 private fun getPropertyType(property: ComponentProperties): TypeName {
     return when {
-        property.schemaName.isNotEmpty() ->{
+        property.schemaName.isNotEmpty() -> {
             val relatedComponent = components.find { it.schemaName == property.schemaName }
-            ClassName("gen.routing.models", relatedComponent!!.simplifiedName)
+            ClassName(Packages.MODEL, relatedComponent!!.simplifiedName)
         }
 
         (property.dataType == DataType.ARRAY) && (property.arrayItemsType != null) ->
@@ -56,7 +59,12 @@ private fun getPropertyType(property: ComponentProperties): TypeName {
 
         (property.dataType == DataType.ARRAY) && !(property.arrayItemsSchemaName.isNullOrBlank()) -> {
             val relatedComponent = components.find { it.schemaName == property.arrayItemsSchemaName }
-            property.dataType.kotlinType.parameterizedBy(ClassName("gen.routing.models", relatedComponent!!.simplifiedName))
+            property.dataType.kotlinType.parameterizedBy(
+                ClassName(
+                    Packages.MODEL,
+                    relatedComponent!!.simplifiedName
+                )
+            )
         }
 
         else ->
