@@ -13,6 +13,7 @@ repositories {
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     implementation("io.swagger.parser.v3:swagger-parser:2.1.21")
+    implementation("com.squareup:kotlinpoet:1.16.0")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.9")
 }
 
