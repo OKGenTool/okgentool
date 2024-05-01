@@ -13,14 +13,48 @@ import parser.components
 fun buildModel(basePath: String) {
     logger().info("Start building model")
     for (component in components) {
-        val fileSpec = createModelComponent(component, basePath)
+        val fileSpec = createModelComponent(component)
         writeFile(fileSpec, basePath)
     }
 }
 
-private fun createModelComponent(component: Component, basePath: String): FileSpec {
-    val className = component.simplifiedName
+private fun createModelComponent(component: Component): FileSpec {
+    if (component.superClassChildSchemaNames.isNotEmpty()) {
+        return createSealedClassComponent(component)
+    }
+    return createSimpleComponent(component)
+}
 
+private fun createSealedClassComponent(component: Component): FileSpec {
+    val subclasses = getSubclasses(component)
+
+    val sealedClass = TypeSpec.classBuilder(component.simplifiedName)
+        .addModifiers(KModifier.SEALED)
+        .build()
+
+    return FileSpec.builder(Packages.MODEL, component.simplifiedName)
+        .addType(sealedClass)
+        .addTypes(subclasses)
+        .build()
+}
+
+private fun getSubclasses(superClassComponent: Component): List<TypeSpec> {
+    val subclasses = mutableListOf<TypeSpec>()
+
+    for (component in superClassComponent.superClassChildComponents) {
+        subclasses.add(getDataClassBuilder(component, ClassName(Packages.MODEL, component.simplifiedName)))
+    }
+
+    return subclasses
+}
+
+private fun createSimpleComponent(component: Component): FileSpec {
+    return FileSpec.builder(Packages.MODEL, component.simplifiedName)
+        .addType(getDataClassBuilder(component))
+        .build()
+}
+
+private fun getDataClassBuilder(component: Component, superclassName: ClassName? = null): TypeSpec {
     val properties = mutableListOf<PropertySpec>()
 
     for (property in component.parameters) {
@@ -35,16 +69,16 @@ private fun createModelComponent(component: Component, basePath: String): FileSp
         .addParameters(properties.map { ParameterSpec(it.name, it.type) })
         .build()
 
-    val classBuilder = TypeSpec.classBuilder(className)
+    val dataClassBuilder = TypeSpec.classBuilder(component.simplifiedName)
         .addModifiers(KModifier.DATA)
         .primaryConstructor(primaryConstructor)
         .addProperties(properties)
 
-    val fileSpec = FileSpec.builder(Packages.MODEL, className)
-        .addType(classBuilder.build())
-        .build()
+    if (superclassName != null) {
+        dataClassBuilder.superclass(superclassName)
+    }
 
-    return fileSpec
+    return dataClassBuilder.build()
 }
 
 private fun getPropertyType(property: ComponentProperties): TypeName {

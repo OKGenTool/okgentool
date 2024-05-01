@@ -15,11 +15,40 @@ fun getComponents(): List<Component> {
         val schema = component.value
         val requiredProperties = schema.required ?: emptyList()
         val properties = getProperties(schema, requiredProperties)
+        val oneOfSchemaNames = getOneOfSchemaNames(schema)
         val schemaName = "#/components/schemas/" + component.key
         logger().info("Parsing component: $schemaName")
-        res.add(Component(schemaName, properties, component.key.capitalize()))
+        res.add(Component(schemaName, properties, component.key.capitalize(), oneOfSchemaNames))
     }
-    return checkChildren(res)
+
+    return checkChildren(removeDuplicates(res))
+}
+
+private fun removeDuplicates(components: MutableList<Component>): MutableList<Component> {
+    val sealedComponents = components.filter { it.superClassChildSchemaNames.isNotEmpty() }
+
+    for (component in sealedComponents) {
+        val oneOfSchemaNames = component.superClassChildSchemaNames
+        for (schemaName in oneOfSchemaNames) {
+            val relatedComponent = components.find { it.schemaName == schemaName } ?: continue
+            component.superClassChildComponents.add(relatedComponent)
+            components.remove(relatedComponent)
+        }
+    }
+
+    return components
+}
+
+private fun getOneOfSchemaNames(schema: Schema<Any>?): List<String> {
+    val oneOfSchemaNames = mutableListOf<String>()
+
+    if (schema != null && schema.oneOf != null) {
+        for (oneOf in schema.oneOf) {
+            oneOfSchemaNames.add(oneOf.`$ref` ?: "")
+        }
+    }
+
+    return oneOfSchemaNames
 }
 
 private fun checkChildren(components: MutableList<Component>): List<Component> {
@@ -53,7 +82,7 @@ private fun checkChildren(components: MutableList<Component>): List<Component> {
 private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>): List<ComponentProperties> {
     val properties = mutableListOf<ComponentProperties>()
 
-    if (schema != null) {
+    if (schema != null && schema.properties != null) {
         for (parameter in schema.properties) {
             val name = parameter.key
             val dataType = DataType.fromString(parameter.value.type ?: "", parameter.value.format ?: "")
