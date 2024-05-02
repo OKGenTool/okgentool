@@ -88,16 +88,38 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
             val dataType = DataType.fromString(parameter.value.type ?: "", parameter.value.format ?: "")
             val required = requiredProperties.contains(name)
             val schemaName = parameter.value.`$ref` ?: ""
+            val values = parameter.value.enum?.map { it.toString() } ?: emptyList()
 
             if (dataType == DataType.ARRAY) {
                 val arrayItems = parameter.value.items
                 val arrayItemsType = DataType.fromString(arrayItems?.type ?: "", arrayItems?.format ?: "")
                 val arrayItemsSchemaName = arrayItems?.`$ref` ?: ""
-                properties.add(ComponentProperties(name, dataType, required, schemaName, arrayItemsType, arrayItemsSchemaName))
+
+                properties.add(
+                    ComponentProperties(
+                        name,
+                        dataType,
+                        required,
+                        schemaName,
+                        values.isNotEmpty(),
+                        arrayItemsType,
+                        arrayItemsSchemaName,
+                        values
+                    )
+                )
                 continue
             }
 
-            properties.add(ComponentProperties(name, dataType, required, schemaName))
+            properties.add(
+                ComponentProperties(
+                    name,
+                    dataType,
+                    required,
+                    schemaName,
+                    isEnum = values.isNotEmpty(),
+                    values = values
+                )
+            )
         }
     }
 

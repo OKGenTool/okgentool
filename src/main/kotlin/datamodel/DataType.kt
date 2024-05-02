@@ -32,3 +32,12 @@ enum class DataType (val type: String, val format: String, val kotlinType: Class
         }
     }
 }
+
+fun getInitializerForType(dataType: DataType): String {
+    return when (dataType) {
+        DataType.STRING -> "%S"
+        DataType.INTEGER, DataType.LONG, DataType.FLOAT, DataType.DOUBLE -> "%L"
+        DataType.BOOLEAN -> "%L"
+        else -> "%T()"
+    }
+}
