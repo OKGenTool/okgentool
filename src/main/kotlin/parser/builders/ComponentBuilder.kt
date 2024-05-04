@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.media.Schema
 import parser.openAPI
 
 fun getComponents(): List<Component> {
+    logger().info("Reading components")
     val components = openAPI.components.schemas ?: return emptyList()
     val res = mutableListOf<Component>()
 

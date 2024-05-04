@@ -1,4 +1,4 @@
-package generator.builders
+package generator.builders.model
 
 import cli.logger
 import com.squareup.kotlinpoet.*
@@ -8,42 +8,43 @@ import datamodel.ComponentProperties
 import datamodel.DataType
 import datamodel.getInitializerForType
 import generator.model.Packages
+import io.swagger.v3.oas.models.Components
 import output.writeFile
-import parser.components
 
-fun buildModel(basePath: String) {
+fun buildModel(components: List<Component>, basePath: String) {
     logger().info("Start building model")
     for (component in components) {
-        val fileSpec = createModelComponent(component)
+        val fileSpec = createModelComponent(component, components)
         writeFile(fileSpec, basePath)
     }
 }
 
-private fun createModelComponent(component: Component): FileSpec {
+fun createModelComponent(component: Component, components: List<Component>): FileSpec {
     if (component.superClassChildSchemaNames.isNotEmpty()) {
-        return createSealedClassComponent(component)
+        return createSealedClassComponent(component, components)
     }
-    return createSimpleComponent(component)
+    return createSimpleComponent(component, components)
 }
 
-private fun createSealedClassComponent(component: Component): FileSpec {
+fun createSealedClassComponent(component: Component, components: List<Component>): FileSpec {
     val sealedClass = TypeSpec.classBuilder(component.simplifiedName)
         .addModifiers(KModifier.SEALED)
         .build()
 
     return FileSpec.builder(Packages.MODEL, component.simplifiedName)
         .addType(sealedClass)
-        .addTypes(getSubclasses(component))
+        .addTypes(getSubclasses(component, components))
         .build()
 }
 
-private fun getSubclasses(superClassComponent: Component): List<TypeSpec> {
+fun getSubclasses(superClassComponent: Component, components: List<Component>): List<TypeSpec> {
     val subclasses = mutableListOf<TypeSpec>()
 
     for (component in superClassComponent.superClassChildComponents) {
         subclasses.add(
             getDataClassBuilder(
                 component,
+                components,
                 ClassName(Packages.MODEL, component.simplifiedName),
                 getCompanionObjectBuilder(component)
             )
@@ -54,14 +55,14 @@ private fun getSubclasses(superClassComponent: Component): List<TypeSpec> {
     return subclasses
 }
 
-private fun createSimpleComponent(component: Component): FileSpec {
+fun createSimpleComponent(component: Component, components: List<Component>): FileSpec {
     return FileSpec.builder(Packages.MODEL, component.simplifiedName)
-        .addType(getDataClassBuilder(component, companionObject = getCompanionObjectBuilder(component)))
+        .addType(getDataClassBuilder(component, components, companionObject = getCompanionObjectBuilder(component)))
         .addTypes(getEnumBuilders(component))
         .build()
 }
 
-private fun getCompanionObjectBuilder(component: Component): TypeSpec? {
+fun getCompanionObjectBuilder(component: Component): TypeSpec? {
     val properties = mutableListOf<PropertySpec>()
     properties.addAll(getCompanionProperties(component))
 
@@ -80,7 +81,7 @@ private fun getCompanionObjectBuilder(component: Component): TypeSpec? {
         .build()
 }
 
-private fun getCompanionProperties(component: Component): List<PropertySpec> {
+fun getCompanionProperties(component: Component): List<PropertySpec> {
     val properties = mutableListOf<PropertySpec>()
 
     component.parameters.forEach {property ->
@@ -103,7 +104,7 @@ private fun getCompanionProperties(component: Component): List<PropertySpec> {
     return properties
 }
 
-private fun getEnumBuilders(component: Component): List<TypeSpec> {
+fun getEnumBuilders(component: Component): List<TypeSpec> {
     val enums = component.parameters.filter { it.isEnum }
     val enumBuilders = mutableListOf<TypeSpec>()
     component.parameters.forEach { property ->
@@ -121,15 +122,16 @@ private fun getEnumBuilders(component: Component): List<TypeSpec> {
     return enumBuilders
 }
 
-private fun getDataClassBuilder(
+fun getDataClassBuilder(
     component: Component,
+    components: List<Component>,
     superclassName: ClassName? = null,
     companionObject: TypeSpec? = null
 ): TypeSpec {
     val properties = mutableListOf<PropertySpec>()
 
     for (property in component.parameters) {
-        val propertyType = getPropertyType(property, component.simplifiedName) ?: continue
+        val propertyType = getPropertyType(property, component.simplifiedName, components) ?: continue
 
         val propertySpec = PropertySpec.builder(property.name, propertyType)
             .initializer(property.name)
@@ -157,7 +159,7 @@ private fun getDataClassBuilder(
     return dataClassBuilder.build()
 }
 
-private fun getPropertyType(property: ComponentProperties, componentName: String): TypeName? {
+fun getPropertyType(property: ComponentProperties, componentName: String, components: List<Component>): TypeName? {
     return when {
         property.isEnum && property.values.size > 1 -> ClassName(Packages.MODEL, componentName + property.name.capitalize())
 

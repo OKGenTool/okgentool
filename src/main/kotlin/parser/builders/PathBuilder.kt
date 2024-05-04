@@ -1,5 +1,6 @@
 package parser.builders
 
+import cli.logger
 import datamodel.HttpMethods
 import datamodel.Path
 import parser.openAPI
@@ -9,6 +10,7 @@ import parser.openAPI
  * Each Path object contains the URL and the list of methods that can be used in that URL.
  */
 fun getPaths(): List<Path> {
+    logger().info("Reading Paths")
     val pathsList = mutableListOf<Path>()
     for (path in openAPI.paths) {
         val methods = mutableListOf<HttpMethods>()

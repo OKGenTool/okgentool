@@ -1,5 +1,6 @@
 package parser.builders
 
+import cli.logger
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.parameters.Parameter
@@ -7,9 +8,9 @@ import io.swagger.v3.oas.models.parameters.RequestBody
 import io.swagger.v3.oas.models.responses.ApiResponses
 import datamodel.*
 import parser.openAPI
-import parser.paths
 
-fun getMethods(): List<Method> {
+fun getMethods(paths: List<Path>): List<Method> {
+    logger().info("Reading Methods")
     val methods = mutableListOf<Method>()
 
     for (path in paths) {

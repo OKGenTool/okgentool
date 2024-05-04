@@ -9,10 +9,10 @@ fun main(args: Array<String>) {
     val client = getClient(args)
 
     logger().info("Start parsing the OAD file")
-    Parser(client.sourcePath)
+    val dataModel = Parser(client.sourcePath).getDataModel()
 
     logger().info("Start code generation")
-    Generator(client.destinationPath)
+    Generator(dataModel, client.destinationPath)
 
     logger().info("Code generation ends")
 }

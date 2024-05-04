@@ -8,13 +8,11 @@ import parser.builders.getComponents
 import parser.builders.getMethods
 import parser.builders.getPaths
 import datamodel.Component
+import datamodel.DataModel
 import datamodel.Method
 import datamodel.Path
 
 lateinit var openAPI: OpenAPI
-lateinit var components: List<Component>
-lateinit var paths: List<Path>
-lateinit var methods: List<Method>
 
 class Parser(sourceFilePath: String) {
 
@@ -29,15 +27,10 @@ class Parser(sourceFilePath: String) {
         parseOptions.isFlattenComposedSchemas = true
         parseOptions.isCamelCaseFlattenNaming = true
         openAPI = OpenAPIParser().readLocation(sourceFilePath, null, parseOptions).openAPI
-        val x = openAPI
+    }
 
-        logger().info("Reading components")
-        components = getComponents()
-
-        logger().info("Reading Paths")
-        paths = getPaths()
-
-        logger().info("Reading Methods")
-        methods = getMethods()
+    fun getDataModel(): DataModel {
+        val paths = getPaths()
+        return DataModel(getComponents(), getMethods(paths), paths)
     }
 }
