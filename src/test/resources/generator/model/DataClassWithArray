@@ -1,0 +1,10 @@
+package gen.routing.model
+
+import kotlin.Int
+import kotlin.String
+import kotlin.collections.List
+
+public data class DataClassWithArray(
+  public val name: String,
+  public val values: List<Int>,
+)

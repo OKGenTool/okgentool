@@ -1,0 +1,14 @@
+package gen.routing.model
+
+import kotlin.Int
+import kotlin.String
+
+public sealed class SealedClass
+
+public data class Child1(
+  public val name: String,
+) : SealedClass()
+
+public data class Child2(
+  public val age: Int,
+) : SealedClass()

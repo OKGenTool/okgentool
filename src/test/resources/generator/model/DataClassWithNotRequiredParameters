@@ -1,0 +1,9 @@
+package gen.routing.model
+
+import kotlin.Int
+import kotlin.String
+
+public data class DataClassWithNotRequiredParameters(
+  public val name: String?,
+  public val age: Int?,
+)

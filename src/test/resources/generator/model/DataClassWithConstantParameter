@@ -1,0 +1,11 @@
+package gen.routing.model
+
+import kotlin.String
+
+public data class DataClassWithConstantParameter(
+  public val name: String,
+) {
+  public companion object {
+    public const val `value`: String = "ABC"
+  }
+}

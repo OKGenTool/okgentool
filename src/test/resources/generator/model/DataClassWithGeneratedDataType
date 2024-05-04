@@ -1,0 +1,8 @@
+package gen.routing.model
+
+import kotlin.String
+
+public data class DataClassWithGeneratedDataType(
+  public val name: String,
+  public val `value`: DataClass,
+)

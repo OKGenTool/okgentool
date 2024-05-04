@@ -33,11 +33,11 @@ fun createSealedClassComponent(component: Component, components: List<Component>
 
     return FileSpec.builder(Packages.MODEL, component.simplifiedName)
         .addType(sealedClass)
-        .addTypes(getSubclasses(component, components))
+        .addTypes(getSubclasses(component, components, component.simplifiedName))
         .build()
 }
 
-fun getSubclasses(superClassComponent: Component, components: List<Component>): List<TypeSpec> {
+fun getSubclasses(superClassComponent: Component, components: List<Component>, superclassName: String): List<TypeSpec> {
     val subclasses = mutableListOf<TypeSpec>()
 
     for (component in superClassComponent.superClassChildComponents) {
@@ -45,7 +45,7 @@ fun getSubclasses(superClassComponent: Component, components: List<Component>): 
             getDataClassBuilder(
                 component,
                 components,
-                ClassName(Packages.MODEL, component.simplifiedName),
+                ClassName(Packages.MODEL, superclassName),
                 getCompanionObjectBuilder(component)
             )
         )
