@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.core.models.ParseOptions
 import parser.builders.getComponents
 import parser.builders.getMethods
+import parser.builders.getOperations
 import parser.builders.getPaths
 
 lateinit var openAPI: OpenAPI
@@ -27,6 +28,6 @@ class Parser(sourceFilePath: String) {
 
     fun getDataModel(): DataModel {
         val paths = getPaths()
-        return DataModel(getComponents(), getMethods(paths), paths)
+        return DataModel(getComponents(), getMethods(paths), paths, getOperations())
     }
 }

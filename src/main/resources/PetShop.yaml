@@ -39,7 +39,6 @@ paths:
         - pet
       summary: Add a new pet to the store
       description: Add a new pet to the store
-      operationId: addPet
       responses:
         '200':
           description: Successful operation
@@ -285,7 +284,6 @@ paths:
         - pet
       summary: uploads an image
       description: ''
-      operationId: uploadFile
       parameters:
         - name: petId
           in: path
