@@ -1,6 +1,5 @@
 package generator.builders.model
 
-import cli.logger
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.Component
@@ -8,11 +7,13 @@ import datamodel.ComponentProperties
 import datamodel.DataType
 import datamodel.getInitializerForType
 import generator.model.Packages
-import io.swagger.v3.oas.models.Components
+import org.slf4j.LoggerFactory
 import output.writeFile
 
+private val logger = LoggerFactory.getLogger("ModelBuilder.kt")
+
 fun buildModel(components: List<Component>, basePath: String) {
-    logger().info("Start building model")
+    logger.info("Start building model")
     for (component in components) {
         val fileSpec = createModelComponent(component, components)
         writeFile(fileSpec, basePath)
@@ -84,7 +85,7 @@ fun getCompanionObjectBuilder(component: Component): TypeSpec? {
 fun getCompanionProperties(component: Component): List<PropertySpec> {
     val properties = mutableListOf<PropertySpec>()
 
-    component.parameters.forEach {property ->
+    component.parameters.forEach { property ->
         if (property.isEnum && property.values.size == 1 && property.dataType != null) {
             properties.add(
                 PropertySpec.builder(
@@ -126,7 +127,7 @@ fun getDataClassBuilder(
     component: Component,
     components: List<Component>,
     superclassName: ClassName? = null,
-    companionObject: TypeSpec? = null
+    companionObject: TypeSpec? = null,
 ): TypeSpec {
     val properties = mutableListOf<PropertySpec>()
 
@@ -161,7 +162,10 @@ fun getDataClassBuilder(
 
 fun getPropertyType(property: ComponentProperties, componentName: String, components: List<Component>): TypeName? {
     return when {
-        property.isEnum && property.values.size > 1 -> ClassName(Packages.MODEL, componentName + property.name.capitalize())
+        property.isEnum && property.values.size > 1 -> ClassName(
+            Packages.MODEL,
+            componentName + property.name.capitalize()
+        )
 
         property.isEnum && property.values.size == 1 -> null
 

@@ -1,16 +1,12 @@
 package parser
 
-import cli.logger
+import datamodel.DataModel
 import io.swagger.parser.OpenAPIParser
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.core.models.ParseOptions
 import parser.builders.getComponents
 import parser.builders.getMethods
 import parser.builders.getPaths
-import datamodel.Component
-import datamodel.DataModel
-import datamodel.Method
-import datamodel.Path
 
 lateinit var openAPI: OpenAPI
 

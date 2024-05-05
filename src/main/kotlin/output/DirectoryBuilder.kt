@@ -1,8 +1,10 @@
 package output
 
-import cli.logger
 import generator.model.Directories
+import org.slf4j.LoggerFactory
 import java.io.File
+
+private val logger = LoggerFactory.getLogger("DirectoryBuilder.kt")
 
 fun buildDirectory(destinationPath: String) {
     val directories = Directories(destinationPath)
@@ -27,6 +29,6 @@ fun buildDirectory(destinationPath: String) {
 
 private fun generateDirectory(directoryPath: String) {
     val directory = File(directoryPath)
-    logger().info("Creating directory: ${directory.path}")
+    logger.info("Creating directory: ${directory.path}")
     if (!directory.mkdirs()) throw Exception("Unable to create the directory.")
 }

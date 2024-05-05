@@ -1,16 +1,18 @@
 package parser.builders
 
-import cli.logger
+import datamodel.*
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.parameters.RequestBody
 import io.swagger.v3.oas.models.responses.ApiResponses
-import datamodel.*
+import org.slf4j.LoggerFactory
 import parser.openAPI
 
+private val logger = LoggerFactory.getLogger("MethodBuilder.kt")
+
 fun getMethods(paths: List<Path>): List<Method> {
-    logger().info("Reading Methods")
+    logger.info("Reading Methods")
     val methods = mutableListOf<Method>()
 
     for (path in paths) {

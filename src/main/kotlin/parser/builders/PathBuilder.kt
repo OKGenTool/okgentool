@@ -1,16 +1,18 @@
 package parser.builders
 
-import cli.logger
 import datamodel.HttpMethods
 import datamodel.Path
+import org.slf4j.LoggerFactory
 import parser.openAPI
+
+private val logger = LoggerFactory.getLogger("PathBuilder.kt")
 
 /**
  * This function receives an OpenAPI object and returns a list of Path objects.
  * Each Path object contains the URL and the list of methods that can be used in that URL.
  */
 fun getPaths(): List<Path> {
-    logger().info("Reading Paths")
+    logger.info("Reading Paths")
     val pathsList = mutableListOf<Path>()
     for (path in openAPI.paths) {
         val methods = mutableListOf<HttpMethods>()
