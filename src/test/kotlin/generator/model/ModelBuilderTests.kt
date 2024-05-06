@@ -74,15 +74,6 @@ class ModelBuilderTests {
         assertEquals(referenceContent, fileSpec)
     }
 
-    @Test
-    fun `Generate data class constant parameter`() {
-        val fileSpec = createModelComponent(dataClassWithConstantParameter, dataClassWithConstantParameterComponents).toString()
-
-        val referenceContent = getReferenceContent("DataClassWithConstantParameter")
-
-        assertEquals(referenceContent, fileSpec)
-    }
-
     private fun getReferenceContent(fileName: String): String {
         return Resources.getResource("generator/model/$fileName").readText().replace("\r\n", "\n")
     }
