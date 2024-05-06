@@ -1,14 +1,16 @@
 package parser.builders
 
-import cli.logger
 import datamodel.Component
 import datamodel.ComponentProperties
 import datamodel.DataType
 import io.swagger.v3.oas.models.media.Schema
+import org.slf4j.LoggerFactory
 import parser.openAPI
 
+private val logger = LoggerFactory.getLogger("ComponentBuilder.kt")
+
 fun getComponents(): List<Component> {
-    logger().info("Reading components")
+    logger.info("Reading components")
     val components = openAPI.components.schemas ?: return emptyList()
     val res = mutableListOf<Component>()
 
@@ -18,7 +20,7 @@ fun getComponents(): List<Component> {
         val properties = getProperties(schema, requiredProperties)
         val oneOfSchemaNames = getOneOfSchemaNames(schema)
         val schemaName = "#/components/schemas/" + component.key
-        logger().info("Parsing component: $schemaName")
+        logger.info("Parsing component: $schemaName")
         res.add(Component(schemaName, properties, component.key.capitalize(), oneOfSchemaNames))
     }
 
@@ -70,7 +72,7 @@ private fun checkChildren(components: MutableList<Component>): List<Component> {
         }
 
         parent = components.find { it.parameters == child.parameters && it != child }
-        if (parent != null && ((key.contains("Body") && key.contains(parent.simplifiedName)) || key.contains("Response")) ) {
+        if (parent != null && ((key.contains("Body") && key.contains(parent.simplifiedName)) || key.contains("Response"))) {
             parent.schemaNameChildren.add(child.schemaName)
             parent.schemaNameChildren.addAll(child.schemaNameChildren)
             components.remove(child)
