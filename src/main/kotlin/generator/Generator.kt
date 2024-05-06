@@ -1,11 +1,18 @@
 package generator
 
-import generator.builders.buildDirectory
-import generator.builders.buildModel
+import datamodel.DataModel
+import generator.builders.model.buildModel
+import org.slf4j.LoggerFactory
+import output.buildDirectory
 
-class Generator(destinationPath: String) {
+private val logger = LoggerFactory.getLogger(Generator::class.java.simpleName)
+
+class Generator(dataModel: DataModel, destinationPath: String) {
     init {
-        val directories = buildDirectory(destinationPath)
-        buildModel(directories.base)
+        logger.info("Build directory structure")
+        buildDirectory(destinationPath)
+
+        logger.info("Build model files")
+        buildModel(dataModel.components, destinationPath)
     }
 }

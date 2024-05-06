@@ -1,4 +1,0 @@
-package output
-
-class Output {
-}
