@@ -123,7 +123,7 @@ fun getDataClassBuilder(
 
 fun getPropertyType(property: ComponentProperties, componentName: String, components: List<Component>): TypeName {
     return when {
-        property.isEnum && property.values.size > 1 -> ClassName(
+        property.isEnum && property.values.isNotEmpty() -> ClassName(
             Packages.MODEL,
             componentName + property.name.capitalize()
         )
