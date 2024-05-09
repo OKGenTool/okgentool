@@ -8,5 +8,7 @@ data class ComponentProperties(
     val isEnum: Boolean = false,
     val arrayItemsType: DataType? = null,
     val arrayItemsSchemaName: String? = null,
-    val values: List<String> = emptyList()
+    val values: List<String> = emptyList(),
+    val minimum: Int? = null,
+    val maximum: Int? = null,
 )

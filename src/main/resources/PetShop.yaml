@@ -609,6 +609,14 @@ externalDocs:
   url: 'http://swagger.io'
 components:
   schemas:
+    IntExample:
+      type: object
+      properties:
+        number:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 100
     ComplexPet:
       oneOf:
         - $ref: '#/components/schemas/Cat'
