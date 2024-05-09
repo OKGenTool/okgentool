@@ -15,7 +15,7 @@ val dataClassWithGeneratedDataType = Component(
         ),
         ComponentProperties(
             name = "value",
-            dataType = null,
+            dataType = DataType.OBJECT,
             required = true,
             schemaName = "#/components/schemas/DataClass"
         )
