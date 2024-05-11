@@ -11,6 +11,9 @@ import parser.openAPI
 
 private val logger = LoggerFactory.getLogger("MethodBuilder.kt")
 
+
+//TODO evaulate the usage of this builder with OperationsBuilder
+
 fun getMethods(paths: List<Path>): List<Method> {
     logger.info("Reading Methods")
     val methods = mutableListOf<Method>()
@@ -23,19 +26,20 @@ fun getMethods(paths: List<Path>): List<Method> {
 
     return methods
 }
+
 fun getMethod(path: Path, method: HttpMethods): Method {
     val methodItem = openAPI.paths[path.url]!!
     val operation = getOperation(methodItem, method)
 
     return Method(
-        operationName = operation.operationId ?: "${method.methodName}_${path.url}",
+        operationName = operation.operationId ?: "${method.methodName}_${path.url}", //TODO
         parameters = getParameters(operation.parameters),
         requestBody = getBody(operation.requestBody),
         responses = getResponses(operation.responses),
     )
 }
 
-private fun getResponses(responses: ApiResponses?): List<Response> {
+fun getResponses(responses: ApiResponses?): List<Response> {
     if (responses == null) return emptyList()
 
     return responses.keys.map {
@@ -48,7 +52,7 @@ private fun getResponses(responses: ApiResponses?): List<Response> {
     }
 }
 
-private fun getBody(requestBody: RequestBody?): Body? {
+fun getBody(requestBody: RequestBody?): Body? {
     if (requestBody == null) return null
 
     val returnTypes = requestBody.content.keys.toList()
@@ -57,7 +61,7 @@ private fun getBody(requestBody: RequestBody?): Body? {
     return Body(schemaName, returnTypes)
 }
 
-private fun getParameters(parameters: List<Parameter>?): List<datamodel.Parameter> {
+fun getParameters(parameters: List<Parameter>?): List<datamodel.Parameter> {
     if (parameters.isNullOrEmpty()) return emptyList()
 
     return parameters.map {

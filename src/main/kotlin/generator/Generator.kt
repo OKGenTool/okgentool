@@ -1,7 +1,7 @@
 package generator
 
 import datamodel.DataModel
-import generator.builders.DSL.buildDSLOperations
+import generator.builders.dsl.buildDSLOperations
 import generator.builders.model.buildModel
 import org.slf4j.LoggerFactory
 import output.buildDirectory
@@ -17,6 +17,7 @@ class Generator(private val dataModel: DataModel, private val destinationPath: S
         buildModel(dataModel.components, destinationPath)
 
         logger.info("Build DSL Files")
-        buildDSLOperations(dataModel.operations, destinationPath)
+        buildDSLOperations(dataModel.operations, destinationPath) //TODO
+//        buildDSLOperations(dataModel.operations, "C:\\ISEL\\PS\\okgentool\\src\\main\\kotlin\\generator\builders\\dsl\\generated")
     }
 }

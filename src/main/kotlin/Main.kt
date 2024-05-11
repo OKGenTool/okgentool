@@ -17,7 +17,6 @@ fun main(args: Array<String>) {
         .build()
 
     logger.info("Code generation ends")
-
 }
 
 
