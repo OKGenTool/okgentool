@@ -7,6 +7,8 @@ import datamodel.ComponentProperties
 import datamodel.DataType
 import datamodel.getInitializerForType
 import generator.model.Packages
+import io.swagger.v3.oas.models.Components
+import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 import output.writeFile
 
@@ -30,6 +32,7 @@ fun createModelComponent(component: Component, components: List<Component>): Fil
 fun createSealedClassComponent(component: Component, components: List<Component>): FileSpec {
     val sealedClass = TypeSpec.classBuilder(component.simplifiedName)
         .addModifiers(KModifier.SEALED)
+        .addAnnotation(Serializable::class)
         .build()
 
     return FileSpec.builder(Packages.MODEL, component.simplifiedName)
@@ -47,7 +50,6 @@ fun getSubclasses(superClassComponent: Component, components: List<Component>, s
                 component,
                 components,
                 ClassName(Packages.MODEL, superclassName),
-                getCompanionObjectBuilder(component)
             )
         )
         subclasses.addAll(getEnumBuilders(component))
@@ -58,58 +60,16 @@ fun getSubclasses(superClassComponent: Component, components: List<Component>, s
 
 fun createSimpleComponent(component: Component, components: List<Component>): FileSpec {
     return FileSpec.builder(Packages.MODEL, component.simplifiedName)
-        .addType(getDataClassBuilder(component, components, companionObject = getCompanionObjectBuilder(component)))
+        .addType(getDataClassBuilder(component, components))
         .addTypes(getEnumBuilders(component))
         .build()
-}
-
-fun getCompanionObjectBuilder(component: Component): TypeSpec? {
-    val properties = mutableListOf<PropertySpec>()
-    properties.addAll(getCompanionProperties(component))
-
-    if (component.superClassChildComponents.isNotEmpty()) {
-        component.superClassChildComponents.forEach { superClassChildComponent ->
-            properties.addAll(getCompanionProperties(superClassChildComponent))
-        }
-    }
-
-    if (properties.isEmpty()) {
-        return null
-    }
-
-    return TypeSpec.companionObjectBuilder()
-        .addProperties(properties)
-        .build()
-}
-
-fun getCompanionProperties(component: Component): List<PropertySpec> {
-    val properties = mutableListOf<PropertySpec>()
-
-    component.parameters.forEach { property ->
-        if (property.isEnum && property.values.size == 1 && property.dataType != null) {
-            properties.add(
-                PropertySpec.builder(
-                    property.name,
-                    property.dataType.kotlinType,
-                    KModifier.CONST
-                )
-                    .initializer(
-                        getInitializerForType(property.dataType),
-                        property.values.first()
-                    )
-                    .build()
-            )
-        }
-    }
-
-    return properties
 }
 
 fun getEnumBuilders(component: Component): List<TypeSpec> {
     val enums = component.parameters.filter { it.isEnum }
     val enumBuilders = mutableListOf<TypeSpec>()
     component.parameters.forEach { property ->
-        if (property.values.size > 1) {
+        if (property.values.isNotEmpty()) {
             enums.forEach { enum ->
                 val enumBuilder = TypeSpec.enumBuilder(component.simplifiedName + enum.name.capitalize())
                 enum.values.forEach { enumValue ->
@@ -132,7 +92,7 @@ fun getDataClassBuilder(
     val properties = mutableListOf<PropertySpec>()
 
     for (property in component.parameters) {
-        val propertyType = getPropertyType(property, component.simplifiedName, components) ?: continue
+        val propertyType = getPropertyType(property, component.simplifiedName, components)
 
         val propertySpec = PropertySpec.builder(property.name, propertyType)
             .initializer(property.name)
@@ -148,6 +108,7 @@ fun getDataClassBuilder(
         .addModifiers(KModifier.DATA)
         .primaryConstructor(primaryConstructor)
         .addProperties(properties)
+        .addAnnotation(Serializable::class)
 
     if (superclassName != null) {
         dataClassBuilder.superclass(superclassName)
@@ -160,14 +121,12 @@ fun getDataClassBuilder(
     return dataClassBuilder.build()
 }
 
-fun getPropertyType(property: ComponentProperties, componentName: String, components: List<Component>): TypeName? {
+fun getPropertyType(property: ComponentProperties, componentName: String, components: List<Component>): TypeName {
     return when {
-        property.isEnum && property.values.size > 1 -> ClassName(
+        property.isEnum && property.values.isNotEmpty() -> ClassName(
             Packages.MODEL,
             componentName + property.name.capitalize()
         )
-
-        property.isEnum && property.values.size == 1 -> null
 
         property.schemaName.isNotEmpty() -> {
             val relatedComponent = components.find { it.schemaName == property.schemaName }
@@ -192,3 +151,45 @@ fun getPropertyType(property: ComponentProperties, componentName: String, compon
             else property.dataType!!.kotlinType.copy(nullable = true)
     }
 }
+
+//fun getCompanionObjectBuilder(component: Component): TypeSpec? {
+//    val properties = mutableListOf<PropertySpec>()
+//    properties.addAll(getCompanionProperties(component))
+//
+//    if (component.superClassChildComponents.isNotEmpty()) {
+//        component.superClassChildComponents.forEach { superClassChildComponent ->
+//            properties.addAll(getCompanionProperties(superClassChildComponent))
+//        }
+//    }
+//
+//    if (properties.isEmpty()) {
+//        return null
+//    }
+//
+//    return TypeSpec.companionObjectBuilder()
+//        .addProperties(properties)
+//        .build()
+//}
+
+//fun getCompanionProperties(component: Component): List<PropertySpec> {
+//    val properties = mutableListOf<PropertySpec>()
+//
+//    component.parameters.forEach {property ->
+//        if (property.isEnum && property.values.size == 1 && property.dataType != null) {
+//            properties.add(
+//                PropertySpec.builder(
+//                    property.name,
+//                    property.dataType.kotlinType,
+//                    KModifier.CONST
+//                )
+//                    .initializer(
+//                        getInitializerForType(property.dataType),
+//                        property.values.first()
+//                    )
+//                    .build()
+//            )
+//        }
+//    }
+//
+//    return properties
+//}
