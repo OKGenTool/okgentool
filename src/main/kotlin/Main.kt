@@ -11,16 +11,40 @@ import java.util.logging.Logger
 private val logger = LoggerFactory.getLogger("Main.kt")
 
 fun main(args: Array<String>) {
-    logger.info("Reading arguments from the command line")
-    val client = getClient(args)
+//    logger.info("Reading arguments from the command line")
+//    val client = getClient(args)
+//
+//    logger.info("Start parsing the OAD file")
+//    val dataModel = Parser(client.sourcePath).getDataModel()
+//
+//    logger.info("Start code generation")
+//    Generator(dataModel, client.destinationPath)
+//
+//    logger.info("Code generation ends")
 
-    logger.info("Start parsing the OAD file")
-    val dataModel = Parser(client.sourcePath).getDataModel()
+    val dataClassWithRequiredIntParameterWithMaxAndMin = Component(
+        schemaName = "#/components/schemas/dataClassWithRequiredIntParameterWithMultipleOf",
+        parameters = listOf(
+            ComponentProperties(
+                name = "value",
+                dataType = DataType.INTEGER,
+                required = true,
+                schemaName = "",
+                multipleOf = 2
+            )
+        ),
+        simplifiedName = "dataClassWithRequiredIntParameterWithMultipleOf",
+        superClassChildSchemaNames = emptyList()
+    )
 
-    logger.info("Start code generation")
-    Generator(dataModel, client.destinationPath)
+    val dataClassWithRequiredIntParameterWithMaxAndMinComponents = listOf(dataClassWithRequiredIntParameterWithMaxAndMin)
 
-    logger.info("Code generation ends")
+    val fileSpec = createModelComponent(
+        dataClassWithRequiredIntParameterWithMaxAndMin,
+        dataClassWithRequiredIntParameterWithMaxAndMinComponents
+    ).toString()
+
+    print(fileSpec)
 }
 
 

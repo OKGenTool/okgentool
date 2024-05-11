@@ -92,8 +92,6 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
             val required = requiredProperties.contains(name)
             val schemaName = parameter.value.`$ref` ?: ""
             val values = parameter.value.enum?.map { it.toString() } ?: emptyList()
-            val minimum = parameter.value.minimum?.toInt()
-            val maximum = parameter.value.maximum?.toInt()
 
             if (dataType == DataType.ARRAY) {
                 val arrayItems = parameter.value.items
@@ -102,31 +100,38 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
 
                 properties.add(
                     ComponentProperties(
-                        name,
-                        dataType,
-                        required,
-                        schemaName,
-                        values.isNotEmpty(),
-                        arrayItemsType,
-                        arrayItemsSchemaName,
-                        values,
-                        minimum,
-                        maximum
+                        name = name,
+                        dataType = dataType,
+                        required = required,
+                        schemaName = schemaName,
+                        isEnum = values.isNotEmpty(),
+                        arrayItemsType = arrayItemsType,
+                        arrayItemsSchemaName = arrayItemsSchemaName,
+                        values = values,
                     )
                 )
                 continue
             }
 
+            val minimum = parameter.value.minimum?.toInt()
+            val maximum = parameter.value.maximum?.toInt()
+            val exclusiveMinimum = parameter.value.exclusiveMinimum ?: false
+            val exclusiveMaximum = parameter.value.exclusiveMaximum ?: false
+            val multipleOf = parameter.value.multipleOf?.toInt()
+
             properties.add(
                 ComponentProperties(
-                    name,
-                    dataType,
-                    required,
-                    schemaName,
+                    name = name,
+                    dataType = dataType,
+                    required = required,
+                    schemaName = schemaName,
                     isEnum = values.isNotEmpty(),
                     values = values,
                     minimum = minimum,
-                    maximum = maximum
+                    maximum = maximum,
+                    exclusiveMinimum = exclusiveMinimum,
+                    exclusiveMaximum = exclusiveMaximum,
+                    multipleOf = multipleOf
                 )
             )
         }

@@ -609,14 +609,25 @@ externalDocs:
   url: 'http://swagger.io'
 components:
   schemas:
-    IntExample:
+    InitTryOut:
       type: object
       properties:
-        number:
+        intMaxMin:
           type: integer
-          format: int64
+          format: int32
           minimum: 1
           maximum: 100
+        intExclusiveMaxMin:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          exclusiveMinimum: true
+          exclusiveMaximum: true
+        intMultipleOf:
+          type: integer
+          format: int32
+          multipleOf: 10
     ComplexPet:
       oneOf:
         - $ref: '#/components/schemas/Cat'

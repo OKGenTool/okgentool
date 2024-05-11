@@ -11,4 +11,7 @@ data class ComponentProperties(
     val values: List<String> = emptyList(),
     val minimum: Int? = null,
     val maximum: Int? = null,
+    val exclusiveMinimum: Boolean = false,
+    val exclusiveMaximum: Boolean = false,
+    val multipleOf: Int? = null,
 )

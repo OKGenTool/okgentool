@@ -39,6 +39,12 @@ fun getDataClassBuilder(
         .addProperties(properties)
         .addAnnotation(Serializable::class)
 
+
+    val initCodeBlock = getInitCodeBlock(component)
+    if (initCodeBlock.isNotEmpty()) {
+        dataClassBuilder.addInitializerBlock(initCodeBlock)
+    }
+
     if (superclassName != null) {
         dataClassBuilder.superclass(superclassName)
     }
