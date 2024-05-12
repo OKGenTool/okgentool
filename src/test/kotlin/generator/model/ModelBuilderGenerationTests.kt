@@ -54,6 +54,18 @@ class ModelBuilderGenerationTests {
     }
 
     @Test
+    fun `Generate data class with bi-dimensional array`() {
+        val fileSpec = createModelComponent(
+            dataClassWithBiDimensionalArray,
+            dataClassWithBiDimensionalArrayComponents
+        ).toString()
+
+        val referenceContent = getReferenceContent("DataClassWithBiDimensionalArray")
+
+        assertEquals(referenceContent, fileSpec)
+    }
+
+    @Test
     fun `Generate data class with generated data type array`() {
         val fileSpec = createModelComponent(dataClassWithGeneratedTypeArray, dataClassWithGeneratedTypeArrayComponents).toString()
 
