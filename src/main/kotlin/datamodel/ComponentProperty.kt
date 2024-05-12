@@ -1,6 +1,6 @@
 package datamodel
 
-data class ComponentProperties(
+data class ComponentProperty(
     val name: String,
     val dataType: DataType,
     val required: Boolean,
@@ -17,4 +17,6 @@ data class ComponentProperties(
     val minLength: Int? = null,
     val maxLength: Int? = null,
     val pattern: String? = null,
+    val arrayProperties: ComponentProperty? = null,
+    val arrayIndex: Int? = null
 )

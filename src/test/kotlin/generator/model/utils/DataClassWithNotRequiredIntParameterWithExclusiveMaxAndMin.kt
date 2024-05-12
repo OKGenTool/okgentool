@@ -1,13 +1,13 @@
 package generator.model.utils
 
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 
 val dataClassWithNotRequiredIntParameterWithExclusiveMaxAndMin = Component(
     schemaName = "#/components/schemas/dataClassWithNotRequiredIntParameterWithExclusiveMaxAndMin",
     parameters = listOf(
-        ComponentProperties(
+        ComponentProperty(
             name = "value",
             dataType = DataType.INTEGER,
             required = false,

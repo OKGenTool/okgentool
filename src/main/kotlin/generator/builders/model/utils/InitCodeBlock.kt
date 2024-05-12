@@ -2,7 +2,7 @@ package generator.builders.model.utils
 
 import com.squareup.kotlinpoet.CodeBlock
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 
 fun getInitCodeBlock(component: Component): CodeBlock {
@@ -20,11 +20,11 @@ fun getInitCodeBlock(component: Component): CodeBlock {
     return codeBlock.build()
 }
 
-private fun getPropertyStatements(componentProperty: ComponentProperties): List<String> {
+private fun getPropertyStatements(componentProperty: ComponentProperty): List<String> {
     val statements = mutableListOf<String>()
 
     when (componentProperty.dataType) {
-        DataType.INTEGER, DataType.DOUBLE, DataType.FLOAT, DataType.LONG, DataType.NUMBER -> {
+        DataType.INTEGER, DataType.DOUBLE, DataType.FLOAT, DataType.LONG, DataType.NUMBER, DataType.INT -> {
             statements.addAll(getNumberPropertyStatements(componentProperty))
         }
 

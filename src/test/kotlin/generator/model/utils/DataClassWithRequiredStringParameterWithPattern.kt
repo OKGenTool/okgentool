@@ -1,13 +1,13 @@
 package generator.model.utils
 
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 
 val dataClassWithRequiredStringParameterWithPattern = Component(
     schemaName = "#/components/schemas/DataClassWithRequiredStringParameterWithPattern",
     parameters = listOf(
-        ComponentProperties(
+        ComponentProperty(
             name = "value",
             dataType = DataType.STRING,
             required = true,

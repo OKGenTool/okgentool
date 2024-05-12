@@ -1,9 +1,9 @@
 package generator.builders.model.utils
 
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import generator.model.Statement
 
-fun getNumberPropertyStatements(componentProperty: ComponentProperties): List<String> {
+fun getNumberPropertyStatements(componentProperty: ComponentProperty): List<String> {
     val statements = mutableListOf<String>()
 
     componentProperty.maximum?.let { maximum ->
@@ -42,7 +42,7 @@ fun getNumberPropertyStatements(componentProperty: ComponentProperties): List<St
     return statements
 }
 
-fun getStringPropertyStatements(componentProperty: ComponentProperties): List<String> {
+fun getStringPropertyStatements(componentProperty: ComponentProperty): List<String> {
     val statements = mutableListOf<String>()
 
     componentProperty.minLength?.let { minLength ->

@@ -609,6 +609,26 @@ externalDocs:
   url: 'http://swagger.io'
 components:
   schemas:
+    ArrayTryOut:
+      type: object
+      properties:
+        doubleArray:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+              format: double
+        tripleArray:
+          type: array
+          items:
+            type: array
+            items:
+              type: array
+              items:
+                type: number
+                format: double
+
     StringTryOut:
       type: object
       properties:

@@ -1,7 +1,7 @@
 package parser.builders
 
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 import io.swagger.v3.oas.models.media.Schema
 import org.slf4j.LoggerFactory
@@ -82,8 +82,8 @@ private fun checkChildren(components: MutableList<Component>): List<Component> {
     return components
 }
 
-private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>): List<ComponentProperties> {
-    val properties = mutableListOf<ComponentProperties>()
+private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>): List<ComponentProperty> {
+    val properties = mutableListOf<ComponentProperty>()
 
     if (schema != null && schema.properties != null) {
         for (parameter in schema.properties) {
@@ -96,20 +96,20 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
             val maxLength = parameter.value.maxLength
 
             if (dataType == DataType.ARRAY) {
-                val arrayItems = parameter.value.items
-                val arrayItemsType = DataType.fromString(arrayItems?.type ?: "", arrayItems?.format ?: "")
-                val arrayItemsSchemaName = arrayItems?.`$ref` ?: ""
-
+                val arrayItems = parameter.value
+                val arrayIndex = 0
                 properties.add(
-                    ComponentProperties(
-                        name = name,
-                        dataType = dataType,
-                        required = required,
-                        schemaName = schemaName,
-                        isEnum = values.isNotEmpty(),
-                        arrayItemsType = arrayItemsType,
-                        arrayItemsSchemaName = arrayItemsSchemaName,
-                        values = values,
+                    getArrayProperties(
+                        arrayItems,
+                        name,
+                        dataType,
+                        required,
+                        schemaName,
+                        values,
+                        minLength,
+                        maxLength,
+                        arrayIndex,
+
                     )
                 )
                 continue
@@ -123,7 +123,7 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
             val pattern = parameter.value.pattern
 
             properties.add(
-                ComponentProperties(
+                ComponentProperty(
                     name = name,
                     dataType = dataType,
                     required = required,
@@ -144,4 +144,63 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
     }
 
     return properties
+}
+
+private fun getArrayProperties(
+    arrayItems: Schema<*>?,
+    name: String,
+    dataType: DataType,
+    required: Boolean,
+    schemaName: String,
+    values: List<String>,
+    minLength: Int?,
+    maxLength: Int?,
+    arrayIndex: Int,
+
+): ComponentProperty {
+    val childArrayItems = arrayItems?.items
+    val arrayItemsType = DataType.fromString(arrayItems?.items?.type ?: "", arrayItems?.items?.format ?: "")
+    val arrayItemsSchemaName = arrayItems?.`$ref` ?: ""
+    val childArrayIndex = arrayIndex + 1
+
+    if (arrayItemsType != DataType.ARRAY) {
+        return ComponentProperty(
+            name = name,
+            dataType = dataType,
+            required = required,
+            schemaName = schemaName,
+            isEnum = values.isNotEmpty(),
+            arrayItemsType = arrayItemsType,
+            arrayItemsSchemaName = arrayItemsSchemaName,
+            values = values,
+            minLength = minLength,
+            maxLength = maxLength,
+            arrayIndex = arrayIndex
+        )
+    }
+
+    return ComponentProperty(
+        name = name,
+        dataType = dataType,
+        required = required,
+        schemaName = schemaName,
+        isEnum = values.isNotEmpty(),
+        arrayItemsType = arrayItemsType,
+        arrayItemsSchemaName = arrayItemsSchemaName,
+        values = values,
+        minLength = minLength,
+        maxLength = maxLength,
+        arrayIndex = arrayIndex,
+        arrayProperties = getArrayProperties(
+            childArrayItems,
+            name,
+            dataType,
+            required,
+            schemaName,
+            values,
+            minLength,
+            maxLength,
+            childArrayIndex,
+        )
+    )
 }
