@@ -14,4 +14,7 @@ data class ComponentProperties(
     val exclusiveMinimum: Boolean = false,
     val exclusiveMaximum: Boolean = false,
     val multipleOf: Int? = null,
+    val minLength: Int? = null,
+    val maxLength: Int? = null,
+    val pattern: String? = null,
 )

@@ -143,6 +143,54 @@ class ModelBuilderGenerationTests {
         assertEquals(referenceContent, fileSpec)
     }
 
+    @Test
+    fun `Generate data class with not required string parameter with minimum and maximum length`() {
+        val fileSpec = createModelComponent(
+            dataClassWithNotRequiredStringParameterWithMinMaxLen,
+            dataClassWithNotRequiredStringParameterWithMinMaxLenComponents
+        ).toString()
+
+        val referenceContent = getReferenceContent("DataClassWithNotRequiredStringParameterWithMinMaxLen")
+
+        assertEquals(referenceContent, fileSpec)
+    }
+
+    @Test
+    fun `Generate data class with required string parameter with minimum and maximum length`() {
+        val fileSpec = createModelComponent(
+            dataClassWithRequiredStringParameterWithMinMaxLen,
+            dataClassWithRequiredStringParameterWithMinMaxLenComponents
+        ).toString()
+
+        val referenceContent = getReferenceContent("DataClassWithRequiredStringParameterWithMinMaxLen")
+
+        assertEquals(referenceContent, fileSpec)
+    }
+
+    @Test
+    fun `Generate data class with not required string parameter with pattern`() {
+        val fileSpec = createModelComponent(
+            dataClassWithNotRequiredStringParameterWithPattern,
+            dataClassWithNotRequiredStringParameterWithPatternComponents
+        ).toString()
+
+        val referenceContent = getReferenceContent("DataClassWithNotRequiredStringParameterWithPattern")
+
+        assertEquals(referenceContent, fileSpec)
+    }
+
+    @Test
+    fun `Generate data class with required string parameter with pattern`() {
+        val fileSpec = createModelComponent(
+            dataClassWithRequiredStringParameterWithPattern,
+            dataClassWithRequiredStringParameterWithPatternComponents
+        ).toString()
+
+        val referenceContent = getReferenceContent("DataClassWithRequiredStringParameterWithPattern")
+
+        assertEquals(referenceContent, fileSpec)
+    }
+
     private fun getReferenceContent(fileName: String): String {
         return Resources.getResource("generator/model/$fileName").readText().replace("\r\n", "\n")
     }

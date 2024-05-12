@@ -29,5 +29,23 @@ enum class Statement(val statement: (Any, Any) -> String) {
         "require($parameterName %% $multipleOf == 0) { \"$parameterName must be a multiple of $multipleOf\" }" }),
 
     MULTIPLE_OF_NULLABLE({ multipleOf, parameterName ->
-        "require($parameterName == null || $parameterName %% $multipleOf == 0) { \"$parameterName must be a multiple of $multipleOf\" }" });
+        "require($parameterName == null || $parameterName %% $multipleOf == 0) { \"$parameterName must be a multiple of $multipleOf\" }" }),
+
+    MIN_LENGTH({ minLength, parameterName ->
+        "require($parameterName.length >= $minLength) { \"$parameterName must have a minimum length of $minLength\" }" }),
+
+    MAX_LENGTH({ maxLength, parameterName ->
+        "require($parameterName.length <= $maxLength) { \"$parameterName must have a maximum length of $maxLength\" }" }),
+
+    MIN_LENGTH_NULLABLE({ minLength, parameterName ->
+        "require($parameterName == null || $parameterName.length >= $minLength) { \"$parameterName must have a minimum length of $minLength\" }" }),
+
+    MAX_LENGTH_NULLABLE({ maxLength, parameterName ->
+        "require($parameterName == null || $parameterName.length <= $maxLength) { \"$parameterName must have a maximum length of $maxLength\" }" }),
+
+    PATTERN({ pattern, parameterName ->
+        "require($parameterName.matches(\"$pattern\".toRegex())) { \"$parameterName must match the pattern $pattern\" }" }),
+
+    PATTERN_NULLABLE({ pattern, parameterName ->
+        "require($parameterName == null || $parameterName.matches(\"$pattern\".toRegex())) { \"$parameterName must match the pattern $pattern\" }" })
 }

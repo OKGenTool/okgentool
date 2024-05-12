@@ -609,6 +609,16 @@ externalDocs:
   url: 'http://swagger.io'
 components:
   schemas:
+    StringTryOut:
+      type: object
+      properties:
+        stringWithMaxMinLength:
+          type: string
+          maxLength: 10
+          minLength: 5
+        stringWithPattern:
+          type: string
+          pattern: '^\d{3}-\d{2}-\d{4}$'
     InitTryOut:
       type: object
       properties:

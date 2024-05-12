@@ -25,7 +25,11 @@ private fun getPropertyStatements(componentProperty: ComponentProperties): List<
 
     when (componentProperty.dataType) {
         DataType.INTEGER, DataType.DOUBLE, DataType.FLOAT, DataType.LONG, DataType.NUMBER -> {
-            statements.addAll(getIntegerPropertyStatements(componentProperty))
+            statements.addAll(getNumberPropertyStatements(componentProperty))
+        }
+
+        DataType.STRING -> {
+            statements.addAll(getStringPropertyStatements(componentProperty))
         }
 
         else -> {}

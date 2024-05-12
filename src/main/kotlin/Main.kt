@@ -23,17 +23,17 @@ fun main(args: Array<String>) {
 //    logger.info("Code generation ends")
 
     val dataClassWithRequiredIntParameterWithMaxAndMin = Component(
-        schemaName = "#/components/schemas/dataClassWithRequiredIntParameterWithMultipleOf",
+        schemaName = "#/components/schemas/DataClassWithRequiredStringParameterWithPattern",
         parameters = listOf(
             ComponentProperties(
                 name = "value",
-                dataType = DataType.INTEGER,
+                dataType = DataType.STRING,
                 required = true,
                 schemaName = "",
-                multipleOf = 2
+                pattern = "^\\d{3}-\\d{2}-\\d{4}$"
             )
         ),
-        simplifiedName = "dataClassWithRequiredIntParameterWithMultipleOf",
+        simplifiedName = "DataClassWithRequiredStringParameterWithPattern",
         superClassChildSchemaNames = emptyList()
     )
 

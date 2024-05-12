@@ -92,6 +92,8 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
             val required = requiredProperties.contains(name)
             val schemaName = parameter.value.`$ref` ?: ""
             val values = parameter.value.enum?.map { it.toString() } ?: emptyList()
+            val minLength = parameter.value.minLength
+            val maxLength = parameter.value.maxLength
 
             if (dataType == DataType.ARRAY) {
                 val arrayItems = parameter.value.items
@@ -118,6 +120,7 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
             val exclusiveMinimum = parameter.value.exclusiveMinimum ?: false
             val exclusiveMaximum = parameter.value.exclusiveMaximum ?: false
             val multipleOf = parameter.value.multipleOf?.toInt()
+            val pattern = parameter.value.pattern
 
             properties.add(
                 ComponentProperties(
@@ -131,7 +134,10 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
                     maximum = maximum,
                     exclusiveMinimum = exclusiveMinimum,
                     exclusiveMaximum = exclusiveMaximum,
-                    multipleOf = multipleOf
+                    multipleOf = multipleOf,
+                    minLength = minLength,
+                    maxLength = maxLength,
+                    pattern = pattern
                 )
             )
         }
