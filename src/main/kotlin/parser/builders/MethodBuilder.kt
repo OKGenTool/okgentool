@@ -32,7 +32,7 @@ fun getMethod(path: Path, method: HttpMethods): Method {
     val operation = getOperation(methodItem, method)
 
     return Method(
-        operationName = operation.operationId ?: "${method.methodName}_${path.url}", //TODO
+        operationName = operation.operationId ?: "${method.methodName}_${path.url}",
         parameters = getParameters(operation.parameters),
         requestBody = getBody(operation.requestBody),
         responses = getResponses(operation.responses),

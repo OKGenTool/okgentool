@@ -1,10 +1,10 @@
 package parser.builders
 
 import datamodel.*
+import datamodel.SchemaProps.Companion.getSchemaProp
 import generator.capitalize
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
-import io.swagger.v3.oas.models.parameters.RequestBody
 import org.slf4j.LoggerFactory
 import parser.openAPI
 
@@ -30,15 +30,30 @@ fun getOperations(): List<DSLOperation> {
 private fun addOperation(operation: Operation?, path: String, method: String) {
     if (operation == null) return
 
-    if (operation.summary.equals("Creates list of users with given input array"))
-        logger.info("Creates list of users with given input array") //TODO
-
     val dslOperation = DSLOperation(
         getOperationName(operation, path, method),
-        getBodyNew(operation.requestBody),
+        getBodyNew(operation),
+        getResponses(operation)
     )
 
     dslOperations.add(dslOperation)
+}
+
+private fun getResponses(operation: Operation): List<ResponseNew>? {
+    if (operation == null) return null
+    val responses: MutableList<ResponseNew> = mutableListOf()
+
+    for (response in operation.responses) {
+        val content = response.value.content
+        val responseNew = ResponseNew(
+            response.key,
+            response.value.description,
+            content?.keys?.toList(),
+            getSchemaProp(content?.let { it[content.keys.first()]?.schema }, SchemaProps.REF)
+        )
+        responses.add(responseNew)
+    }
+    return responses
 }
 
 /**
@@ -67,16 +82,17 @@ private fun getComposedOperationName(path: String, method: String): String {
     return "${method}$finalPath"
 }
 
-private fun getBodyNew(requestBody: RequestBody?): BodyNew? {
-    if (requestBody == null) return null
+private fun getBodyNew(operation: Operation): BodyNew? {
+    val requestBody = operation.requestBody ?: return null
 
-    val returnTypes = requestBody.content.keys.toList()
+    val contentTypes = requestBody.content.keys.toList()
 
-    val schema = requestBody.content[returnTypes.first()]?.schema
+    val schema = requestBody.content[contentTypes.first()]?.schema
     val schemaRef = SchemaProps.getSchemaProp(schema, SchemaProps.REF)
+
     // If the schema as a $ref
     if (schemaRef != null) {
-        return getBodyRef(schemaRef, returnTypes)
+        return getBodyRef(schemaRef, contentTypes)
     } else {
         //The schema is not a $ref
         val type = SchemaProps.getSchemaProp(schema, SchemaProps.TYPE)
@@ -86,35 +102,35 @@ private fun getBodyNew(requestBody: RequestBody?): BodyNew? {
             //Get Array Type: Could be an array of ref or pojo
             var className = schema?.items?.`$ref`
             if (className != null) {
-                return BodyCollRef(returnTypes, SchemaProps.getRefSimpleName(className))
+                return BodyCollRef(contentTypes, SchemaProps.getRefSimpleName(className))
             } else {
                 //It is an array of POJOs
-                return  getBodyCollPojo(schema, returnTypes)
+                return getBodyCollPojo(operation.tags, schema, contentTypes)
             }
         }
 
         //The schema is a regular pojo
-        return getBodyObj(schema, returnTypes)
+        return getBodyObj(schema, contentTypes)
     }
 }
 
-fun getBodyCollPojo(schema: Schema<Any>?, returnTypes: List<String>): BodyCollPojo {
+fun getBodyCollPojo(tags: List<String>?, schema: Schema<Any>?, contentTypes: List<String>): BodyCollPojo {
     val type = SchemaProps.getSchemaProp(schema, SchemaProps.ARRAYTYPE)
     val format = SchemaProps.getSchemaProp(schema, SchemaProps.ARRAYFORMAT)
     val dataType = DataType.fromString(type!!, format)
-    return BodyCollPojo(returnTypes, dataType!!)
+    return BodyCollPojo(contentTypes, tags, dataType!!)
 }
 
-fun getBodyObj(schema: Schema<Any>?, returnTypes: List<String>): BodyObj {
+fun getBodyObj(schema: Schema<Any>?, contentTypes: List<String>): BodyObj {
     val type = SchemaProps.getSchemaProp(schema, SchemaProps.TYPE)
     val format = SchemaProps.getSchemaProp(schema, SchemaProps.FORMAT)
     val dataType = DataType.fromString(type!!, format)
-    return BodyObj(returnTypes, dataType!!)
+    return BodyObj(contentTypes, dataType!!)
 }
 
-fun getBodyRef(schemaRef: String, returnTypes: List<String>): BodyRef {
+fun getBodyRef(schemaRef: String, contentTypes: List<String>): BodyRef {
     return BodyRef(
-        returnTypes,
+        contentTypes,
         SchemaProps.getRefSimpleName(schemaRef)
     )
 }

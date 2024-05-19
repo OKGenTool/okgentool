@@ -23,9 +23,52 @@ fun buildDSLOperations(dataModel: DataModel, basePath: String) {
 //                    .build()
 //            )
 
-        if (operation.requestBody != null) fileSpec.addType(getRequest(operation.name, operation.requestBody!!))
+        if (operation.requestBody != null)
+            fileSpec.addType(getRequest(operation.name, operation.requestBody!!))
+
+        if (operation.responses != null) {
+            //TODO add response Class
+            fileSpec.addType(getResponse(operation))
+        }
+
 
         writeFile(fileSpec.build(), basePath)
+    }
+}
+
+private fun getResponse(operation: DSLOperation): TypeSpec {
+    val propertySpecs = getProperties(operation.name, operation.responses!!)
+
+    val responseBuilder = TypeSpec.classBuilder("${operation.name.capitalize()}Response").addModifiers(KModifier.DATA)
+
+    //Build constructor
+    val const = FunSpec.constructorBuilder()
+    propertySpecs?.map { property ->
+        responseBuilder.addProperty(property)
+        const.addParameter(property.name, property.type)
+    }
+    responseBuilder.primaryConstructor(const.build())
+
+    return responseBuilder.build()
+}
+
+private fun getProperties(operationName: String, responses: List<ResponseNew>): List<PropertySpec>? {
+    return responses.map { response ->
+        val varName = "${operationName}Response${response.statusCode}"
+
+//        val varType = String::class //TODO get the proper data model
+        var varType: TypeName
+        val schemaRef = response.schemaRef
+        if (schemaRef.isNullOrEmpty()) {
+            varType = String::class.asTypeName()
+        } else {
+            val simpleName = SchemaProps.getRefSimpleName(schemaRef)
+            varType = ClassName(
+                Packages.MODEL, simpleName.capitalize()
+            )
+        }
+        PropertySpec.builder(varName, varType).initializer(varName).build()
+
     }
 }
 
@@ -43,16 +86,16 @@ private fun getRequest(operationName: String, body: BodyNew): TypeSpec {
         }
 
         is BodyObj -> {
-            varName =
-                if (body.returnType[0] == OctetStream.toString()) "binFile"
-                else "myProp" //TODO what scenarios exists?
+            varName = if (body.contentTypes[0] == OctetStream.toString()) "binFile"
+            else "prop"
 
             varType = body.dataType.kotlinType
         }
 
         //When is a collection of regular POJOs
         is BodyCollPojo -> {
-            varName = "someCollection" //TODO
+            //Use the first tag (if any) to build the var name
+            varName = body.tags?.firstOrNull()?.let { "${it}List" } ?: "list"
             varType = List::class.asTypeName().parameterizedBy(body.dataType.kotlinType)
         }
 
