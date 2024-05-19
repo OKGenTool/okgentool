@@ -1,5 +1,6 @@
 package datamodel
 
+import generator.decapitalize
 import io.swagger.v3.oas.models.media.Schema
 
 enum class SchemaProps() {
@@ -22,6 +23,6 @@ enum class SchemaProps() {
         fun getRefSimpleName(ref: String): String =
             ref.split("/")
                 .last()
-                .lowercase()
+                .decapitalize()
     }
 }

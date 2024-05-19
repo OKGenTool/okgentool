@@ -12,5 +12,9 @@ fun String.capitalize(): String {
     }
 }
 
-
+fun String.decapitalize():String{
+    return this.replaceFirstChar {
+        it.lowercase(Locale.getDefault())
+    }
+}
 

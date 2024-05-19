@@ -51,7 +51,7 @@ private fun getResponse(operation: DSLOperation): TypeSpec {
 
 private fun getProperties(operationName: String, responses: List<ResponseNew>): List<PropertySpec>? {
     return responses.map { response ->
-        val varName = "${operationName}Response${response.statusCode}"
+        val varName = "${operationName}Response${response.statusCode.capitalize()}"
 
         val varType: TypeName
         val schemaRef = response.schemaRef
