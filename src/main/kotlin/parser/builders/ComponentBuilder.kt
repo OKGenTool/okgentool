@@ -3,6 +3,7 @@ package parser.builders
 import datamodel.Component
 import datamodel.ComponentProperties
 import datamodel.DataType
+import generator.capitalize
 import io.swagger.v3.oas.models.media.Schema
 import org.slf4j.LoggerFactory
 import parser.openAPI

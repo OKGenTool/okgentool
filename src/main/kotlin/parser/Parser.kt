@@ -16,7 +16,13 @@ class Parser(sourceFilePath: String) {
     init {
         val parseOptions = ParseOptions()
         parseOptions.isResolve = true
-        parseOptions.isResolveFully = true
+
+        /**
+         * parseOptions.isResolveFully = true
+         * This parameter duplicates schemas and requestBodies. Use with caution.
+         * See more: https://github.com/swagger-api/swagger-parser?tab=readme-ov-file#2-resolvefully
+         */
+
         parseOptions.isResolveCombinators = true
         parseOptions.isResolveRequestBody = true
         parseOptions.isValidateExternalRefs = true
@@ -27,7 +33,8 @@ class Parser(sourceFilePath: String) {
     }
 
     fun getDataModel(): DataModel {
-        val paths = getPaths()
-        return DataModel(getComponents(), getMethods(paths), paths, getOperations())
+//        val paths = getPaths()
+//        return DataModel(getComponents(), getMethods(paths), paths, getOperations())
+        return DataModel(getComponents(), getOperations())
     }
 }

@@ -5,6 +5,7 @@ import com.squareup.kotlinpoet.asTypeName
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+//TODO this enum is compromised with kotlinpoet
 enum class DataType (val type: String, val format: String, val kotlinType: ClassName) {
     INTEGER("integer", "int32", Int::class.asTypeName()),
     LONG("integer", "int64", Long::class.asTypeName()),
@@ -23,7 +24,7 @@ enum class DataType (val type: String, val format: String, val kotlinType: Class
     OBJECT("object", "", Any::class.asTypeName());
 
     companion object {
-        fun fromString(type: String, format: String): DataType? {
+        fun fromString(type: String, format: String?): DataType? {
             return entries.firstOrNull { it.type == type && (it.format == format || it.format == "") }
         }
 
