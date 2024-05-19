@@ -6,7 +6,9 @@ import datamodel.*
 import generator.capitalize
 import generator.model.Packages
 import generator.model.Parameter
+import generator.model.Visibility
 import io.ktor.http.ContentType.Application.OctetStream
+import io.ktor.server.application.*
 import org.slf4j.LoggerFactory
 import output.writeFile
 
@@ -33,7 +35,17 @@ fun buildDSLOperations(dataModel: DataModel, basePath: String) {
 
         //Get Operation main class
         fileSpec.addType(
-            getMainClass(listOf(requestParameter), operation.name)
+            getMainClass(
+                listOf(
+                    requestParameter,
+                    Parameter(
+                        "call",
+                        ApplicationCall::class.asTypeName(),
+                        Visibility.PRIVATE
+                    )
+                ),
+                operation.name
+            )
         )
 
         writeFile(fileSpec.build(), basePath)
@@ -57,9 +69,9 @@ private fun getResponse(operation: DSLOperation): TypeSpec {
 
     //Build constructor
     val const = FunSpec.constructorBuilder()
-    propertySpecs?.map { property ->
-        responseBuilder.addProperty(property)
-        const.addParameter(property.name, property.type)
+    propertySpecs?.map {
+        responseBuilder.addProperty(it)
+        const.addParameter(it.name, it.type)
     }
     responseBuilder.primaryConstructor(const.build())
 
@@ -101,12 +113,12 @@ private fun TypeSpec.Builder.getConstructor(parameters: List<Parameter?>): TypeS
     val constructor = FunSpec.constructorBuilder()
     val properties: MutableList<PropertySpec> = mutableListOf()
 
-    parameters.map { parameter ->
-        if (parameter != null) {
-            constructor.addParameter(parameter.name, parameter.type)
+    parameters.map {
+        if (it != null) {
+            constructor.addParameter(it.name, it.type)
             properties.add(
-                PropertySpec.builder(parameter.name, parameter.type)
-                    .initializer(parameter.name)
+                PropertySpec.builder(it.name, it.type, it.visibility.modifier)
+                    .initializer(it.name)
                     .build()
             )
         }
