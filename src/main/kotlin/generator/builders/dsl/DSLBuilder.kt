@@ -24,13 +24,10 @@ fun buildDSLOperations(dataModel: DataModel, basePath: String) {
 //            )
 
         if (operation.requestBody != null)
-            fileSpec.addType(getRequest(operation.name, operation.requestBody!!))
+            fileSpec.addType(getRequest(operation.name, operation.requestBody))
 
-        if (operation.responses != null) {
-            //TODO add response Class
+        if (operation.responses != null)
             fileSpec.addType(getResponse(operation))
-        }
-
 
         writeFile(fileSpec.build(), basePath)
     }
@@ -56,18 +53,22 @@ private fun getProperties(operationName: String, responses: List<ResponseNew>): 
     return responses.map { response ->
         val varName = "${operationName}Response${response.statusCode}"
 
-//        val varType = String::class //TODO get the proper data model
-        var varType: TypeName
+        val varType: TypeName
         val schemaRef = response.schemaRef
         if (schemaRef.isNullOrEmpty()) {
-            varType = String::class.asTypeName()
+            varType = LambdaTypeName.get(returnType = UNIT).copy(suspending = true)
         } else {
             val simpleName = SchemaProps.getRefSimpleName(schemaRef)
-            varType = ClassName(
-                Packages.MODEL, simpleName.capitalize()
-            )
+            varType = LambdaTypeName.get(
+                parameters = arrayOf(ClassName(Packages.MODEL, simpleName.capitalize())),
+                returnType = UNIT
+            ).copy(suspending = true)
+
         }
-        PropertySpec.builder(varName, varType).initializer(varName).build()
+        PropertySpec
+            .builder(varName, varType)
+            .initializer(varName)
+            .build()
 
     }
 }
