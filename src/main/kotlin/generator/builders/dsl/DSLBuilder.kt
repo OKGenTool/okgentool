@@ -5,6 +5,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.*
 import generator.capitalize
 import generator.model.Packages
+import generator.model.Parameter
 import io.ktor.http.ContentType.Application.OctetStream
 import org.slf4j.LoggerFactory
 import output.writeFile
@@ -17,20 +18,36 @@ fun buildDSLOperations(dataModel: DataModel, basePath: String) {
     for (operation in dslOperations) {
         if (operation.name.equals("createUsersWithListInput")) logger.info("createUsersWithListInput")
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
-//            .addType(
-//                TypeSpec.classBuilder(operation.name)
-//                    .addModifiers(KModifier.DATA)
-//                    .build()
-//            )
 
-        if (operation.requestBody != null)
-            fileSpec.addType(getRequest(operation.name, operation.requestBody))
+        var requestParameter: Parameter? = null
+
+        if (operation.requestBody != null) {
+            requestParameter = getParameter(operation.requestBody)
+            fileSpec.addType(
+                getRequest(listOf(requestParameter), operation.name)
+            )
+        }
 
         if (operation.responses != null)
             fileSpec.addType(getResponse(operation))
 
+        //Get Operation main class
+        fileSpec.addType(
+            getMainClass(listOf(requestParameter), operation.name)
+        )
+
         writeFile(fileSpec.build(), basePath)
     }
+}
+
+private fun getMainClass(parameters: List<Parameter?>, operationName: String): TypeSpec {
+    val mainClass = TypeSpec.classBuilder(operationName.capitalize())
+
+    if (!parameters.isEmpty()) {
+        mainClass.getConstructor(parameters)
+    }
+
+    return mainClass.build()
 }
 
 private fun getResponse(operation: DSLOperation): TypeSpec {
@@ -49,7 +66,7 @@ private fun getResponse(operation: DSLOperation): TypeSpec {
     return responseBuilder.build()
 }
 
-private fun getProperties(operationName: String, responses: List<ResponseNew>): List<PropertySpec>? {
+private fun getProperties(operationName: String, responses: List<ResponseNew>): List<PropertySpec> {
     return responses.map { response ->
         val varName = "${operationName}Response${response.statusCode.capitalize()}"
 
@@ -73,73 +90,76 @@ private fun getProperties(operationName: String, responses: List<ResponseNew>): 
     }
 }
 
-private fun getRequest(operationName: String, body: BodyNew): TypeSpec {
-    var varName: String = ""
-    var varType: TypeName? = null
-    var typeName: TypeName? = null
+private fun getRequest(parameters: List<Parameter>, operationName: String): TypeSpec {
+    return TypeSpec.classBuilder("${operationName}Request".capitalize())
+        .addModifiers(KModifier.DATA)
+        .getConstructor(parameters)
+        .build()
+}
+
+private fun TypeSpec.Builder.getConstructor(parameters: List<Parameter?>): TypeSpec.Builder {
+    val constructor = FunSpec.constructorBuilder()
+    val properties: MutableList<PropertySpec> = mutableListOf()
+
+    parameters.map { parameter ->
+        if (parameter != null) {
+            constructor.addParameter(parameter.name, parameter.type)
+            properties.add(
+                PropertySpec.builder(parameter.name, parameter.type)
+                    .initializer(parameter.name)
+                    .build()
+            )
+        }
+    }
+
+    return this.primaryConstructor(
+        constructor.build()
+    ).addProperties(properties)
+}
+
+
+//fun getClassName(dataType: DataType, subClass: ClassName?): ClassName {
+//    if (dataType == DataType.ARRAY) return dataType.kotlinType.parameterizedBy(subClass!!).rawType
+//    return dataType.kotlinType
+//}
+
+private fun getParameter(body: BodyNew): Parameter {
+    var name: String = ""
+    var type: TypeName? = null
 
     when (body) {
         is BodyRef -> {
-            varName = body.schemaRef
-            varType = ClassName(
+            name = body.schemaRef
+            type = ClassName(
                 Packages.MODEL, body.schemaRef.capitalize()
             )
         }
 
         is BodyObj -> {
-            varName = if (body.contentTypes[0] == OctetStream.toString()) "binFile"
+            name = if (body.contentTypes[0] == OctetStream.toString()) "binFile"
             else "prop"
 
-            varType = body.dataType.kotlinType
+            type = body.dataType.kotlinType
         }
 
         //When is a collection of regular POJOs
         is BodyCollPojo -> {
             //Use the first tag (if any) to build the var name
-            varName = body.tags?.firstOrNull()?.let { "${it}List" } ?: "list"
-            varType = List::class.asTypeName().parameterizedBy(body.dataType.kotlinType)
+            name = body.tags?.firstOrNull()?.let { "${it}List" } ?: "list"
+            type = List::class.asTypeName().parameterizedBy(body.dataType.kotlinType)
         }
 
         is BodyCollRef -> {
-            varName = "${body.className}List"
-            varType = List::class.asTypeName().parameterizedBy(
+            name = "${body.className}List"
+            type = List::class.asTypeName().parameterizedBy(
                 ClassName(
                     Packages.MODEL, body.className.capitalize()
                 )
             )
         }
     }
-    return TypeSpec.classBuilder("${operationName}Request".capitalize()).addModifiers(KModifier.DATA)
-        .primaryConstructor(
-            FunSpec.constructorBuilder().addParameter(varName, varType!!).build()
-        ).addProperty(
-            PropertySpec.builder(varName, varType).initializer(varName).build()
-        ).build()
-}
 
-fun getClassName(dataType: DataType, subClass: ClassName?): ClassName {
-    if (dataType == DataType.ARRAY) return dataType.kotlinType.parameterizedBy(subClass!!).rawType
-    return dataType.kotlinType
+    return Parameter(name, type!!)
 }
 
 
-/**
- * Example from https://square.github.io/kotlinpoet/
- */
-fun example(basePath: String) {
-    val greeterClass = ClassName(Packages.DSLOPERATIONS, "Greeter")
-    val file = FileSpec.builder(Packages.DSLOPERATIONS, "HelloWorld").addType(
-        TypeSpec.classBuilder("Greeter").addModifiers(KModifier.DATA).primaryConstructor(
-            FunSpec.constructorBuilder().addParameter("name", String::class).build()
-        ).addProperty(
-            PropertySpec.builder("name", String::class).initializer("name").build()
-        ).addFunction(
-            FunSpec.builder("greet").addStatement("println(%P)", "Hello, \$name").build()
-        ).build()
-    ).addFunction(
-        FunSpec.builder("main").addParameter("args", String::class, KModifier.VARARG)
-            .addStatement("%T(args[0]).greet()", greeterClass).build()
-    ).build()
-
-    writeFile(file, basePath)
-}
