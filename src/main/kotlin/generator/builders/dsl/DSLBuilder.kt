@@ -7,6 +7,7 @@ import generator.capitalize
 import generator.getVarNameFromParam
 import generator.model.GenParameter
 import generator.model.Packages
+import generator.model.ResponseProp
 import generator.model.Visibility
 import io.ktor.http.ContentType.Application.OctetStream
 import io.ktor.server.application.*
@@ -24,25 +25,24 @@ fun buildDSLOperations(dataModel: DataModel, basePath: String) {
 
         var requestGenParameter: GenParameter? = null
 
-        var request: TypeSpec? = null
-        var response: TypeSpec? = null
+        var requestType: TypeSpec? = null
+        var responseType: TypeSpec? = null
 
         //Build Request class
         if (operation.requestBody != null) {
             requestGenParameter = getParameter(operation.requestBody)
-            request = getRequest(listOf(requestGenParameter), operation.name)
-            fileSpec.addType(request)
+            requestType = getRequestType(listOf(requestGenParameter), operation.name)
+            fileSpec.addType(requestType)
         }
 
         //Build Response Class
-        if (operation.responses != null) {
-            response = getResponse(operation)
-            fileSpec.addType(response)
-        }
+        val responseProps = getResponseProps(operation.name, operation.responses!!)
+        responseType = getResponseType(operation.name, responseProps.map { it.responseType })
+        fileSpec.addType(responseType)
 
         //Build Operation main class
         fileSpec.addType(
-            getMainClass(
+            getOperationType(
                 listOf(
                     requestGenParameter,
                     GenParameter(
@@ -52,8 +52,10 @@ fun buildDSLOperations(dataModel: DataModel, basePath: String) {
                     )
                 ),
                 operation.name,
-                request,
-                response
+                requestType,
+                responseType,
+                operation.responses,
+                responseProps
             )
         )
             .addImport("io.ktor.server.response", "respond")
@@ -63,11 +65,13 @@ fun buildDSLOperations(dataModel: DataModel, basePath: String) {
     }
 }
 
-private fun getMainClass(
+private fun getOperationType(
     genParameters: List<GenParameter?>,
     operationName: String,
     request: TypeSpec?,
     response: TypeSpec?,
+    responses: List<ResponseNew>,
+    responseProps: List<ResponseProp>,
 ): TypeSpec {
     val mainClass = TypeSpec.classBuilder(operationName.capitalize())
 
@@ -83,8 +87,7 @@ private fun getMainClass(
             PropertySpec
                 .builder(
                     "request",
-                    ClassName(Packages.DSLOPERATIONS, request.name!!),
-                    KModifier.PRIVATE
+                    ClassName(Packages.DSLOPERATIONS, request.name!!)
                 )
                 .initializer("${request.name}($reqVarName)")
                 .build()
@@ -112,14 +115,13 @@ private fun getMainClass(
             .builder(
                 "response",
                 ClassName(Packages.DSLOPERATIONS, response?.name!!),
-                KModifier.PRIVATE
             )
             .initializer(responseCode)
             .build()
     )
 
     //TODO Add Response Functions
-    getResponseFunctions(response.propertySpecs)
+    getResponseFunctions(response.propertySpecs, responses, responseProps)
         .map {
             mainClass.addFunction(it)
         }
@@ -127,46 +129,67 @@ private fun getMainClass(
     return mainClass.build()
 }
 
-private fun getResponseFunctions(properties: List<PropertySpec>): List<FunSpec> {
-    val responses = mutableListOf<FunSpec>()
+private fun getResponseFunctions(
+    properties: List<PropertySpec>,
+    responses: List<ResponseNew>,
+    responseProps: List<ResponseProp>,
+): List<FunSpec> {
+    val functions = mutableListOf<FunSpec>()
 
-    properties.map {
-        val propParams = (it.type as LambdaTypeName).parameters
-        val respFun = FunSpec.builder(it.name)
+    responseProps.map {
+        val propParams = (it.responseType.type as LambdaTypeName).parameters
+        val respFun = FunSpec.builder(it.responseType.name)
             .addModifiers(KModifier.PRIVATE, KModifier.SUSPEND)
-        propParams.map {
+//        propParams.map {
+//            respFun.addParameter(
+//                getVarNameFromParam(it.type.toString()), it.type
+//            )
+//        }
+        var param: ParameterSpec? = null
+        var paramName: String? = null
+        if (propParams.isNotEmpty()) {
+            param = propParams.first()
+            paramName = getVarNameFromParam(param.type.toString())
             respFun.addParameter(
-                getVarNameFromParam(it.type.toString()), it.type
+                paramName,
+                param.type
             )
         }
 
+
         //TODO get the appropriate code for this response
+        val statusCode = it.response.statusCode.toIntOrNull()
+        if (statusCode == null) //TODO What to do when the status code is "default"?
+            logger.error("Error in status code: ${it.response.statusCode}")
+
         respFun.addCode(
             """
             call.respond(
-                HttpStatusCode.OK.description("Successful operation"),
-                pet
+                HttpStatusCode(${statusCode}, "${it.response.description}"),
+                ${paramName ?: ""}
             )
             """.trimIndent()
         )
 
-        responses.add(respFun.build())
+        functions.add(respFun.build())
     }
 
 
 
-    return responses
+    return functions
 }
 
 
-private fun getResponse(operation: DSLOperation): TypeSpec {
-    val propertySpecs = getProperties(operation.name, operation.responses!!)
+private fun getResponseType(operationName: String, propertySpecs: List<PropertySpec>): TypeSpec {
+//    val propertySpecs = getProperties(operation.name, operation.responses!!)
 
-    val responseBuilder = TypeSpec.classBuilder("${operation.name.capitalize()}Response").addModifiers(KModifier.DATA)
+    val responseBuilder = TypeSpec
+        .classBuilder("${operationName.capitalize()}Response")
+        .addModifiers(KModifier.DATA)
 
     //Build constructor
     val const = FunSpec.constructorBuilder()
-    propertySpecs?.map {
+    propertySpecs.map {
         responseBuilder.addProperty(it)
         const.addParameter(it.name, it.type)
     }
@@ -175,12 +198,13 @@ private fun getResponse(operation: DSLOperation): TypeSpec {
     return responseBuilder.build()
 }
 
-private fun getProperties(operationName: String, responses: List<ResponseNew>): List<PropertySpec> {
-    return responses.map { response ->
-        val varName = "${operationName}Response${response.statusCode.capitalize()}"
+//private fun getProperties(operationName: String, responses: List<ResponseNew>): List<PropertySpec> {
+private fun getResponseProps(operationName: String, responses: List<ResponseNew>): List<ResponseProp> {
+    return responses.map {
+        val varName = "${operationName}Response${it.statusCode.capitalize()}"
 
         val varType: TypeName
-        val schemaRef = response.schemaRef
+        val schemaRef = it.schemaRef
         if (schemaRef.isNullOrEmpty()) {
             varType = LambdaTypeName.get(returnType = UNIT).copy(suspending = true)
         } else {
@@ -191,15 +215,17 @@ private fun getProperties(operationName: String, responses: List<ResponseNew>): 
             ).copy(suspending = true)
 
         }
-        PropertySpec
-            .builder(varName, varType)
-            .initializer(varName)
-            .build()
-
+        ResponseProp(
+            it,
+            PropertySpec
+                .builder(varName, varType)
+                .initializer(varName)
+                .build()
+        )
     }
 }
 
-private fun getRequest(genParameters: List<GenParameter>, operationName: String): TypeSpec {
+private fun getRequestType(genParameters: List<GenParameter>, operationName: String): TypeSpec {
     return TypeSpec.classBuilder("${operationName}Request".capitalize())
         .addModifiers(KModifier.DATA)
         .getConstructor(genParameters)
