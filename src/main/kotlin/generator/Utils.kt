@@ -12,9 +12,17 @@ fun String.capitalize(): String {
     }
 }
 
-fun String.decapitalize():String{
+fun String.decapitalize(): String {
     return this.replaceFirstChar {
         it.lowercase(Locale.getDefault())
     }
 }
 
+/**
+ * Use on class names like: gen.routing.model.Pet
+ */
+fun getVarNameFromParam(fullClassName: String): String =
+    fullClassName
+        .split(".")
+        .last()
+        .decapitalize()
