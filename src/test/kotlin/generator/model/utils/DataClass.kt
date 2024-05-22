@@ -1,19 +1,19 @@
 package generator.model.utils
 
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 
 val dataClass = Component(
     schemaName = "#/components/schemas/DataClass",
     parameters = listOf(
-        ComponentProperties(
+        ComponentProperty(
             name = "name",
             dataType = DataType.STRING,
             required = true,
             schemaName = ""
         ),
-        ComponentProperties(
+        ComponentProperty(
             name = "age",
             dataType = DataType.INTEGER,
             required = true,

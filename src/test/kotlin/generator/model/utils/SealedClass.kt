@@ -1,7 +1,7 @@
 package generator.model.utils
 
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 
 val sealedClass = Component(
@@ -16,7 +16,7 @@ val sealedClass = Component(
         Component(
             schemaName = "#/components/schemas/Child1",
             parameters = listOf(
-                ComponentProperties(
+                ComponentProperty(
                     name = "name",
                     dataType = DataType.STRING,
                     required = true,
@@ -29,7 +29,7 @@ val sealedClass = Component(
         Component(
             schemaName = "#/components/schemas/Child2",
             parameters = listOf(
-                ComponentProperties(
+                ComponentProperty(
                     name = "age",
                     dataType = DataType.INTEGER,
                     required = true,

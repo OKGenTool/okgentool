@@ -1,12 +1,11 @@
 import cli.getClient
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 import generator.Generator
 import generator.builders.model.createModelComponent
 import org.slf4j.LoggerFactory
 import parser.Parser
-import java.util.logging.Logger
 
 private val logger = LoggerFactory.getLogger("Main.kt")
 
