@@ -203,6 +203,54 @@ class ModelBuilderGenerationTests {
         assertEquals(referenceContent, fileSpec)
     }
 
+    @Test
+    fun `Generate data class with not required array parameter with minimum and maximum items`() {
+        val fileSpec = createModelComponent(
+            dataClassWithNotRequiredArrayParameterWithMinMaxItems,
+            dataClassWithNotRequiredArrayParameterWithMinMaxItemsComponents
+        ).toString()
+
+        val referenceContent = getReferenceContent("DataClassWithNotRequiredArrayParameterWithMinMaxItems")
+
+        assertEquals(referenceContent, fileSpec)
+    }
+
+    @Test
+    fun `Generate data class with required array parameter with minimum and maximum items`() {
+        val fileSpec = createModelComponent(
+            dataClassWithRequiredArrayParameterWithMinMaxItems,
+            dataClassWithRequiredArrayParameterWithMinMaxItemsComponents
+        ).toString()
+
+        val referenceContent = getReferenceContent("DataClassWithRequiredArrayParameterWithMinMaxItems")
+
+        assertEquals(referenceContent, fileSpec)
+    }
+
+    @Test
+    fun `Generate data class with not required array parameter with unique items`() {
+        val fileSpec = createModelComponent(
+            dataClassWithNotRequiredArrayParameterWithUniqueItems,
+            dataClassWithNotRequiredArrayParameterWithUniqueItemsComponents
+        ).toString()
+
+        val referenceContent = getReferenceContent("DataClassWithNotRequiredArrayParameterWithUniqueItems")
+
+        assertEquals(referenceContent, fileSpec)
+    }
+
+    @Test
+    fun `Generate data class with required array parameter with unique items`() {
+        val fileSpec = createModelComponent(
+            dataClassWithRequiredArrayParameterWithUniqueItems,
+            dataClassWithRequiredArrayParameterWithUniqueItemsComponents
+        ).toString()
+
+        val referenceContent = getReferenceContent("DataClassWithRequiredArrayParameterWithUniqueItems")
+
+        assertEquals(referenceContent, fileSpec)
+    }
+
     private fun getReferenceContent(fileName: String): String {
         return Resources.getResource("generator/model/$fileName").readText().replace("\r\n", "\n")
     }

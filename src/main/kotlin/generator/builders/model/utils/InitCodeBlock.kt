@@ -32,6 +32,10 @@ private fun getPropertyStatements(componentProperty: ComponentProperty): List<St
             statements.addAll(getStringPropertyStatements(componentProperty))
         }
 
+        DataType.ARRAY -> {
+            statements.addAll(getArrayPropertyStatements(componentProperty))
+        }
+
         else -> {}
     }
     return statements

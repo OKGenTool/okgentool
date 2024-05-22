@@ -628,7 +628,17 @@ components:
               items:
                 type: number
                 format: double
-
+        maxMinArray:
+          type: array
+          items:
+            type: integer
+          minItems: 1
+          maxItems: 2
+        uniqueItemsArray:
+          type: array
+          items:
+            type: integer
+          uniqueItems: true
     StringTryOut:
       type: object
       properties:

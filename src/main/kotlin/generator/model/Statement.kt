@@ -47,5 +47,23 @@ enum class Statement(val statement: (Any, Any) -> String) {
         "require($parameterName.matches(\"$pattern\".toRegex())) { \"$parameterName must match the pattern $pattern\" }" }),
 
     PATTERN_NULLABLE({ pattern, parameterName ->
-        "require($parameterName == null || $parameterName.matches(\"$pattern\".toRegex())) { \"$parameterName must match the pattern $pattern\" }" })
+        "require($parameterName == null || $parameterName.matches(\"$pattern\".toRegex())) { \"$parameterName must match the pattern $pattern\" }" }),
+
+    MIN_ITEMS({ minItems, parameterName ->
+        "require($parameterName.size >= $minItems) { \"$parameterName must have a minimum length of $minItems\" }" }),
+
+    MIN_ITEMS_NULLABLE({ minItems, parameterName ->
+        "require($parameterName == null || $parameterName.size >= $minItems) { \"$parameterName must have a minimum length of $minItems\" }" }),
+
+    MAX_ITEMS({ maxItems, parameterName ->
+        "require($parameterName.size <= $maxItems) { \"$parameterName must have a maximum length of $maxItems\" }" }),
+
+    MAX_ITEMS_NULLABLE({ maxItems, parameterName ->
+        "require($parameterName == null || $parameterName.size <= $maxItems) { \"$parameterName must have a maximum length of $maxItems\" }" }),
+
+    UNIQUE_ITEMS({ _, parameterName ->
+        "require($parameterName.toSet().size == $parameterName.size) { \"$parameterName must have unique items\" }" }),
+
+    UNIQUE_ITEMS_NULLABLE({ _, parameterName ->
+        "require($parameterName == null || $parameterName.toSet().size == $parameterName.size) { \"$parameterName must have unique items\" }" })
 }

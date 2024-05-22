@@ -17,6 +17,9 @@ data class ComponentProperty(
     val minLength: Int? = null,
     val maxLength: Int? = null,
     val pattern: String? = null,
+    val minItems: Int? = null,
+    val maxItems: Int? = null,
+    val uniqueItems: Boolean = false,
     val arrayProperties: ComponentProperty? = null,
     val arrayIndex: Int? = null
 )

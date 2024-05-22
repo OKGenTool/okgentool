@@ -92,24 +92,26 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
             val required = requiredProperties.contains(name)
             val schemaName = parameter.value.`$ref` ?: ""
             val values = parameter.value.enum?.map { it.toString() } ?: emptyList()
-            val minLength = parameter.value.minLength
-            val maxLength = parameter.value.maxLength
 
             if (dataType == DataType.ARRAY) {
                 val arrayItems = parameter.value
                 val arrayIndex = 0
+                val minItems = parameter.value.minItems
+                val maxItems = parameter.value.maxItems
+                val uniqueItems = parameter.value.uniqueItems ?: false
+
                 properties.add(
                     getArrayProperties(
-                        arrayItems,
-                        name,
-                        dataType,
-                        required,
-                        schemaName,
-                        values,
-                        minLength,
-                        maxLength,
-                        arrayIndex,
-
+                        arrayItems = arrayItems,
+                        name = name,
+                        dataType = dataType,
+                        required = required,
+                        schemaName = schemaName,
+                        values = values,
+                        arrayIndex = arrayIndex,
+                        minItems = minItems,
+                        maxItems = maxItems,
+                        uniqueItems = uniqueItems
                     )
                 )
                 continue
@@ -121,6 +123,8 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
             val exclusiveMaximum = parameter.value.exclusiveMaximum ?: false
             val multipleOf = parameter.value.multipleOf?.toInt()
             val pattern = parameter.value.pattern
+            val minLength = parameter.value.minLength
+            val maxLength = parameter.value.maxLength
 
             properties.add(
                 ComponentProperty(
@@ -153,14 +157,17 @@ private fun getArrayProperties(
     required: Boolean,
     schemaName: String,
     values: List<String>,
-    minLength: Int?,
-    maxLength: Int?,
     arrayIndex: Int,
-
+    minItems: Int?,
+    maxItems: Int?,
+    uniqueItems: Boolean = false
 ): ComponentProperty {
     val childArrayItems = arrayItems?.items
     val arrayItemsType = DataType.fromString(arrayItems?.items?.type ?: "", arrayItems?.items?.format ?: "")
     val arrayItemsSchemaName = arrayItems?.`$ref` ?: ""
+    val childUniqueItems = arrayItems?.uniqueItems ?: false
+    val childMinItems = arrayItems?.minItems
+    val childMaxItems = arrayItems?.maxItems
     val childArrayIndex = arrayIndex + 1
 
     if (arrayItemsType != DataType.ARRAY) {
@@ -173,9 +180,10 @@ private fun getArrayProperties(
             arrayItemsType = arrayItemsType,
             arrayItemsSchemaName = arrayItemsSchemaName,
             values = values,
-            minLength = minLength,
-            maxLength = maxLength,
-            arrayIndex = arrayIndex
+            minItems = minItems,
+            maxItems = maxItems,
+            arrayIndex = arrayIndex,
+            uniqueItems = uniqueItems
         )
     }
 
@@ -188,19 +196,21 @@ private fun getArrayProperties(
         arrayItemsType = arrayItemsType,
         arrayItemsSchemaName = arrayItemsSchemaName,
         values = values,
-        minLength = minLength,
-        maxLength = maxLength,
+        minItems = minItems,
+        maxItems = maxItems,
         arrayIndex = arrayIndex,
+        uniqueItems = uniqueItems,
         arrayProperties = getArrayProperties(
-            childArrayItems,
-            name,
-            dataType,
-            required,
-            schemaName,
-            values,
-            minLength,
-            maxLength,
-            childArrayIndex,
+            arrayItems = childArrayItems,
+            name = name,
+            dataType = dataType,
+            required = required,
+            schemaName = schemaName,
+            values = values,
+            minItems = childMinItems,
+            maxItems = childMaxItems,
+            arrayIndex = childArrayIndex,
+            uniqueItems = childUniqueItems
         )
     )
 }

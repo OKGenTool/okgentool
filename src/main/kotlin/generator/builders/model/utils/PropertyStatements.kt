@@ -68,3 +68,32 @@ fun getStringPropertyStatements(componentProperty: ComponentProperty): List<Stri
 
     return statements
 }
+
+fun getArrayPropertyStatements(componentProperty: ComponentProperty): List<String> {
+    val statements = mutableListOf<String>()
+
+    componentProperty.minItems?.let { minItems ->
+        if (componentProperty.required)
+            statements.add(Statement.MIN_ITEMS.statement(minItems, componentProperty.name))
+        else
+            statements.add(Statement.MIN_ITEMS_NULLABLE.statement(minItems, componentProperty.name))
+    }
+
+    componentProperty.maxItems?.let { maxItems ->
+        if (componentProperty.required)
+            statements.add(Statement.MAX_ITEMS.statement(maxItems, componentProperty.name))
+        else
+            statements.add(Statement.MAX_ITEMS_NULLABLE.statement(maxItems, componentProperty.name))
+    }
+
+    componentProperty.uniqueItems.let { uniqueItems ->
+        if (uniqueItems) {
+            if (componentProperty.required)
+                statements.add(Statement.UNIQUE_ITEMS.statement(uniqueItems, componentProperty.name))
+            else
+                statements.add(Statement.UNIQUE_ITEMS_NULLABLE.statement(uniqueItems, componentProperty.name))
+        }
+    }
+
+    return statements
+}
