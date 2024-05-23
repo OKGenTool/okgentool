@@ -59,12 +59,12 @@ fun getStringPropertyStatements(componentProperty: ComponentProperty): List<Stri
             statements.add(Statement.MAX_LENGTH_NULLABLE.statement(maxLength, componentProperty.name))
     }
 
-    componentProperty.pattern?.let { pattern ->
-        if (componentProperty.required)
-            statements.add(Statement.PATTERN.statement(pattern, componentProperty.name))
-        else
-            statements.add(Statement.PATTERN_NULLABLE.statement(pattern, componentProperty.name))
-    }
+//    componentProperty.pattern?.let { pattern ->
+//        if (componentProperty.required)
+//            statements.add(Statement.PATTERN.statement(pattern, componentProperty.name))
+//        else
+//            statements.add(Statement.PATTERN_NULLABLE.statement(pattern, componentProperty.name))
+//    }
 
     return statements
 }

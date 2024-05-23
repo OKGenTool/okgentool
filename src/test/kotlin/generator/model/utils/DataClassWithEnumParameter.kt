@@ -23,7 +23,7 @@ val dataClassWithEnumParameter = Component(
             values = listOf("A", "B", "C")
         )
     ),
-    simplifiedName = "DataClassWithGeneratedTypeArray",
+    simplifiedName = "DataClassWithEnumParameter",
     superClassChildSchemaNames = emptyList()
 )
 
