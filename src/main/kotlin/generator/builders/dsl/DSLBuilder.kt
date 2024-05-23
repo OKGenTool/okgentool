@@ -95,7 +95,7 @@ private fun getOperationType(
     }
 
     //Add response var
-    var responseCode = "${response?.name}(\n"
+    var responseCode = "${response?.name}("
     response?.propertySpecs?.map {
         val propParams = (it.type as LambdaTypeName).parameters
         if (!propParams.isEmpty()) {
@@ -103,9 +103,9 @@ private fun getOperationType(
             propParams.map {
                 propParamsCode += "${getVarNameFromParam(it.toString())},"
             }
-            responseCode += "${it.name} = { $propParamsCode -> ${it.name}($propParamsCode)},\n"
+            responseCode += "\n${it.name} = { $propParamsCode -> ${it.name}($propParamsCode)},\n"
         } else {
-            responseCode += "${it.name} = { ${it.name}() }"
+            responseCode += "\n${it.name} = { ${it.name}() },"
         }
     }
     responseCode += "\n)"
@@ -140,11 +140,6 @@ private fun getResponseFunctions(
         val propParams = (it.responseType.type as LambdaTypeName).parameters
         val respFun = FunSpec.builder(it.responseType.name)
             .addModifiers(KModifier.PRIVATE, KModifier.SUSPEND)
-//        propParams.map {
-//            respFun.addParameter(
-//                getVarNameFromParam(it.type.toString()), it.type
-//            )
-//        }
         var param: ParameterSpec? = null
         var paramName: String? = null
         if (propParams.isNotEmpty()) {
@@ -156,16 +151,10 @@ private fun getResponseFunctions(
             )
         }
 
-
-        //TODO get the appropriate code for this response
-        val statusCode = it.response.statusCode.toIntOrNull()
-        if (statusCode == null) //TODO What to do when the status code is "default"?
-            logger.error("Error in status code: ${it.response.statusCode}")
-
         respFun.addCode(
             """
             call.respond(
-                HttpStatusCode(${statusCode}, "${it.response.description}"),
+                HttpStatusCode(${it.response.statusCodeInt}, "${it.response.description}"),
                 ${paramName ?: ""}
             )
             """.trimIndent()
@@ -201,7 +190,7 @@ private fun getResponseType(operationName: String, propertySpecs: List<PropertyS
 //private fun getProperties(operationName: String, responses: List<ResponseNew>): List<PropertySpec> {
 private fun getResponseProps(operationName: String, responses: List<ResponseNew>): List<ResponseProp> {
     return responses.map {
-        val varName = "${operationName}Response${it.statusCode.capitalize()}"
+        val varName = "${operationName}Response${it.statusCodeStr.capitalize()}"
 
         val varType: TypeName
         val schemaRef = it.schemaRef

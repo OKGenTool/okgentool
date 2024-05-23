@@ -45,6 +45,7 @@ private fun getResponses(operation: Operation): List<ResponseNew>? {
 
     for (response in operation.responses) {
         val content = response.value.content
+
         val responseNew = ResponseNew(
             response.key,
             response.value.description,
