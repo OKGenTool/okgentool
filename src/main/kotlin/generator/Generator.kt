@@ -17,6 +17,6 @@ class Generator(private val dataModel: DataModel, private val destinationPath: S
         buildModel(dataModel.components, destinationPath)
 
         logger.info("Build DSL Files")
-        buildDSLOperations(dataModel, destinationPath)
+        buildDSLOperations(dataModel.dslOperations, destinationPath)
     }
 }

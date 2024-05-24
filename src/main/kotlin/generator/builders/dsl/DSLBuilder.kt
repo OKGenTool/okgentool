@@ -16,9 +16,7 @@ import output.writeFile
 
 private val logger = LoggerFactory.getLogger("DSLBuilder.kt")
 
-//TODO receive dslOperations instead of the entire dataModel
-fun buildDSLOperations(dataModel: DataModel, basePath: String) {
-    val dslOperations = dataModel.dslOperations
+fun buildDSLOperations(dslOperations: List<DSLOperation>, basePath: String) {
     for (operation in dslOperations) {
         if (operation.name.equals("createUsersWithListInput")) logger.info("createUsersWithListInput")
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
@@ -63,6 +61,8 @@ fun buildDSLOperations(dataModel: DataModel, basePath: String) {
 
         writeFile(fileSpec.build(), basePath)
     }
+
+    buildOkGenDsl(basePath) //TODO
 }
 
 private fun getOperationType(
@@ -121,7 +121,7 @@ private fun getOperationType(
     )
 
     //TODO Add Response Functions
-    getResponseFunctions(response.propertySpecs, responses, responseProps)
+    getResponseFunctions(responseProps)
         .map {
             mainClass.addFunction(it)
         }
@@ -129,11 +129,7 @@ private fun getOperationType(
     return mainClass.build()
 }
 
-private fun getResponseFunctions(
-    properties: List<PropertySpec>,
-    responses: List<ResponseNew>,
-    responseProps: List<ResponseProp>,
-): List<FunSpec> {
+private fun getResponseFunctions(responseProps: List<ResponseProp>): List<FunSpec> {
     val functions = mutableListOf<FunSpec>()
 
     responseProps.map {
@@ -219,26 +215,6 @@ private fun getRequestType(genParameters: List<GenParameter>, operationName: Str
         .addModifiers(KModifier.DATA)
         .getConstructor(genParameters)
         .build()
-}
-
-private fun TypeSpec.Builder.getConstructor(genParameters: List<GenParameter?>): TypeSpec.Builder {
-    val constructor = FunSpec.constructorBuilder()
-    val properties: MutableList<PropertySpec> = mutableListOf()
-
-    genParameters.map {
-        if (it != null) {
-            constructor.addParameter(it.name, it.type)
-            properties.add(
-                PropertySpec.builder(it.name, it.type, it.visibility.modifier)
-                    .initializer(it.name)
-                    .build()
-            )
-        }
-    }
-
-    return this.primaryConstructor(
-        constructor.build()
-    ).addProperties(properties)
 }
 
 private fun getParameter(body: BodyNew): GenParameter {
