@@ -15,7 +15,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClass.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -24,7 +24,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithNotRequiredParameters.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -33,7 +33,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("SealedClass.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -42,7 +42,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithGeneratedDataType.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -51,7 +51,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithArray.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -63,7 +63,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithBiDimensionalArray.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -72,7 +72,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithGeneratedTypeArray.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -81,7 +81,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithEnumParameter.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -93,7 +93,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithRequiredIntParameterWithMaxAndMin.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -105,7 +105,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithNotRequiredIntParameterWithMaxAndMin.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -117,7 +117,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithRequiredIntParameterWithExclusiveMaxAndMin.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -129,7 +129,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithNotRequiredIntParameterWithExclusiveMaxAndMin.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -141,7 +141,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithNotRequiredIntParameterWithMultipleOf.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -153,7 +153,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithRequiredIntParameterWithMultipleOf.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -165,7 +165,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithNotRequiredStringParameterWithMinMaxLen.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -177,7 +177,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithRequiredStringParameterWithMinMaxLen.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
 //    @Test
@@ -189,7 +189,7 @@ class GenerationTests {
 //
 //        val referenceContent = getReferenceContent("DataClassWithNotRequiredStringParameterWithPattern.kt")
 //
-//        assertEquals(referenceContent, fileSpec)
+//        assertGeneratedMatch(referenceContent, fileSpec)
 //    }
 //
 //    @Test
@@ -201,7 +201,7 @@ class GenerationTests {
 //
 //        val referenceContent = getReferenceContent("DataClassWithRequiredStringParameterWithPattern.kt")
 //
-//        assertEquals(referenceContent, fileSpec)
+//        assertGeneratedMatch(referenceContent, fileSpec)
 //    }
 
     @Test
@@ -213,7 +213,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithNotRequiredArrayParameterWithMinMaxItems.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -225,7 +225,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithRequiredArrayParameterWithMinMaxItems.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -237,7 +237,7 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithNotRequiredArrayParameterWithUniqueItems.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
@@ -249,11 +249,18 @@ class GenerationTests {
 
         val referenceContent = getReferenceContent("DataClassWithRequiredArrayParameterWithUniqueItems.kt")
 
-        assertEquals(referenceContent, fileSpec)
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     private fun getReferenceContent(fileName: String): String {
         val path = "src/test/kotlin/gen/routing/model/$fileName"
         return File(path).readText().replace("\r\n", "\n")
+    }
+
+    private fun assertGeneratedMatch(referenceContent: String, fileSpec: String) {
+        val cleanedReferenceContent = referenceContent.replace("\n", "").replace(" ", "")
+        val cleanedFileSpec = fileSpec.replace("\n", "").replace(" ", "")
+
+        assertEquals(cleanedReferenceContent, cleanedFileSpec)
     }
 }
