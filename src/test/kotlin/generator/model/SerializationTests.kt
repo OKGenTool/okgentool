@@ -79,13 +79,13 @@ class SerializationTests {
         val child1 = Child1("test")
         val child2 = Child2(5)
 
-        val jsonString1 = Json.encodeToString(child1)
-        val jsonString2 = Json.encodeToString(child2)
-        val deserialized1 = Json.decodeFromString<Child1>(jsonString1)
-        val deserialized2 = Json.decodeFromString<Child2>(jsonString2)
+        val jsonString1 = Json.encodeToString(SealedClass.serializer(), child1)
+        val jsonString2 = Json.encodeToString(SealedClass.serializer(), child2)
+        val deserialized1 = Json.decodeFromString<SealedClass>(jsonString1)
+        val deserialized2 = Json.decodeFromString<SealedClass>(jsonString2)
 
-        assertEquals("{\"name\":\"test\"}", jsonString1)
-        assertEquals("{\"age\":5}", jsonString2)
+        assertEquals("""{"type":"Child1","name":"test"}""", jsonString1)
+        assertEquals("""{"type":"Child2","age":5}""", jsonString2)
         assertEquals(child1, deserialized1)
         assertEquals(child2, deserialized2)
     }

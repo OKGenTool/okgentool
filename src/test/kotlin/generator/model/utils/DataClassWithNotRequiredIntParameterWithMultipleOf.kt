@@ -5,7 +5,7 @@ import datamodel.ComponentProperty
 import datamodel.DataType
 
 val dataClassWithNotRequiredIntParameterWithMultipleOf = Component(
-    schemaName = "#/components/schemas/dataClassWithNotRequiredIntParameterWithMultipleOf",
+    schemaName = "#/components/schemas/DataClassWithNotRequiredIntParameterWithMultipleOf",
     parameters = listOf(
         ComponentProperty(
             name = "value",
@@ -15,7 +15,7 @@ val dataClassWithNotRequiredIntParameterWithMultipleOf = Component(
             multipleOf = 2
         )
     ),
-    simplifiedName = "dataClassWithNotRequiredIntParameterWithMultipleOf",
+    simplifiedName = "DataClassWithNotRequiredIntParameterWithMultipleOf",
     superClassChildSchemaNames = emptyList()
 )
 

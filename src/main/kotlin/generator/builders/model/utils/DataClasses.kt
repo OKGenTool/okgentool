@@ -3,6 +3,7 @@ package generator.builders.model.utils
 import com.squareup.kotlinpoet.*
 import datamodel.Component
 import generator.model.Packages
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 fun createDataClassComponent(component: Component, components: List<Component>): FileSpec {
@@ -45,7 +46,10 @@ fun getDataClassBuilder(
     }
 
     if (superclassName != null) {
-        dataClassBuilder.superclass(superclassName)
+        dataClassBuilder
+            .superclass(superclassName)
+            .addAnnotation(AnnotationSpec.builder(SerialName::class)
+                .addMember("%S", component.simplifiedName).build())
     }
 
     if (companionObject != null) {
