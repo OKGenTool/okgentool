@@ -35,7 +35,9 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
         getOperationName(operation, path, method),
         getBodyNew(operation),
         getResponses(operation),
-        HttpMethod.parse(method)
+        HttpMethod.parse(method),
+        path,
+        operation.summary
     )
 
     dslOperations.add(dslOperation)

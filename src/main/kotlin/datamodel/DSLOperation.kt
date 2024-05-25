@@ -6,5 +6,7 @@ data class DSLOperation(
     val name: String,
     val requestBody: BodyNew?,
     val responses: List<ResponseNew>?,
-    val method:HttpMethod
+    val method:HttpMethod,
+    val path: String,
+    val summary: String
 )

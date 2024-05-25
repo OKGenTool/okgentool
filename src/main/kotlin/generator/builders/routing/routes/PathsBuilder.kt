@@ -4,6 +4,8 @@ import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
+import datamodel.DSLOperation
+import generator.capitalize
 import generator.model.Packages
 import io.ktor.resources.*
 
@@ -12,36 +14,41 @@ import output.writeFile
 
 private val logger = LoggerFactory.getLogger("PathsBuilder.kt")
 
-fun buildPaths(basePath: String) {
+private const val PATHSFILE = "Paths"
 
-
-    // Define the addPet class
-    val addPetClass = TypeSpec.classBuilder("AddPet")
-//        .addModifiers(KModifier.CLASS)
-        .addAnnotation(
-            AnnotationSpec.builder(Resource::class.asTypeName())
-                .addMember("%S", "/pet")
-                .build()
-        )
-        .addKdoc(
-            """
-             Add a new pet to the store
-             @param pet Create a new pet in the store
-        """.trimIndent()
-        )
-        .build()
-
+fun buildPaths(dslOperations: List<DSLOperation>, basePath: String) {
+    logger.info("Generating $PATHSFILE file")
     // Define the Paths object
-    val pathsObject = TypeSpec.objectBuilder("Paths")
-        .addType(addPetClass)
+    val pathsObject = TypeSpec.objectBuilder(PATHSFILE)
+        .addFunctions(dslOperations)
         .build()
 
     // Define the Kotlin file
-    val kotlinFile = FileSpec.builder(Packages.ROUTES, "Paths")
+    val kotlinFile = FileSpec.builder(Packages.ROUTES, PATHSFILE)
         .addType(pathsObject)
         .build()
 
     writeFile(kotlinFile, basePath)
+}
 
+private fun TypeSpec.Builder.addFunctions(dslOperations: List<DSLOperation>): TypeSpec.Builder {
+    dslOperations.forEach {
+        this.addType(
+            TypeSpec.classBuilder(it.name.capitalize())
+                .addAnnotation(
+                    AnnotationSpec.builder(Resource::class.asTypeName())
+                        .addMember("%S", it.path)
+                        .build()
+                )
+                .addKdoc(
+                    """
+                         ${it.summary}
+                    """.trimIndent()
+                )
+                .build()
+        )
+
+    }
+    return this
 }
 
