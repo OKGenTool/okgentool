@@ -3,6 +3,7 @@ package parser.builders
 import datamodel.*
 import datamodel.SchemaProps.Companion.getSchemaProp
 import generator.capitalize
+import io.ktor.http.*
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
 import org.slf4j.LoggerFactory
@@ -33,7 +34,8 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
     val dslOperation = DSLOperation(
         getOperationName(operation, path, method),
         getBodyNew(operation),
-        getResponses(operation)
+        getResponses(operation),
+        HttpMethod.parse(method)
     )
 
     dslOperations.add(dslOperation)
