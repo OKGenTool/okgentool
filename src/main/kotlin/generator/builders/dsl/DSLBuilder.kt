@@ -16,7 +16,7 @@ import output.writeFile
 
 private val logger = LoggerFactory.getLogger("DSLBuilder.kt")
 
-fun buildDSLOperations(dslOperations: List<DSLOperation>, basePath: String) {
+fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<String>, basePath: String) {
     for (operation in dslOperations) {
         if (operation.name.equals("createUsersWithListInput")) logger.info("createUsersWithListInput")
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
@@ -62,7 +62,8 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, basePath: String) {
         writeFile(fileSpec.build(), basePath)
     }
 
-    buildOkGenDsl(basePath) //TODO
+    buildApiOperations(basePath)
+    buildOkGenDsl(dslOperations, componentNames, basePath) //TODO
 }
 
 private fun getOperationType(

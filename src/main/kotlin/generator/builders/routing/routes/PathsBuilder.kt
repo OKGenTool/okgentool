@@ -14,7 +14,7 @@ import output.writeFile
 
 private val logger = LoggerFactory.getLogger("PathsBuilder.kt")
 
-private const val PATHSFILE = "Paths"
+const val PATHSFILE = "Paths"
 
 fun buildPaths(dslOperations: List<DSLOperation>, basePath: String) {
     logger.info("Generating $PATHSFILE file")
