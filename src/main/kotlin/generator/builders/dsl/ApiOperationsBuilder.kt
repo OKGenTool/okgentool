@@ -42,6 +42,5 @@ fun buildApiOperations(basePath: String) {
         .addType(apiOperationsClass)
         .build()
 
-    // Write the file to the system (you can specify the path)
     writeFile(fileSpec, basePath)
 }
