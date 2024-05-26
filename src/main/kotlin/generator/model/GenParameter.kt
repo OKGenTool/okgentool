@@ -8,6 +8,7 @@ data class GenParameter(
     val name: String,
     val type: TypeName,
     val visibility: Visibility = Visibility.PUBLIC,
+    val validations: List<String>? = null,
 )
 
 enum class Visibility(val modifier: KModifier) {

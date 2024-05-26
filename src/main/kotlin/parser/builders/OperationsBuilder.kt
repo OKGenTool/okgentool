@@ -31,13 +31,26 @@ fun getOperations(): List<DSLOperation> {
 private fun addOperation(operation: Operation?, path: String, method: String) {
     if (operation == null) return
 
+    val parameters: List<DSLParameter>? = operation.parameters?.takeIf { it.isNotEmpty() }?.map {
+        val type = DataType.fromString(it.schema.type, it.schema.format)
+        DSLParameter(
+            it.name,
+            In.fromValue(it.`in`),
+            it.description,
+            type!!,
+            if (type == DataType.ARRAY) DataType.fromString(it.schema.items.type, it.schema?.items?.format) else null,
+            it.schema.enum
+        )
+    }
+
     val dslOperation = DSLOperation(
         getOperationName(operation, path, method),
         getBodyNew(operation),
         getResponses(operation),
         HttpMethod.parse(method),
         path,
-        operation.summary
+        operation.summary,
+        parameters
     )
 
     dslOperations.add(dslOperation)

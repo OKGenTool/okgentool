@@ -2,6 +2,7 @@ package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
 import datamodel.DSLOperation
+import datamodel.DataType
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
@@ -85,24 +86,42 @@ fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSpec> {
             returnType = UNIT
         ).copy(suspending = true)
 
+
+        val codeBlock = CodeBlock.builder()
+            .add("${APIOPERATIONS.decapitalize()}.addOperation(\"${it.name}\")\n")
+            .add("$KTORROUTE.${it.method.value}<$PATHSFILE.${it.name.capitalize()}>{\n")
+            .getRequestCode(it)
+            .add("}")
+
         functions.add(
             FunSpec.builder(it.name)
                 .addParameter("function", suspFunc)
-                //TODO get the class from Path file
-                .addCode(
-                    """
-                    ${APIOPERATIONS.decapitalize()}.addOperation("${it.name}")
-                    $KTORROUTE.${it.method.value}<$PATHSFILE.${it.name.capitalize()}>{
-                        val body = call.receive<Pet>()
-                        function(${it.name.capitalize()}(body, call))
-                    }
-                """.trimIndent()
-                )
+                .addCode(codeBlock.build())
                 .build()
         )
     }
 
     return functions
+}
+
+private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock.Builder {
+    //For Requests with query parameters
+    if (!operation.parameters.isNullOrEmpty()) {
+        var parameters = ""
+        operation.parameters.map {
+            if (it.type == DataType.ARRAY)
+                this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]?.split(\",\")\n")
+            else
+                this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]\n")
+            parameters += "${it.name},"
+        }
+        this.add("\tfunction(${operation.name.capitalize()}($parameters call))")
+    } else {
+        //For requests with body
+        this.add("\tval body = call.receive<Pet>()\n")
+            .add("\tfunction(${operation.name.capitalize()}(body, call))")
+    }
+    return this
 }
 
 private fun FileSpec.Builder.addImports(componentNames: List<String>): FileSpec.Builder {
