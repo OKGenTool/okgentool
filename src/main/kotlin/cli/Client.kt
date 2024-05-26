@@ -12,7 +12,7 @@ fun getClient(args: Array<String>): Client {
     for (i in args.indices) {
         when (args[i]) {
             "-s" -> sourcePath = args[i + 1]
-            "-g" -> destinationPath = args[i + 1] //TODO why -g? Maybe -d could be a better arg for "destination"
+            "-t" -> destinationPath = args[i + 1] //TODO why -g? Maybe -d could be a better arg for "destination"
             else -> {}
         }
     }
