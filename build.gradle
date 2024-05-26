@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.9.0'
     id 'application'
@@ -5,7 +7,6 @@ plugins {
 }
 
 group = 'org.example'
-version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -29,4 +30,19 @@ kotlin {
 
 application {
     mainClassName = 'MainKt'
+}
+
+task copyRuntimeDependencies(type: Copy) {
+    into 'build/libs'
+    from configurations.runtimeClasspath
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'MainKt'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

@@ -1,9 +1,5 @@
 import cli.getClient
-import datamodel.Component
-import datamodel.ComponentProperty
-import datamodel.DataType
 import generator.Generator
-import generator.builders.model.createModelComponent
 import org.slf4j.LoggerFactory
 import parser.Parser
 
@@ -17,7 +13,7 @@ fun main(args: Array<String>) {
     val dataModel = Parser(client.sourcePath).getDataModel()
 
     logger.info("Start code generation")
-    Generator(dataModel, client.destinationPath)
+    Generator(dataModel, client.serverDestinationPath)
 
     logger.info("Code generation ends")
 }
