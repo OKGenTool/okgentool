@@ -4,7 +4,7 @@ import kotlin.Int
 import kotlinx.serialization.Serializable
 
 @Serializable
-public data class dataClassWithRequiredIntParameterWithMultipleOf(
+public data class DataClassWithRequiredIntParameterWithMultipleOf(
   public val `value`: Int,
 ) {
   init {

@@ -18,6 +18,7 @@ val dataClassWithGeneratedTypeArray = Component(
             dataType = DataType.ARRAY,
             required = true,
             schemaName = "",
+            arrayItemsType = DataType.OBJECT,
             arrayItemsSchemaName = "#/components/schemas/DataClass"
         )
     ),

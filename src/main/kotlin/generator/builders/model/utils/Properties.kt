@@ -43,7 +43,7 @@ private fun arrayPropertyType(property: ComponentProperty, components: List<Comp
             arrayPropertyType(property.arrayProperties, components)
         )
     }
-    if (property.arrayItemsType != null)
+    if (property.arrayItemsType != null && property.arrayItemsType != DataType.OBJECT)
         return property.dataType.kotlinType.parameterizedBy(property.arrayItemsType.kotlinType)
     if (!property.arrayItemsSchemaName.isNullOrBlank()){
         val relatedComponent = components.find { it.schemaName == property.arrayItemsSchemaName }

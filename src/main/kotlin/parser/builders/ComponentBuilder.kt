@@ -164,7 +164,7 @@ private fun getArrayProperties(
 ): ComponentProperty {
     val childArrayItems = arrayItems?.items
     val arrayItemsType = DataType.fromString(arrayItems?.items?.type ?: "", arrayItems?.items?.format ?: "")
-    val arrayItemsSchemaName = arrayItems?.`$ref` ?: ""
+    val arrayItemsSchemaName = arrayItems?.items?.`$ref` ?: ""
     val childUniqueItems = arrayItems?.uniqueItems ?: false
     val childMinItems = arrayItems?.minItems
     val childMaxItems = arrayItems?.maxItems
