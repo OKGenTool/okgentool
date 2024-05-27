@@ -3,6 +3,7 @@ package generator.builders.dsl
 import com.squareup.kotlinpoet.*
 import datamodel.DSLOperation
 import datamodel.DataType
+import datamodel.In
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
@@ -68,7 +69,7 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
     writeFile(fileSpec.build(), basePath)
 }
 
-fun getInnerClass(dslOperations: List<DSLOperation>): TypeSpec =
+private fun getInnerClass(dslOperations: List<DSLOperation>): TypeSpec =
     TypeSpec.classBuilder(INNERCLASS).apply {
         addModifiers(KModifier.INNER)
         getOperationFunctions(dslOperations).forEach {
@@ -76,7 +77,7 @@ fun getInnerClass(dslOperations: List<DSLOperation>): TypeSpec =
         }
     }.build()
 
-fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSpec> {
+private fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSpec> {
     val functions = mutableListOf<FunSpec>()
 
     dslOperations.map {
@@ -109,10 +110,18 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
     if (!operation.parameters.isNullOrEmpty()) {
         var parameters = ""
         operation.parameters.map {
-            if (it.type == DataType.ARRAY)
-                this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]?.split(\",\")\n")
-            else
-                this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]\n")
+            when (it.`in`) {
+                In.PATH -> {
+                    this.add("\tval ${it.name} = call.parameters[\"${it.name}\"]?${getConvertion(it.type)}\n")
+                }
+
+                else -> {
+                    if (it.type == DataType.ARRAY)
+                        this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]?.split(\",\")\n")
+                    else
+                        this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]\n")
+                }
+            }
             parameters += "${it.name},"
         }
         this.add("\tfunction(${operation.name.capitalize()}($parameters call))")
@@ -123,6 +132,21 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
     }
     return this
 }
+
+fun getConvertion(type: DataType): String =
+    when (type) {
+        DataType.INTEGER -> ".toIntOrNull()"
+        DataType.LONG -> ".toLongOrNull()"
+        DataType.FLOAT -> ".toFloatOrNull()"
+        DataType.DOUBLE -> ".toDoubleOrNull()"
+        DataType.BYTE -> ".toByteOrNull()"
+        DataType.BOOLEAN -> ".toBoolean()"
+        DataType.NUMBER -> ".toDoubleOrNull()"
+        DataType.ARRAY -> ".split(\",\")"
+        else -> {
+            ""
+        }
+    }
 
 private fun FileSpec.Builder.addImports(componentNames: List<String>): FileSpec.Builder {
     this.addImport("io.ktor.server.resources", "post")

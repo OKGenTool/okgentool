@@ -28,17 +28,8 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
         var responseType: TypeSpec? = null
 
         //Build Request class
-        if (operation.requestBody != null) {
-            //Build request class when using body
-            parameters.add(getParameter(operation.requestBody))
-            requestType = getRequestType(parameters, operation.name)
-            fileSpec.addType(requestType)
-        } else if (!operation.parameters.isNullOrEmpty()) {
-            //Build request class when using query parameters
-            requestType = getRequestQueryParam(operation)
-            fileSpec.addType(requestType)
-            parameters.addAll(getQueryParameters(operation))
-        }
+        requestType = buildRequestClass(operation, parameters)
+        requestType?.let { fileSpec.addType(requestType) }
 
         //Build Response Class
         val responseProps = getResponseProps(operation.name, operation.responses!!)
@@ -71,7 +62,7 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
 
     buildApiOperations(basePath)
     buildReadRequestResult(basePath)
-    buildOkGenDsl(dslOperations, componentNames, basePath) //TODO
+    buildOkGenDsl(dslOperations, componentNames, basePath)
 }
 
 
@@ -144,7 +135,7 @@ private fun getOperationType(
 }
 
 
-private fun getParameter(body: BodyNew): GenParameter {
+fun getBodyAsParameter(body: BodyNew): GenParameter {
     var name: String = ""
     var type: TypeName? = null
 
