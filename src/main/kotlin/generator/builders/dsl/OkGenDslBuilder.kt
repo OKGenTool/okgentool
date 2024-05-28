@@ -81,6 +81,8 @@ private fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSp
     val functions = mutableListOf<FunSpec>()
 
     dslOperations.map {
+        if(it.name in notImplemented) return@map //TODO implement this operations
+
         //Define suspend function for operation parameter
         val suspFunc = LambdaTypeName.get(
             receiver = ClassName(Packages.DSLOPERATIONS, it.name.capitalize()),
@@ -112,7 +114,7 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
         operation.parameters.map {
             when (it.`in`) {
                 In.PATH -> {
-                    this.add("\tval ${it.name} = call.parameters[\"${it.name}\"]?${getConvertion(it.type)}\n")
+                    this.add("\tval ${it.name} = call.parameters[\"${it.name}\"]${getConvertion(it.type)}\n")
                 }
 
                 else -> {
@@ -135,14 +137,14 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
 
 fun getConvertion(type: DataType): String =
     when (type) {
-        DataType.INTEGER -> ".toIntOrNull()"
-        DataType.LONG -> ".toLongOrNull()"
-        DataType.FLOAT -> ".toFloatOrNull()"
-        DataType.DOUBLE -> ".toDoubleOrNull()"
-        DataType.BYTE -> ".toByteOrNull()"
-        DataType.BOOLEAN -> ".toBoolean()"
-        DataType.NUMBER -> ".toDoubleOrNull()"
-        DataType.ARRAY -> ".split(\",\")"
+        DataType.INTEGER -> "?.toIntOrNull()"
+        DataType.LONG -> "?.toLongOrNull()"
+        DataType.FLOAT -> "?.toFloatOrNull()"
+        DataType.DOUBLE -> "?.toDoubleOrNull()"
+        DataType.BYTE -> "?.toByteOrNull()"
+        DataType.BOOLEAN -> "?.toBoolean()"
+        DataType.NUMBER -> "?.toDoubleOrNull()"
+        DataType.ARRAY -> "?.split(\",\")"
         else -> {
             ""
         }
@@ -163,3 +165,9 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>): FileSpec.
 
     return this
 }
+
+//TODO implement this operations
+val notImplemented = setOf(
+    "postPetPetIdUploadImage", "getInventory", "placeOrder", "createUser", "createUsersWithListInput",
+    "logoutUser", "updateUser"
+)
