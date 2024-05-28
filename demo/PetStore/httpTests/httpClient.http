@@ -1,0 +1,30 @@
+###
+POST http://127.0.0.1:8080/pet
+Content-Type: application/json
+//Accept: application/xml
+
+{
+    "name" : "boby",
+    "photoUrls" : [ "photoUrls" ]
+}
+
+###
+POST http://127.0.0.1:8080/pet
+
+###
+PUT http://127.0.0.1:8080/pet
+Content-Type: application/json
+
+{
+    "name" : "boby",
+    "photoUrls" : [ "photoUrls" ]
+}
+
+###
+GET http://127.0.0.1:8080/pet/findByStatus?status=available,pending
+
+###
+GET http://127.0.0.1:8080/pet/findByTags?tags=cat,dog,hamster
+
+###
+GET http://127.0.0.1:8080/pet/
