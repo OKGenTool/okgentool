@@ -3,6 +3,7 @@ package generator.builders.dsl
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.*
+import generator.builders.routing.plugins.buildSerialization
 import generator.builders.routing.routes.buildReadRequestResult
 import generator.capitalize
 import generator.getVarNameFromParam
@@ -62,6 +63,7 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
 
     buildApiOperations(basePath)
     buildReadRequestResult(basePath)
+    buildSerialization(basePath)
     buildOkGenDsl(dslOperations, componentNames, basePath)
 }
 
