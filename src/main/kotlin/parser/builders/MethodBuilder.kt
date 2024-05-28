@@ -69,7 +69,7 @@ fun getParameters(parameters: List<Parameter>?): List<datamodel.Parameter> {
             name = it.name,
             `in` = In.fromValue(it.`in`.toString()),
             required = it.required ?: false,
-            dataType = DataType.fromString(it.schema.type, it.schema?.format ?: "")!!,
+            dataType = DataType.fromString(it.schema.type, it.schema?.format ?: ""),
             allowEmptyValue = it.allowEmptyValue ?: false,
             items = null, // TODO
             default = it.schema?.default?.toString(), // TODO

@@ -13,7 +13,8 @@ fun main(args: Array<String>) {
     val dataModel = Parser(client.sourcePath).getDataModel()
 
     logger.info("Start code generation")
-    Generator(dataModel, client.destinationPath)
+    Generator(dataModel, client.serverDestinationPath)
+        .build()
 
     logger.info("Code generation ends")
 }

@@ -25,7 +25,7 @@ enum class DataType (val type: String, val format: String, val kotlinType: Class
     OBJECT("object", "", Any::class.asTypeName());
 
     companion object {
-        fun fromString(type: String, format: String): DataType {
+        fun fromString(type: String, format: String?): DataType {
             return entries.firstOrNull { it.type == type && (it.format == format || it.format == "") }
                 ?: OBJECT
         }
