@@ -1,7 +1,7 @@
 package parser.builders
 
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 import generator.capitalize
 import io.swagger.v3.oas.models.media.Schema
@@ -83,8 +83,8 @@ private fun checkChildren(components: MutableList<Component>): List<Component> {
     return components
 }
 
-private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>): List<ComponentProperties> {
-    val properties = mutableListOf<ComponentProperties>()
+private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>): List<ComponentProperty> {
+    val properties = mutableListOf<ComponentProperty>()
 
     if (schema != null && schema.properties != null) {
         for (parameter in schema.properties) {
@@ -95,37 +95,123 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
             val values = parameter.value.enum?.map { it.toString() } ?: emptyList()
 
             if (dataType == DataType.ARRAY) {
-                val arrayItems = parameter.value.items
-                val arrayItemsType = DataType.fromString(arrayItems?.type ?: "", arrayItems?.format ?: "")
-                val arrayItemsSchemaName = arrayItems?.`$ref` ?: ""
+                val arrayItems = parameter.value
+                val arrayIndex = 0
+                val minItems = parameter.value.minItems
+                val maxItems = parameter.value.maxItems
+                val uniqueItems = parameter.value.uniqueItems ?: false
 
                 properties.add(
-                    ComponentProperties(
-                        name,
-                        dataType,
-                        required,
-                        schemaName,
-                        values.isNotEmpty(),
-                        arrayItemsType,
-                        arrayItemsSchemaName,
-                        values
+                    getArrayProperties(
+                        arrayItems = arrayItems,
+                        name = name,
+                        dataType = dataType,
+                        required = required,
+                        schemaName = schemaName,
+                        values = values,
+                        arrayIndex = arrayIndex,
+                        minItems = minItems,
+                        maxItems = maxItems,
+                        uniqueItems = uniqueItems
                     )
                 )
                 continue
             }
 
+            val minimum = parameter.value.minimum?.toInt()
+            val maximum = parameter.value.maximum?.toInt()
+            val exclusiveMinimum = parameter.value.exclusiveMinimum ?: false
+            val exclusiveMaximum = parameter.value.exclusiveMaximum ?: false
+            val multipleOf = parameter.value.multipleOf?.toInt()
+            val pattern = parameter.value.pattern
+            val minLength = parameter.value.minLength
+            val maxLength = parameter.value.maxLength
+
             properties.add(
-                ComponentProperties(
-                    name,
-                    dataType,
-                    required,
-                    schemaName,
+                ComponentProperty(
+                    name = name,
+                    dataType = dataType,
+                    required = required,
+                    schemaName = schemaName,
                     isEnum = values.isNotEmpty(),
-                    values = values
+                    values = values,
+                    minimum = minimum,
+                    maximum = maximum,
+                    exclusiveMinimum = exclusiveMinimum,
+                    exclusiveMaximum = exclusiveMaximum,
+                    multipleOf = multipleOf,
+                    minLength = minLength,
+                    maxLength = maxLength,
+                    pattern = pattern
                 )
             )
         }
     }
 
     return properties
+}
+
+private fun getArrayProperties(
+    arrayItems: Schema<*>?,
+    name: String,
+    dataType: DataType,
+    required: Boolean,
+    schemaName: String,
+    values: List<String>,
+    arrayIndex: Int,
+    minItems: Int?,
+    maxItems: Int?,
+    uniqueItems: Boolean = false
+): ComponentProperty {
+    val childArrayItems = arrayItems?.items
+    val arrayItemsType = DataType.fromString(arrayItems?.items?.type ?: "", arrayItems?.items?.format ?: "")
+    val arrayItemsSchemaName = arrayItems?.items?.`$ref` ?: ""
+    val childUniqueItems = arrayItems?.uniqueItems ?: false
+    val childMinItems = arrayItems?.minItems
+    val childMaxItems = arrayItems?.maxItems
+    val childArrayIndex = arrayIndex + 1
+
+    if (arrayItemsType != DataType.ARRAY) {
+        return ComponentProperty(
+            name = name,
+            dataType = dataType,
+            required = required,
+            schemaName = schemaName,
+            isEnum = values.isNotEmpty(),
+            arrayItemsType = arrayItemsType,
+            arrayItemsSchemaName = arrayItemsSchemaName,
+            values = values,
+            minItems = minItems,
+            maxItems = maxItems,
+            arrayIndex = arrayIndex,
+            uniqueItems = uniqueItems
+        )
+    }
+
+    return ComponentProperty(
+        name = name,
+        dataType = dataType,
+        required = required,
+        schemaName = schemaName,
+        isEnum = values.isNotEmpty(),
+        arrayItemsType = arrayItemsType,
+        arrayItemsSchemaName = arrayItemsSchemaName,
+        values = values,
+        minItems = minItems,
+        maxItems = maxItems,
+        arrayIndex = arrayIndex,
+        uniqueItems = uniqueItems,
+        arrayProperties = getArrayProperties(
+            arrayItems = childArrayItems,
+            name = name,
+            dataType = dataType,
+            required = required,
+            schemaName = schemaName,
+            values = values,
+            minItems = childMinItems,
+            maxItems = childMaxItems,
+            arrayIndex = childArrayIndex,
+            uniqueItems = childUniqueItems
+        )
+    )
 }

@@ -1,23 +1,24 @@
 package generator.model.utils
 
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 
 val dataClassWithGeneratedTypeArray = Component(
     schemaName = "#/components/schemas/DataClassWithGeneratedTypeArray",
     parameters = listOf(
-        ComponentProperties(
+        ComponentProperty(
             name = "name",
             dataType = DataType.STRING,
             required = true,
             schemaName = ""
         ),
-        ComponentProperties(
+        ComponentProperty(
             name = "value",
             dataType = DataType.ARRAY,
             required = true,
             schemaName = "",
+            arrayItemsType = DataType.OBJECT,
             arrayItemsSchemaName = "#/components/schemas/DataClass"
         )
     ),

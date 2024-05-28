@@ -12,20 +12,22 @@ enum class DataType (val type: String, val format: String, val kotlinType: Class
     FLOAT("number", "float", Float::class.asTypeName()),
     DOUBLE("number", "double", Double::class.asTypeName()),
     STRING("string", "", String::class.asTypeName()),
-    BYTE("string", "byte", Byte::class.asTypeName()),
+    BYTE("string", "byte", ByteArray::class.asTypeName()),
     BINARY("string", "binary", ByteArray::class.asTypeName()),
     BOOLEAN("boolean", "", Boolean::class.asTypeName()),
     DATE("string", "date", LocalDate::class.asTypeName()),
     DATE_TIME("string", "date-time", LocalDateTime::class.asTypeName()),
     PASSWORD("string", "password", String::class.asTypeName()),
 
+    INT("integer", "", Int::class.asTypeName()),
     NUMBER("number", "", Double::class.asTypeName()),
     ARRAY("array", "", List::class.asTypeName()),
     OBJECT("object", "", Any::class.asTypeName());
 
     companion object {
-        fun fromString(type: String, format: String?): DataType? {
+        fun fromString(type: String, format: String): DataType {
             return entries.firstOrNull { it.type == type && (it.format == format || it.format == "") }
+                ?: OBJECT
         }
 
         fun getFormats(type: String): List<String> {

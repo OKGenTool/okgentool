@@ -1,19 +1,19 @@
 package generator.model.utils
 
 import datamodel.Component
-import datamodel.ComponentProperties
+import datamodel.ComponentProperty
 import datamodel.DataType
 
 val dataClassWithEnumParameter = Component(
     schemaName = "#/components/schemas/DataClassWithEnumParameter",
     parameters = listOf(
-        ComponentProperties(
+        ComponentProperty(
             name = "name",
             dataType = DataType.STRING,
             required = true,
             schemaName = ""
         ),
-        ComponentProperties(
+        ComponentProperty(
             name = "value",
             dataType = DataType.ARRAY,
             required = true,
@@ -23,7 +23,7 @@ val dataClassWithEnumParameter = Component(
             values = listOf("A", "B", "C")
         )
     ),
-    simplifiedName = "DataClassWithGeneratedTypeArray",
+    simplifiedName = "DataClassWithEnumParameter",
     superClassChildSchemaNames = emptyList()
 )
 

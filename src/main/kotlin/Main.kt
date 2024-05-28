@@ -14,7 +14,6 @@ fun main(args: Array<String>) {
 
     logger.info("Start code generation")
     Generator(dataModel, client.destinationPath)
-        .build()
 
     logger.info("Code generation ends")
 }
