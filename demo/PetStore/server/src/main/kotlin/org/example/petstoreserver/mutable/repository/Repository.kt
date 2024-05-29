@@ -1,8 +1,10 @@
 package org.example.petstoreserver.mutable.repository
 
-
-
-import org.example.petstoreserver.mutable.routing.models.Pet
+import gen.routing.model.Pet
+import org.example.petstoreserver.mutable.failure
+import org.example.petstoreserver.mutable.routing.routes.PetRouteError
+import org.example.petstoreserver.mutable.routing.routes.PetRouteResult
+import org.example.petstoreserver.mutable.success
 import org.slf4j.LoggerFactory
 
 val logger = LoggerFactory.getLogger(Repository::class.java.simpleName)!!
@@ -16,13 +18,13 @@ class Repository {
         if (pet.id != null) {
             throw RuntimeException("Trying to add a Pet with ID")
         }
-        val petId = pets.count() + 1
+        val petId: Long = (pets.count() + 1).toLong()
 
         val newPet = Pet(
+            petId,
             pet.name,
-            pet.photoUrls,
-            petId.toLong(),
             pet.category,
+            pet.photoUrls,
             pet.tags,
             pet.status
         )
