@@ -1,6 +1,6 @@
 package org.example.petstoreserver.mutable.repository
 
-import gen.routing.model.Pet
+import org.example.petstoreserver.gen.routing.model.Pet
 import org.example.petstoreserver.mutable.failure
 import org.example.petstoreserver.mutable.routing.routes.PetRouteError
 import org.example.petstoreserver.mutable.routing.routes.PetRouteResult

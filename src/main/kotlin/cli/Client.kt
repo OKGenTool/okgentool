@@ -39,8 +39,8 @@ fun getClient(args: Array<String>) {
     }
 
     checkSourcePath(sourcePath)
-    checkDestinationPath(serverDestinationPath)
-    checkDestinationPath(clientDestinationPath)
+//    checkDestinationPath(serverDestinationPath) //TODO do not use this
+//    checkDestinationPath(clientDestinationPath)
     packageName = formatPackageName(packageName)
 }
 

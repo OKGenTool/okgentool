@@ -1,6 +1,6 @@
 package org.example.petstoreserver.mutable.services
 
-import gen.routing.model.Pet
+import org.example.petstoreserver.gen.routing.model.Pet
 import org.example.petstoreserver.mutable.repository.Repository
 import org.example.petstoreserver.mutable.routing.routes.PetRouteResult
 import org.slf4j.LoggerFactory
