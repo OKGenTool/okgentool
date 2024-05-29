@@ -21,7 +21,7 @@ private const val OUTERCLASS = "OkGenDsl"
 private const val APIOPERATIONS = "ApiOperations"
 private const val KTORROUTE = "ktorRoute"
 
-fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>, basePath: String) {
+fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>) {
     logger.info("Generating $OUTERCLASS file")
 
     val route = GenParameter(
@@ -66,7 +66,7 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
             )
             .addImports(componentNames)
 
-    writeFile(fileSpec.build(), basePath)
+    writeFile(fileSpec.build())
 }
 
 private fun getInnerClass(dslOperations: List<DSLOperation>): TypeSpec =
@@ -81,7 +81,7 @@ private fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSp
     val functions = mutableListOf<FunSpec>()
 
     dslOperations.map {
-        if(it.name in notImplemented) return@map //TODO implement this operations
+        if (it.name in notImplemented) return@map //TODO implement this operations
 
         //Define suspend function for operation parameter
         val suspFunc = LambdaTypeName.get(

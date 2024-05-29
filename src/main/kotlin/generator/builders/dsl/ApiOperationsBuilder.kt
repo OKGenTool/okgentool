@@ -8,7 +8,7 @@ import output.writeFile
 
 private val logger = LoggerFactory.getLogger("ApiOperationsBuilder.kt")
 
-fun buildApiOperations(basePath: String) {
+fun buildApiOperations() {
     // Define the apiOperations property
     val apiOperationsProperty = PropertySpec.builder(
         "apiOperations",
@@ -42,5 +42,5 @@ fun buildApiOperations(basePath: String) {
         .addType(apiOperationsClass)
         .build()
 
-    writeFile(fileSpec, basePath)
+    writeFile(fileSpec)
 }

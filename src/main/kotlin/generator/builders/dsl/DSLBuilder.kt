@@ -18,7 +18,7 @@ import output.writeFile
 
 private val logger = LoggerFactory.getLogger("DSLBuilder.kt")
 
-fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<String>, basePath: String) {
+fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<String>) {
     for (operation in dslOperations) {
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
 
@@ -58,13 +58,13 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
             .addImport("io.ktor.http", "HttpStatusCode")
             .addImport(Packages.ROUTES, "ReadRequestResult", "RequestErrorInvalidArgument")
 
-        writeFile(fileSpec.build(), basePath)
+        writeFile(fileSpec.build())
     }
 
-    buildApiOperations(basePath)
-    buildReadRequestResult(basePath)
-    buildSerialization(basePath)
-    buildOkGenDsl(dslOperations, componentNames, basePath)
+    buildApiOperations()
+    buildReadRequestResult()
+    buildSerialization()
+    buildOkGenDsl(dslOperations, componentNames)
 }
 
 

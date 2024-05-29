@@ -12,7 +12,7 @@ private const val SERIALIZATION_FILE = "Serialization.kt"
 
 private val logger = LoggerFactory.getLogger("SerializationBuilder")
 
-fun buildSerialization(basePath: String){
+fun buildSerialization() {
     logger.info("Generating $SERIALIZATION_FILE")
 
     // Create the function
@@ -31,11 +31,11 @@ fun buildSerialization(basePath: String){
     // Create the Kotlin file
     val file = FileSpec.builder(Packages.PLUGINS, SERIALIZATION_FILE)
         .addFunction(functionSpec)
-        .addImport("io.ktor.server.application", "Application","install")
+        .addImport("io.ktor.server.application", "Application", "install")
         .addImport("io.ktor.server.plugins.contentnegotiation", "ContentNegotiation")
         .addImport("io.ktor.serialization.kotlinx.json", "json")
         .addImport("io.ktor.serialization.kotlinx.xml", "xml")
         .build()
 
-    writeFile(file, basePath)
+    writeFile(file)
 }

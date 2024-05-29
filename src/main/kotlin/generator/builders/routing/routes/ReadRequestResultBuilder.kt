@@ -5,11 +5,11 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import generator.model.Packages
 import output.writeFile
 
-const val PACKAGENAME = Packages.ROUTES
+val PACKAGENAME = Packages.ROUTES
 const val READREQUESTRESULT = "ReadRequestResult"
 const val REQUESTERROR = "RequestError"
 
-fun buildReadRequestResult(basePath: String) {
+fun buildReadRequestResult() {
 
     // Define the ReadRequestResult sealed class
     val readRequestResultClass = TypeSpec.classBuilder(READREQUESTRESULT)
@@ -90,6 +90,6 @@ fun buildReadRequestResult(basePath: String) {
         .addType(requestErrorInvalidArgumentClass)
         .build()
 
-    writeFile(file, basePath)
+    writeFile(file)
 
 }

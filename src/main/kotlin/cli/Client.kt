@@ -4,14 +4,12 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.system.exitProcess
 
-data class Client(
-    val sourcePath: String,
-    val serverDestinationPath: String,
-    val clientDestinationPath: String,
-    val packageName: String,
-)
+var sourcePath: String = ""
+var serverDestinationPath: String = ""
+var clientDestinationPath: String = ""
+var packageName: String = ""
 
-fun getClient(args: Array<String>): Client {
+fun getClient(args: Array<String>) {
     if (args.isEmpty()) {
         println(getErrorMessage("No arguments provided"))
         exitProcess(1)
@@ -21,11 +19,6 @@ fun getClient(args: Array<String>): Client {
         println(getHelpText())
         exitProcess(1)
     }
-
-    var sourcePath = ""
-    var serverDestinationPath = ""
-    var clientDestinationPath = ""
-    var packageName = ""
 
     for (i in args.indices) {
         when (args[i]) {
@@ -40,7 +33,7 @@ fun getClient(args: Array<String>): Client {
     if (
         sourcePath.isEmpty() ||
         (serverDestinationPath.isEmpty() && clientDestinationPath.isEmpty())
-        ) {
+    ) {
         println(getErrorMessage("Invalid command line arguments"))
         exitProcess(1)
     }
@@ -48,13 +41,7 @@ fun getClient(args: Array<String>): Client {
     checkSourcePath(sourcePath)
     checkDestinationPath(serverDestinationPath)
     checkDestinationPath(clientDestinationPath)
-
-    return Client(
-        sourcePath,
-        serverDestinationPath,
-        clientDestinationPath,
-        formatPackageName(packageName)
-    )
+    packageName = formatPackageName(packageName)
 }
 
 private fun getHelpText(): String {
