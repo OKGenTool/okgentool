@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.resources.*
+import org.example.petstoreserver.gen.routing.plugins.configureGenSerialization
 import org.example.petstoreserver.mutable.routing.plugins.configureMutableRouting
 import org.slf4j.LoggerFactory
 
@@ -17,7 +18,7 @@ fun main() {
 
 fun Application.module() {
     install(Resources)
-//    configureGenSerialization()
+    configureGenSerialization()
     configureMutableRouting()       //Mutable routing comes first
 //    configureGenDefaultRouting()    //Generated routing comes last
 }
