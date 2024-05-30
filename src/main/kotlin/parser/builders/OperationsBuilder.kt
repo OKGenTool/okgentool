@@ -56,20 +56,20 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
     dslOperations.add(dslOperation)
 }
 
-private fun getResponses(operation: Operation): List<ResponseNew>? {
+private fun getResponses(operation: Operation): List<Response>? {
     if (operation == null) return null
-    val responses: MutableList<ResponseNew> = mutableListOf()
+    val responses: MutableList<Response> = mutableListOf()
 
     for (response in operation.responses) {
         val content = response.value.content
 
-        val responseNew = ResponseNew(
+        val response = Response(
             response.key,
             response.value.description,
             content?.keys?.toList(),
             getSchemaProp(content?.let { it[content.keys.first()]?.schema }, SchemaProps.REF)
         )
-        responses.add(responseNew)
+        responses.add(response)
     }
     return responses
 }

@@ -1,6 +1,6 @@
 package generator.model
 
 import com.squareup.kotlinpoet.PropertySpec
-import datamodel.ResponseNew
+import datamodel.Response
 
-data class ResponseProp(val response: ResponseNew, val responseType: PropertySpec)
+data class ResponseProp(val response: Response, val responseType: PropertySpec)

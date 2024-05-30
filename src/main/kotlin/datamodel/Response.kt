@@ -2,9 +2,9 @@ package datamodel
 
 import org.slf4j.LoggerFactory
 
-private val logger = LoggerFactory.getLogger(ResponseNew::class.java.simpleName)
+private val logger = LoggerFactory.getLogger(Response::class.java.simpleName)
 
-data class ResponseNew(
+data class Response(
     val statusCodeStr: String,
     val description: String,
     val contentTypes: List<String>?,

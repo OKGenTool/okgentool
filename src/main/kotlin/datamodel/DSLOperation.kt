@@ -5,7 +5,7 @@ import io.ktor.http.*
 data class DSLOperation(
     val name: String,
     val requestBody: Body?,
-    val responses: List<ResponseNew>?,
+    val responses: List<Response>?,
     val method: HttpMethod,
     val path: String,
     val summary: String,

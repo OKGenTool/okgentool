@@ -1,14 +1,14 @@
 package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
-import datamodel.ResponseNew
+import datamodel.Response
 import datamodel.SchemaProps
 import generator.capitalize
 import generator.getVarNameFromParam
 import generator.model.Packages
 import generator.model.ResponseProp
 
-fun getResponseProps(operationName: String, responses: List<ResponseNew>): List<ResponseProp> {
+fun getResponseProps(operationName: String, responses: List<Response>): List<ResponseProp> {
     return responses.map {
         val varName = "${operationName}Response${it.statusCodeStr.capitalize()}"
 
