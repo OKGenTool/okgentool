@@ -7,7 +7,7 @@ import datamodel.In
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
-import generator.model.GenParameter
+import generator.model.Parameter
 import generator.model.Packages
 import generator.model.Visibility
 import io.ktor.server.routing.*
@@ -24,7 +24,7 @@ private const val KTORROUTE = "ktorRoute"
 fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>) {
     logger.info("Generating $OUTERCLASS file")
 
-    val route = GenParameter(
+    val route = Parameter(
         KTORROUTE,
         Route::class.java.asTypeName(),
         Visibility.PRIVATE
@@ -81,7 +81,7 @@ private fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSp
     val functions = mutableListOf<FunSpec>()
 
     dslOperations.map {
-        if (it.name in notImplemented) return@map //TODO implement this operations
+        if (it.name in notImplemented) return@map //TODO implement these operations
 
         //Define suspend function for operation parameter
         val suspFunc = LambdaTypeName.get(
@@ -166,7 +166,7 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>): FileSpec.
     return this
 }
 
-//TODO implement this operations
+//TODO implement these operations
 val notImplemented = setOf(
     "postPetPetIdUploadImage", "getInventory", "placeOrder", "createUser", "createUsersWithListInput",
     "logoutUser", "updateUser"

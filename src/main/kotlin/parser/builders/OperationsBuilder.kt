@@ -100,7 +100,7 @@ private fun getComposedOperationName(path: String, method: String): String {
     return "${method}$finalPath"
 }
 
-private fun getBodyNew(operation: Operation): BodyNew? {
+private fun getBodyNew(operation: Operation): Body? {
     val requestBody = operation.requestBody ?: return null
 
     val contentTypes = requestBody.content.keys.toList()

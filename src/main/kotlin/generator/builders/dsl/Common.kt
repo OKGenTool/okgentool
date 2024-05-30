@@ -3,13 +3,13 @@ package generator.builders.dsl
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import generator.model.GenParameter
+import generator.model.Parameter
 
-fun TypeSpec.Builder.getConstructor(genParameters: List<GenParameter?>): TypeSpec.Builder {
+fun TypeSpec.Builder.getConstructor(parameters: List<Parameter?>): TypeSpec.Builder {
     val constructor = FunSpec.constructorBuilder()
     val properties: MutableList<PropertySpec> = mutableListOf()
 
-    genParameters.map {
+    parameters.map {
         if (it != null) {
             constructor.addParameter(it.name, it.type)
             properties.add(

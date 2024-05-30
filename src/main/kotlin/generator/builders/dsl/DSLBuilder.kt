@@ -7,7 +7,7 @@ import generator.builders.routing.plugins.buildSerialization
 import generator.builders.routing.routes.buildReadRequestResult
 import generator.capitalize
 import generator.getVarNameFromParam
-import generator.model.GenParameter
+import generator.model.Parameter
 import generator.model.Packages
 import generator.model.ResponseProp
 import generator.model.Visibility
@@ -22,8 +22,8 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
     for (operation in dslOperations) {
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
 
-        val parameters: MutableList<GenParameter> = mutableListOf()
-        var requestGenParameter: GenParameter? = null
+        val parameters: MutableList<Parameter> = mutableListOf()
+        var requestParameter: Parameter? = null
 
         var requestType: TypeSpec? = null
         var responseType: TypeSpec? = null
@@ -39,7 +39,7 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
 
         //Build Operation main class
         parameters.add(
-            GenParameter(
+            Parameter(
                 "call",
                 ApplicationCall::class.asTypeName(),
                 Visibility.PRIVATE
@@ -69,7 +69,7 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
 
 
 private fun getOperationType(
-    genParameters: List<GenParameter?>,
+    parameters: List<Parameter?>,
     operationName: String,
     request: TypeSpec?,
     response: TypeSpec?,
@@ -77,13 +77,13 @@ private fun getOperationType(
 ): TypeSpec {
     val mainClass = TypeSpec.classBuilder(operationName.capitalize())
 
-    if (!genParameters.isEmpty()) {
-        mainClass.getConstructor(genParameters)
+    if (!parameters.isEmpty()) {
+        mainClass.getConstructor(parameters)
     }
 
 //    val reqVarName = genParameters.first()?.name
     var reqVarName = ""
-    genParameters.forEach {
+    parameters.forEach {
         if (it?.name != "call")
             reqVarName += "${it?.name}, "
     }
@@ -127,7 +127,7 @@ private fun getOperationType(
             .build()
     )
 
-    //TODO Add Response Functions
+    //Add Response Functions
     getResponseFunctions(responseProps)
         .map {
             mainClass.addFunction(it)
@@ -137,7 +137,7 @@ private fun getOperationType(
 }
 
 
-fun getBodyAsParameter(body: BodyNew): GenParameter {
+fun getBodyAsParameter(body: Body): Parameter {
     var name: String = ""
     var type: TypeName? = null
 
@@ -173,7 +173,7 @@ fun getBodyAsParameter(body: BodyNew): GenParameter {
         }
     }
 
-    return GenParameter(name, type!!)
+    return Parameter(name, type!!)
 }
 
 

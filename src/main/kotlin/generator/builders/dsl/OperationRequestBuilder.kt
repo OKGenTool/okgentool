@@ -5,12 +5,12 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.DSLOperation
 import datamodel.In
 import generator.capitalize
-import generator.model.GenParameter
+import generator.model.Parameter
 import generator.model.Packages
 import generator.model.Visibility
 
 
-fun buildRequestClass(operation: DSLOperation, parameters: MutableList<GenParameter>)
+fun buildRequestClass(operation: DSLOperation, parameters: MutableList<Parameter>)
         : TypeSpec? {
     //Build request class when using body
     operation.requestBody?.let {
@@ -29,7 +29,7 @@ fun buildRequestClass(operation: DSLOperation, parameters: MutableList<GenParame
 /**
  * Build request class when using query parameters
  */
-fun getRequestWithParam(operation: DSLOperation, params: List<GenParameter>): TypeSpec {
+fun getRequestWithParam(operation: DSLOperation, params: List<Parameter>): TypeSpec {
     val validation = getValidationCompObj(params)
 
     //TODO must implement multiple validations. One for each query string
@@ -77,15 +77,15 @@ fun getRequestWithParam(operation: DSLOperation, params: List<GenParameter>): Ty
 }
 
 
-fun getRequestType(genParameters: List<GenParameter>, operationName: String): TypeSpec {
+fun getRequestType(parameters: List<Parameter>, operationName: String): TypeSpec {
     return TypeSpec.classBuilder("${operationName}Request".capitalize())
         .addModifiers(KModifier.DATA)
-        .getConstructor(genParameters)
+        .getConstructor(parameters)
         .build()
 }
 
 
-private fun getValidationCompObj(params: List<GenParameter>): TypeSpec? {
+private fun getValidationCompObj(params: List<Parameter>): TypeSpec? {
     var hasValidations = false
     val validation = TypeSpec.companionObjectBuilder()
 
@@ -111,8 +111,8 @@ private fun getValidationCompObj(params: List<GenParameter>): TypeSpec? {
 /**
  * Get parameters when using requests with query strings or path parameter
  */
-private fun getParameters(operation: DSLOperation): List<GenParameter> {
-    val params: MutableList<GenParameter> = mutableListOf()
+private fun getParameters(operation: DSLOperation): List<Parameter> {
+    val params: MutableList<Parameter> = mutableListOf()
 
     operation.parameters?.forEach {
         val typeName: TypeName
@@ -128,7 +128,7 @@ private fun getParameters(operation: DSLOperation): List<GenParameter> {
         }
 
         params.add(
-            GenParameter(
+            Parameter(
                 "param${it.name.capitalize()}",
                 typeName.copy(nullable = true),
                 visibility,
