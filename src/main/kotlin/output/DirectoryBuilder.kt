@@ -7,9 +7,8 @@ import java.io.File
 private val logger = LoggerFactory.getLogger("DirectoryBuilder.kt")
 
 public fun cleanUp(path: String) {
-    //TODO may not work in unix based systems
-    val genFolder = Packages.BASE.replace(".","\\")
-    val genDir = File("$path\\$genFolder")
+    val genFolder = Packages.BASE.replace(".",File.separator)
+    val genDir = File("$path${File.separator}$genFolder")
 
     if (genDir.exists()) {
         val deleteResult = genDir.deleteRecursively()
