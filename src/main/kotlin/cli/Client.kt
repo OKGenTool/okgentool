@@ -39,8 +39,8 @@ fun getClient(args: Array<String>) {
     }
 
     checkSourcePath(sourcePath)
-//    checkDestinationPath(serverDestinationPath) //TODO do not use this
-//    checkDestinationPath(clientDestinationPath)
+    checkDestinationPath(serverDestinationPath)
+    checkDestinationPath(clientDestinationPath)
     packageName = formatPackageName(packageName)
 }
 
@@ -90,10 +90,10 @@ private fun checkSourcePath(sourcePath: String) {
 
 private fun checkDestinationPath(serverDestinationPath: String) {
     val path = Paths.get(serverDestinationPath)
-    if (!Files.exists(path)) {
-        println(getErrorMessage("Directory $serverDestinationPath does not exist"))
-        exitProcess(1)
-    }
+//    if (!Files.exists(path)) {
+//        println(getErrorMessage("Directory $serverDestinationPath does not exist"))
+//        exitProcess(1)
+//    }
     if (!Files.isDirectory(path)) {
         println(getErrorMessage("$serverDestinationPath is not a directory"))
         exitProcess(1)
