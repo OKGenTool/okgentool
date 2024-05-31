@@ -7,12 +7,12 @@ import datamodel.In
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
-import generator.model.Parameter
 import generator.model.Packages
+import generator.model.Parameter
 import generator.model.Visibility
+import generator.writeFile
 import io.ktor.server.routing.*
 import org.slf4j.LoggerFactory
-import output.writeFile
 
 private val logger = LoggerFactory.getLogger("OkGenDslBuilder.kt")
 

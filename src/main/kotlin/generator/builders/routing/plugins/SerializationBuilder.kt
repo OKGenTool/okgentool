@@ -4,8 +4,8 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import generator.model.Packages
+import generator.writeFile
 import org.slf4j.LoggerFactory
-import output.writeFile
 
 private const val SERIALIZATION = "configureGenSerialization"
 private const val SERIALIZATION_FILE = "Serialization.kt"

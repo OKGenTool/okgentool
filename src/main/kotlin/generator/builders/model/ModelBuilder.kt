@@ -4,8 +4,8 @@ import com.squareup.kotlinpoet.FileSpec
 import datamodel.Component
 import generator.builders.model.utils.createDataClassComponent
 import generator.builders.model.utils.createSealedClassComponent
+import generator.writeFile
 import org.slf4j.LoggerFactory
-import output.writeFile
 
 private val logger = LoggerFactory.getLogger("ModelBuilder.kt")
 

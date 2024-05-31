@@ -3,7 +3,7 @@ package generator.builders.routing.routes
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import generator.model.Packages
-import output.writeFile
+import generator.writeFile
 
 val PACKAGENAME = Packages.ROUTES
 const val READREQUESTRESULT = "ReadRequestResult"
@@ -91,5 +91,4 @@ fun buildReadRequestResult() {
         .build()
 
     writeFile(file)
-
 }

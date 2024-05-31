@@ -7,14 +7,14 @@ import generator.builders.routing.plugins.buildSerialization
 import generator.builders.routing.routes.buildReadRequestResult
 import generator.capitalize
 import generator.getVarNameFromParam
-import generator.model.Parameter
 import generator.model.Packages
+import generator.model.Parameter
 import generator.model.ResponseProp
 import generator.model.Visibility
+import generator.writeFile
 import io.ktor.http.ContentType.Application.OctetStream
 import io.ktor.server.application.*
 import org.slf4j.LoggerFactory
-import output.writeFile
 
 private val logger = LoggerFactory.getLogger("DSLBuilder.kt")
 

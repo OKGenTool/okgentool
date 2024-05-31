@@ -6,7 +6,6 @@ import generator.builders.dsl.buildDSLOperations
 import generator.builders.model.buildModel
 import generator.builders.routing.routes.buildPaths
 import org.slf4j.LoggerFactory
-import output.cleanUp
 
 private val logger = LoggerFactory.getLogger(Generator::class.java.simpleName)
 

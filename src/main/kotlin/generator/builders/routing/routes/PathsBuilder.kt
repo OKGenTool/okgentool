@@ -7,10 +7,10 @@ import com.squareup.kotlinpoet.asTypeName
 import datamodel.DSLOperation
 import generator.capitalize
 import generator.model.Packages
+import generator.writeFile
 import io.ktor.resources.*
-
 import org.slf4j.LoggerFactory
-import output.writeFile
+
 
 private val logger = LoggerFactory.getLogger("PathsBuilder.kt")
 

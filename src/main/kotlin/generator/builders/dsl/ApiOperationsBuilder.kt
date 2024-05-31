@@ -3,8 +3,8 @@ package generator.builders.dsl
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import generator.model.Packages
+import generator.writeFile
 import org.slf4j.LoggerFactory
-import output.writeFile
 
 private val logger = LoggerFactory.getLogger("ApiOperationsBuilder.kt")
 

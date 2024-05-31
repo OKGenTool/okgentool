@@ -1,9 +1,16 @@
 package generator
 
+import cli.serverDestinationPath
+import com.squareup.kotlinpoet.FileSpec
+import generator.model.Packages
+import org.slf4j.LoggerFactory
+import java.io.File
+import java.nio.file.Paths
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
+private val logger = LoggerFactory.getLogger("Utils.kt")
 
 fun String.capitalize(): String {
     return this.replaceFirstChar {
@@ -42,4 +49,21 @@ fun <T : Any> convertStringToType(value: String, clazz: KClass<T>): T? {
         Char::class -> if (value.length == 1) value[0] as T else null
         else -> null
     }
+}
+
+fun cleanUp(path: String) {
+    val genFolder = Packages.BASE.replace(".", File.separator)
+    val genDir = File("$path${File.separator}$genFolder")
+
+    if (genDir.exists()) {
+        val deleteResult = genDir.deleteRecursively()
+        if (!deleteResult) {
+            throw Exception("Unable to delete the directory.")
+        }
+    }
+}
+
+fun writeFile(fileSpec: FileSpec) {
+    logger.info("Writing file: ${fileSpec.relativePath}")
+    fileSpec.writeTo(Paths.get(serverDestinationPath).toFile())
 }
