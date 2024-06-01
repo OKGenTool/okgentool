@@ -71,8 +71,7 @@ private fun arrayPropertyType(property: ComponentProperty, components: List<Comp
                     Packages.MODEL,
                     relatedComponent.simplifiedName
                 )
-                .copy(nullable = true)
-            )
+            ).copy(nullable = true)
     }
 
     throw IllegalArgumentException("Array property ${property.name} must have items type")
