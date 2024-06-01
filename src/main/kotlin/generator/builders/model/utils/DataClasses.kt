@@ -20,18 +20,26 @@ fun getDataClassBuilder(
     companionObject: TypeSpec? = null,
 ): TypeSpec {
     val properties = mutableListOf<PropertySpec>()
+    val parameters = mutableListOf<ParameterSpec>()
 
     for (property in component.parameters) {
-        val propertyType = getPropertyType(property, component.simplifiedName, components)
+        val propertyType = getPropertyType(property, component.simplifiedName, components).copy(nullable = true)
+        val initializer = if (property.required) property.name else "null"
 
         val propertySpec = PropertySpec.builder(property.name, propertyType)
             .initializer(property.name)
             .build()
+
+        val parameterSpec = ParameterSpec.builder(property.name, propertyType)
+            .defaultValue(initializer)
+            .build()
+
         properties.add(propertySpec)
+        parameters.add(parameterSpec)
     }
 
     val primaryConstructor = FunSpec.constructorBuilder()
-        .addParameters(properties.map { ParameterSpec(it.name, it.type) })
+        .addParameters(parameters)
         .build()
 
     val dataClassBuilder = TypeSpec.classBuilder(component.simplifiedName)

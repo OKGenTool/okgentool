@@ -23,10 +23,16 @@ fun getPropertyType(property: ComponentProperty, componentName: String, componen
 private fun enumPropertyType(property: ComponentProperty, componentName: String): TypeName {
     if (property.values.isEmpty())
         throw IllegalArgumentException("Enum property ${property.name} must have values")
-    return ClassName(
-        Packages.MODEL,
-        componentName + property.name.capitalize()
-    )
+    return if (property.required)
+        ClassName(
+            Packages.MODEL,
+            componentName + property.name.capitalize()
+        )
+    else
+        ClassName(
+            Packages.MODEL,
+            componentName + property.name.capitalize()
+        ).copy(nullable = true)
 }
 
 private fun objectPropertyType(property: ComponentProperty, components: List<Component>): TypeName {
@@ -34,7 +40,8 @@ private fun objectPropertyType(property: ComponentProperty, components: List<Com
         throw IllegalArgumentException("Object property ${property.name} must have schema name")
     val relatedComponent = components.find { it.schemaName == property.schemaName }
         ?: throw IllegalArgumentException("Object property ${property.name} must have schema name")
-    return ClassName(Packages.MODEL, relatedComponent.simplifiedName)
+    return if (property.required) ClassName(Packages.MODEL, relatedComponent.simplifiedName)
+    else ClassName(Packages.MODEL, relatedComponent.simplifiedName).copy(nullable = true)
 }
 
 private fun arrayPropertyType(property: ComponentProperty, components: List<Component>): TypeName {
@@ -43,17 +50,29 @@ private fun arrayPropertyType(property: ComponentProperty, components: List<Comp
             arrayPropertyType(property.arrayProperties, components)
         )
     }
+
     if (property.arrayItemsType != null && property.arrayItemsType != DataType.OBJECT)
-        return property.dataType.kotlinType.parameterizedBy(property.arrayItemsType.kotlinType)
+        return if (property.required) property.dataType.kotlinType.parameterizedBy(property.arrayItemsType.kotlinType)
+        else property.dataType.kotlinType.parameterizedBy(property.arrayItemsType.kotlinType).copy(nullable = true)
+
     if (!property.arrayItemsSchemaName.isNullOrBlank()){
         val relatedComponent = components.find { it.schemaName == property.arrayItemsSchemaName }
             ?: throw IllegalArgumentException("Array property ${property.name} must have schema name")
-        return property.dataType.kotlinType.parameterizedBy(
-            ClassName(
-                Packages.MODEL,
-                relatedComponent.simplifiedName
+        return if (property.required)
+            property.dataType.kotlinType.parameterizedBy(
+                ClassName(
+                    Packages.MODEL,
+                    relatedComponent.simplifiedName
+                )
             )
-        )
+        else
+            property.dataType.kotlinType.parameterizedBy(
+                ClassName(
+                    Packages.MODEL,
+                    relatedComponent.simplifiedName
+                )
+                .copy(nullable = true)
+            )
     }
 
     throw IllegalArgumentException("Array property ${property.name} must have items type")
