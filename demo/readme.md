@@ -50,16 +50,85 @@ But the server is not handling requests yet.
 In the next chapter you will implement some operations.
 
 ## 4. Implement API Operations using the OkGenTool DSL
-To implement the API Operations edit the file `PetRoute.kt` in the package `routes`of the mutable code.
+To implement the API Operations, edit the file `PetRoute.kt` in the package `routes`of the mutable code.  
+This file has a variable `petServices` built previously for demo purposes, and it's intent is to simulate a **Services** module of a typical HTTP API server. This piece of code is mutable and of responsibility of the developer.
+
+In this file, we will add an extension function `petDSLRouting` to the `OkGenDsl` generated class:
+```kotlin
+val petServices = PetServices()
+
+fun OkGenDsl.petDSLRouting() {
+    //...
+}
+```
+
 ### Add Pet
+Let's implement the **Add Pet** operation.  
+Inside the `petDSLRouting()`, when writing `route.` IDE will suggest the available operations. Choose `addPet`.
+
+```kotlin
+fun OkGenDsl.petDSLRouting() {
+    route.addPet {
+    }
+}
+```
+Now we need to define the function that we need to pass to `addPet`. At this level we have available an object `request` that has properties passed in the HTTP request, either in the body, the query string or in the path. In this operation the property available is `pet`. Let's get the pet from the request and pass it to our internal services to add it to the database.
+```kotlin
+fun OkGenDsl.petDSLRouting() {
+    route.addPet {
+        val pet = request.pet
+        val newPet = petServices.addPet(pet)
+    }
+}
+```
+
+We also need to implement a response.  
+Other object available in all operations is the `response`. This object has all the responses defined in the OAD for this operation. In this case, we have two available responses:
+- `addPetResponse200`
+- `addPetResponse405`
+  
+It seems logical that the `addPetResponse200` should be used in a success operation and the `addPetResponse405` for a failed operation. Let's adapt our code accordingly.
+>[!TIP]
+It's recommended that you consult the OAD file, to get better context of the operation and to choose the best response from the ones defined in the description file.
+
+```kotlin
+fun OkGenDsl.petDSLRouting() {
+    route.addPet {
+        try {
+            val pet = request.pet
+            val newPet = petServices.addPet(pet)
+            response.addPetResponse200(newPet)
+        }catch (ex:Exception){
+            response.addPetResponse405()
+        }
+    }
+}
+```
+
+
 ### Get Pet
 ### Update Pet
 
 ## 5. Test the server
-Use an application to make HTTP requests like [**curl**](https://curl.se/) or [**postman**](https://www.postman.com/), and test the implemented operations.  
+Use an application like [**curl**](https://curl.se/) or [**postman**](https://www.postman.com/) to make HTTP requests, and test the implemented operations.  
 In this demo, will be using **curl**.
 
 ### Add Pet
+Execute:
+```
+curl -X POST http://127.0.0.1:8080/pet -H "Content-Type: application/json" -d "{\"name\": \"boby\", \"photoUrls\": [\"photoUrls\"]}"
+
+```
+Expected result:
+```
+{"id":1,"name":"boby","category":null,"photoUrls":["photoUrls"],"tags":null,"status":null}
+```
+
+
+
+
+
+
 ### Get Pet
 ### Update Pet
 1. update pet
