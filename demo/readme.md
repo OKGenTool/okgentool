@@ -1,10 +1,17 @@
 # Pet Store Server Demo
 
 This demo demonstrates the main features of **OkGenTool**.  
-
 It's using a widely known OpenAPI Description (OAD), **[Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)**, that contains several operations that a common API usually supports.
-
 Bellow are the steps to setup and run the project **PetStoreServer** using **OkGenTool**.
+
+### Before you begin
+Before you begin, note that this demo takes in consideration some assumptions, and it's important to validate them before running the demo, to ensure that everything runs as expected. If these assumptions are not verified, a developer who wants to run the demo should make the necessary adjustments by it's own.  
+The assumptions are:
+- The demo is running on a Windows system
+- IntelliJ is previously installed with kotlin compiler
+- [`curl`](https://curl.se/) is installed on the running system 
+
+
 
 ## 1. Setup and generate code
 1. Download this demo to a local folder on your computer. Example: `C:\ISEL\PS\okgentool\demo`  
@@ -109,7 +116,7 @@ fun OkGenDsl.petDSLRouting() {
 ### Get Pet by ID
 Next we will implement the operation **Get Pet by ID**.  
 Like in the previous operation, the `request` object contains the property used to make the HTTP request. In this case the property is `petId`.
-Like before, let's add the property in a local variable and use it to get the information from the internal services.
+Like before, we should add the property in a local variable and use it to get the information from the internal services. Here are how the final code should look like:
 
 ```kotlin
 fun OkGenDsl.petDSLRouting() {    
@@ -136,12 +143,9 @@ For this operation, the OAD defines the following responses with the respective 
 
 
 ### Update Pet
+# TODO
 
 ## 5. Test the server
-Use an application like [**curl**](https://curl.se/) or [**postman**](https://www.postman.com/) to make HTTP requests, and test the implemented operations.  
-In this demo, will be using **curl** (Windows version). 
-
-
 Run the server and let's test the implemented operations.
 
 ### Add Pet
