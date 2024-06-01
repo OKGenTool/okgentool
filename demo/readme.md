@@ -8,25 +8,27 @@ Bellow are the steps to setup and run a project using **OkGenTool**.
 1. Open a command line window in the same folder
 1. Run the following command:
     ```
-    java -jar okgentool.jar -s "C:\ISEL\PS\okgentool\demo\PetShop.yaml" -ts "C:\ISEL\PS\okgentool\demo\PetStore\server\src\main\kotlin" -p "org.example.petstoreserver"
+    java -jar okgentool.jar -s "C:\ISEL\PS\okgentool\demo\PetShop.yaml"
+    -ts "C:\ISEL\PS\okgentool\demo\PetStore\server\src\main\kotlin"
+    -p "org.example.petstoreserver"
     ```
     Parameters:
     - `-s <sourcePath>` is the path for the OAD file
     - `-ts <targetPath>` is the target folder where the files will be generated
     - `-p <package>` (optional) is the base package name of your project.
 
-    >[!TIP]
-    Adapt the path to your local system.  
-    Use absolute paths only. Relative paths are in the roadmap here: #46
+>[!TIP]
+ Adapt the path to your local system.  
+ Use absolute paths only. Relative paths are in the roadmap here: https://github.com/OKGenTool/okgentool/issues/46
     
 
-1. Open the demo folder with an IDE (IntelliJ recommended)  
-    >[!NOTE]
-    If IDE was previously opened, you may need to reopen it to reload the indexes, of the generated files.  
-    If the mutable code could not access the generatede code, and reopening the IDE, does not solves the problem, the IDE needs to be repaired. In IntelliJ use this option:  `File -> Repair IDE`
+4. Open the demo folder with an IDE (IntelliJ recommended)  
+>[!NOTE]
+If IDE was previously opened, you may need to reopen it to reload the indexes, of the generated files.  
+If the mutable code could not access the generatede code, and reopening the IDE, does not solves the problem, the IDE needs to be repaired. In IntelliJ use this option:  `File -> Repair IDE`
 
-1. Observe the gen package, that contain the code that has been generated.
-1. Observe the demo package, that contain the mutable code that has been implemented
+5. Observe the gen package, that contain the code that has been generated.
+6. Observe the demo package, that contain the mutable code that has been implemented
 for the propose of the demo.
 
 
