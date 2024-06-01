@@ -90,7 +90,7 @@ private fun getProperties(schema: Schema<Any>?, requiredProperties: List<String>
         for (parameter in schema.properties) {
             val name = parameter.key
             val dataType = DataType.fromString(parameter.value.type ?: "", parameter.value.format ?: "")
-            val required = requiredProperties.contains(name)
+            val required = requiredProperties.contains(name) || parameter.value.nullable == false
             val schemaName = parameter.value.`$ref` ?: ""
             val values = parameter.value.enum?.map { it.toString() } ?: emptyList()
 
