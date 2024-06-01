@@ -11,7 +11,7 @@ class PetServices {
 
     val repository = Repository()
 
-    fun addPet(pet: Pet): Pet {
+    fun addPet(pet: Pet?): Pet {
         return repository.addPet(pet)
     }
 
@@ -24,6 +24,6 @@ class PetServices {
 
     fun getAllPets(): List<Pet> = repository.getAllPets()
 
-    fun getPet(petId: Long): Pet? = repository.getPet(petId)
+    fun getPet(petId: Long?): Pet? = repository.getPet(petId)
 
 }

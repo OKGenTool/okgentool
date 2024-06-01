@@ -8,6 +8,7 @@ import generator.capitalize
 import generator.model.Parameter
 import generator.model.Packages
 import generator.model.Visibility
+import generator.nullable
 
 
 fun buildRequestClass(operation: DSLOperation, parameters: MutableList<Parameter>)
@@ -130,7 +131,7 @@ private fun getParameters(operation: DSLOperation): List<Parameter> {
         params.add(
             Parameter(
                 it.name,
-                typeName.copy(nullable = true),
+                typeName.nullable(),
                 visibility,
                 it.enum?.map { it.toString() }
             )

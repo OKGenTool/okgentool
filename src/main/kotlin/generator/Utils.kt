@@ -2,6 +2,7 @@ package generator
 
 import cli.serverDestinationPath
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.TypeName
 import generator.model.Packages
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -67,3 +68,5 @@ fun writeFile(fileSpec: FileSpec) {
     logger.info("Writing file: ${fileSpec.relativePath}")
     fileSpec.writeTo(Paths.get(serverDestinationPath).toFile())
 }
+
+fun TypeName.nullable(): TypeName = this.copy(nullable = true)

@@ -13,8 +13,11 @@ class Repository {
     private val pets = mutableListOf<Pet>()
 
     //TODO consider concurrency
-    fun addPet(pet: Pet): Pet {
-        //TODO throw exception if already as petId
+    fun addPet(pet: Pet?): Pet {
+        if (pet == null)
+            throw RuntimeException("pet is null")
+
+        //Throw exception if already as petId
         if (pet.id != null) {
             throw RuntimeException("Trying to add a Pet with ID")
         }
@@ -39,7 +42,10 @@ class Repository {
         else success(foundPet)
     }
 
-    fun getPet(id: Long): Pet? {
+    fun getPet(id: Long?): Pet? {
+        if (id == null) {
+            throw RuntimeException("Id is null")
+        }
         return pets.find { it.id == id }
     }
 

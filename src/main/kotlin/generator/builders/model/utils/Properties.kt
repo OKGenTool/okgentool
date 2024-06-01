@@ -6,7 +6,9 @@ import com.squareup.kotlinpoet.TypeName
 import datamodel.Component
 import datamodel.ComponentProperty
 import datamodel.DataType
+import generator.capitalize
 import generator.model.Packages
+import generator.nullable
 
 fun getPropertyType(property: ComponentProperty, componentName: String, components: List<Component>): TypeName {
     return when {
@@ -32,7 +34,7 @@ private fun enumPropertyType(property: ComponentProperty, componentName: String)
         ClassName(
             Packages.MODEL,
             componentName + property.name.capitalize()
-        ).copy(nullable = true)
+        ).nullable()
 }
 
 private fun objectPropertyType(property: ComponentProperty, components: List<Component>): TypeName {
@@ -41,7 +43,7 @@ private fun objectPropertyType(property: ComponentProperty, components: List<Com
     val relatedComponent = components.find { it.schemaName == property.schemaName }
         ?: throw IllegalArgumentException("Object property ${property.name} must have schema name")
     return if (property.required) ClassName(Packages.MODEL, relatedComponent.simplifiedName)
-    else ClassName(Packages.MODEL, relatedComponent.simplifiedName).copy(nullable = true)
+    else ClassName(Packages.MODEL, relatedComponent.simplifiedName).nullable()
 }
 
 private fun arrayPropertyType(property: ComponentProperty, components: List<Component>): TypeName {
@@ -53,9 +55,9 @@ private fun arrayPropertyType(property: ComponentProperty, components: List<Comp
 
     if (property.arrayItemsType != null && property.arrayItemsType != DataType.OBJECT)
         return if (property.required) property.dataType.kotlinType.parameterizedBy(property.arrayItemsType.kotlinType)
-        else property.dataType.kotlinType.parameterizedBy(property.arrayItemsType.kotlinType).copy(nullable = true)
+        else property.dataType.kotlinType.parameterizedBy(property.arrayItemsType.kotlinType).nullable()
 
-    if (!property.arrayItemsSchemaName.isNullOrBlank()){
+    if (!property.arrayItemsSchemaName.isNullOrBlank()) {
         val relatedComponent = components.find { it.schemaName == property.arrayItemsSchemaName }
             ?: throw IllegalArgumentException("Array property ${property.name} must have schema name")
         return if (property.required)
@@ -71,7 +73,7 @@ private fun arrayPropertyType(property: ComponentProperty, components: List<Comp
                     Packages.MODEL,
                     relatedComponent.simplifiedName
                 )
-            ).copy(nullable = true)
+            ).nullable()
     }
 
     throw IllegalArgumentException("Array property ${property.name} must have items type")
@@ -79,5 +81,5 @@ private fun arrayPropertyType(property: ComponentProperty, components: List<Comp
 
 private fun simplePropertyType(property: ComponentProperty): TypeName {
     return if (property.required) property.dataType.kotlinType
-    else property.dataType.kotlinType.copy(nullable = true)
+    else property.dataType.kotlinType.nullable()
 }

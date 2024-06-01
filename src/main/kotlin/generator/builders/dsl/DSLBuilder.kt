@@ -11,6 +11,7 @@ import generator.model.Packages
 import generator.model.Parameter
 import generator.model.ResponseProp
 import generator.model.Visibility
+import generator.nullable
 import generator.writeFile
 import io.ktor.http.ContentType.Application.OctetStream
 import io.ktor.server.application.*
@@ -173,7 +174,7 @@ fun getBodyAsParameter(body: Body): Parameter {
         }
     }
 
-    return Parameter(name, type!!)
+    return Parameter(name, type?.nullable()!!)
 }
 
 

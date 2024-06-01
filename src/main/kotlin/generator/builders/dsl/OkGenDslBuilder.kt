@@ -1,9 +1,7 @@
 package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
-import datamodel.DSLOperation
-import datamodel.DataType
-import datamodel.In
+import datamodel.*
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
@@ -129,7 +127,22 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
         this.add("\tfunction(${operation.name.capitalize()}($parameters call))")
     } else {
         //For requests with body
-        this.add("\tval body = call.receive<Pet>()\n")
+        val body = operation.requestBody
+        var className: String = ""
+
+        when (body) {
+            is BodyObj -> className = body.dataType.kotlinType.simpleName
+            is BodyRef -> className = SchemaProps.getRefSimpleName(body.schemaRef)
+            is BodyCollRef -> className = body.className
+            is BodyCollPojo -> className = body.dataType.kotlinType.simpleName
+        }
+
+        this.add("\tvar body:${className.capitalize()}? = null\n")
+            .add("\ttry {\n")
+            .add("\t\tbody = call.receive<${className.capitalize()}>()\n")
+            .add("\t}catch (ex: Exception){\n")
+            .add("\t\t//do nothing\n")
+            .add("\t}\n")
             .add("\tfunction(${operation.name.capitalize()}(body, call))")
     }
     return this
