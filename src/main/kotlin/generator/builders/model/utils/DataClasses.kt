@@ -23,16 +23,19 @@ fun getDataClassBuilder(
     val parameters = mutableListOf<ParameterSpec>()
 
     for (property in component.parameters) {
-        val propertyType = getPropertyType(property, component.simplifiedName, components).copy(nullable = true)
-        val initializer = if (property.required) property.name else "null"
+        val propertyType = getPropertyType(property, component.simplifiedName, components)
 
         val propertySpec = PropertySpec.builder(property.name, propertyType)
             .initializer(property.name)
             .build()
 
-        val parameterSpec = ParameterSpec.builder(property.name, propertyType)
-            .defaultValue(initializer)
-            .build()
+        val parameterSpec = if(property.required)
+            ParameterSpec.builder(property.name, propertyType)
+                .build()
+        else
+            ParameterSpec.builder(property.name, propertyType)
+                .defaultValue("null")
+                .build()
 
         properties.add(propertySpec)
         parameters.add(parameterSpec)

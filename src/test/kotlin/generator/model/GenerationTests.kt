@@ -104,8 +104,8 @@ class GenerationTests {
         ).toString()
 
         val referenceContent = getReferenceContent("DataClassWithNotRequiredIntParameterWithMaxAndMin.kt")
-        assertEquals(referenceContent, fileSpec)
-//        assertGeneratedMatch(referenceContent, fileSpec)
+
+        assertGeneratedMatch(referenceContent, fileSpec)
     }
 
     @Test
