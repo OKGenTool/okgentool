@@ -106,7 +106,35 @@ fun OkGenDsl.petDSLRouting() {
 ```
 
 
-### Get Pet
+### Get Pet by ID
+Next we will implement the operation **Get Pet by ID**.  
+Like in the previous operation, the `request` object contains the property used to make the HTTP request. In this case the property is `petId`.
+Like before, let's add the property in a local variable and use it to get the information from the internal services.
+
+```kotlin
+fun OkGenDsl.petDSLRouting() {    
+    //...
+    route.getPetById {
+        try {
+            val petId = request.petId
+            val pet = petServices.getPet(petId)
+            if (pet != null)
+                response.getPetByIdResponse200(pet) //successful operation 
+            else
+                response.getPetByIdResponse404() //Pet not found
+        } catch (ex: Exception) {
+            response.getPetByIdResponse400() //Invalid ID supplied
+        }
+    }
+}
+```
+
+For this operation, the OAD defines the following responses with the respective descriptions:
+- `getPetByIdResponse200` - successful operation
+- `getPetByIdResponse400` - Invalid ID supplied
+- `getPetByIdResponse404` - Pet not found
+
+
 ### Update Pet
 
 ## 5. Test the server
@@ -118,23 +146,56 @@ Run the server and let's test the implemented operations.
 
 ### Add Pet
 Accordingly to the OAD, the operation **Add Pet** consist in making a `POST` request to the path `/pet` passing an object in `json` or `xml` format with two required properties: `name` and `photoUrls`.  
-using curl the command should look like this:
+Using curl the command should look like this:
 
 ```
-curl -X POST http://127.0.0.1:8080/pet -H "Content-Type: application/json" -d "{\"name\": \"boby\", \"photoUrls\": [\"photoUrls\"]}"
+curl -i -X POST http://127.0.0.1:8080/pet -H "Content-Type: application/json" -d "{\"name\": \"boby\", \"photoUrls\": [\"photoUrls\"]}"
 
 ```
 If everything worked as expected, this should be the result:
 ```
+HTTP/1.1 200 Successful operation
+Content-Length: 90
+Content-Type: application/json
+
 {"id":1,"name":"boby","category":null,"photoUrls":["photoUrls"],"tags":null,"status":null}
 ```
 
+If any error ocurred (example: the object could not be parsed due to incorrect format), the output will be:
+```
+HTTP/1.1 405 Invalid input
+Content-Length: 0
+```
+
+### Get Pet by ID
+The operation to get a pet providing a pet id, is realized through making a `GET` request to the path `/pet/{petId}`.
+
+```
+curl -i http://127.0.0.1:8080/pet/1 
+```
+
+Expected result if the pet is found:
+```
+HTTP/1.1 200 successful operation
+Content-Length: 90
+Content-Type: application/json
+
+{"id":1,"name":"boby","category":null,"photoUrls":["photoUrls"],"tags":null,"status":null}
+```
+
+Expected result if the pet is not found:
+```
+HTTP/1.1 404 Pet not found
+Content-Length: 0
+```
+
+Expected result if it was passed an invalid ID in the path parameter (example `/pet/xxx`):
+```
+HTTP/1.1 400 Invalid ID supplied
+Content-Length: 0
+```
 
 
-
-
-
-### Get Pet
 ### Update Pet
 1. update pet
 2. get pet again to confirm the modification made by the previous operation
