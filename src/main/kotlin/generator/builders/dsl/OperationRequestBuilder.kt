@@ -34,7 +34,7 @@ fun getRequestWithParam(operation: DSLOperation, params: List<Parameter>): TypeS
 
     //TODO must implement multiple validations. One for each query string
     val firstParameter = operation.parameters?.first()
-    val paramName = "param${firstParameter?.name?.capitalize()}"
+    val paramName = firstParameter?.name.toString()
     val paramValidation = "valid${paramName.capitalize()}"
 
     // Create the init block
@@ -129,7 +129,7 @@ private fun getParameters(operation: DSLOperation): List<Parameter> {
 
         params.add(
             Parameter(
-                "param${it.name.capitalize()}",
+                it.name,
                 typeName.copy(nullable = true),
                 visibility,
                 it.enum?.map { it.toString() }
