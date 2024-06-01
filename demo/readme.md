@@ -1,9 +1,12 @@
-# Run Demo
+# Pet Store Server Demo
 
-This demo demonstrates the main features that are implemented.  
-Bellow are the steps to setup and run a project using **OkGenTool**.
+This demo demonstrates the main features of **OkGenTool**.  
 
-## Steps
+It's using a widely known OpenAPI Description (OAD), **[Pet Store](https://github.com/OAI/OpenAPI-Specification/blob/main/examples/v3.0/petstore.yaml)**, that contains several operations that a common API usually supports.
+
+Bellow are the steps to setup and run the project **PetStoreServer** using **OkGenTool**.
+
+## 1. Setup
 1. Download this demo to a local folder on your computer. Example: `C:\ISEL\PS\okgentool\demo`  
 1. Open a command line window in the same folder
 1. Run the following command:
@@ -27,8 +30,10 @@ Bellow are the steps to setup and run a project using **OkGenTool**.
 If IDE was previously opened, you may need to reopen it to reload the indexes, of the generated files.  
 If the mutable code could not access the generatede code, and reopening the IDE, does not solves the problem, the IDE needs to be repaired. In IntelliJ use this option:  `File -> Repair IDE`
 
-5. Observe the gen package, that contain the code that has been generated.
-6. Observe the demo package, that contain the mutable code that has been implemented
+## 2. Observations
+>[!CAUTION] TODO: review this chapter
+1. Observe the gen package, that contain the code that has been generated.
+1. Observe the demo package, that contain the mutable code that has been implemented
 for the propose of the demo.
 
 
@@ -38,4 +43,33 @@ code using the OKGenTool and after that start the implementation of the mutable 
 the features that we offer. Despite we have implemented part of the mutable code we let one
 endpoint to implement in this demo. Bellow are the steps to implement the endpoint GET
 /users.
-1. TODO
+
+## 3. Run the server
+At this point you should have a error free running server.  
+But the server is not handling requests yet.  
+In the next chapter you will implement some operations.
+
+## 4. Implement API Operations using the OkGenTool DSL
+### Add Pet
+### Get Pet
+### Update Pet
+
+## 5. Test the server
+Use an application to make HTTP requests like [**curl**](https://curl.se/) or [**postman**](https://www.postman.com/), and test the implemented operations.  
+In this demo, will be using **curl**.
+
+### Add Pet
+### Get Pet
+### Update Pet
+1. update pet
+2. get pet again to confirm the modification made by the previous operation
+
+
+## 4. Limitations
+**OkGenTool** has some limitations that are identified and planned to be solved/implemented.  
+The known limitations, by module,  are:
+### DSL
+1. Could not handle operations with multiple query strings or path parameters
+2. Could not handle operations with combination of parameters in query string with path parameters and with bodies.
+
+### Components
