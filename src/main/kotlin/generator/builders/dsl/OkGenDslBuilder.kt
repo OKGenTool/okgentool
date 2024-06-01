@@ -22,6 +22,15 @@ private const val KTORROUTE = "ktorRoute"
 fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>) {
     logger.info("Generating $OUTERCLASS file")
 
+    val logger = PropertySpec
+        .builder("logger", ClassName("org.slf4j", "Logger"))
+        .initializer(
+            "%T.getLogger(%T::class.java.simpleName)",
+            ClassName("org.slf4j", "LoggerFactory"),
+            ClassName(Packages.DSL, "OkGenDsl")
+        ).addModifiers(KModifier.PRIVATE)
+        .build()
+
     val route = Parameter(
         KTORROUTE,
         Route::class.java.asTypeName(),
@@ -30,6 +39,7 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
 
     val fileSpec =
         FileSpec.builder(Packages.DSL, OUTERCLASS)
+            .addProperty(logger)
             .addType(
                 //Build outer class
                 TypeSpec.classBuilder(OUTERCLASS)
@@ -141,7 +151,7 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
             .add("\ttry {\n")
             .add("\t\tbody = call.receive<${className.capitalize()}>()\n")
             .add("\t}catch (ex: Exception){\n")
-            .add("\t\t//do nothing\n") //TODO log this exception
+            .add("\t\tlogger.error(ex.message)\n")
             .add("\t}\n")
             .add("\tfunction(${operation.name.capitalize()}(body, call))")
     }
