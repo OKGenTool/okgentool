@@ -1,4 +1,4 @@
-# OkGenTool - OpenAPI Ktor Generation Tool
+# OKGenTool - OpenAPI Ktor Generation Tool
 <img src="./docs/okgentool_large.jpeg" width="200">
 
 ## Introduction

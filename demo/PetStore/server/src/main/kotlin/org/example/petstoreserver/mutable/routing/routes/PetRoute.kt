@@ -1,6 +1,5 @@
 package org.example.petstoreserver.mutable.routing.routes
 
-import org.example.petstoreserver.gen.dsl.OkGenDsl
 import org.example.petstoreserver.mutable.services.PetServices
 import org.slf4j.LoggerFactory
 

@@ -1,8 +1,8 @@
 # Pet Store Server Demo
 
-This demo demonstrates the main features of **OkGenTool**.  
+This demo demonstrates the main features of **OKGenTool**.  
 It's using a widely known OpenAPI Description (OAD), **[Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)**, that contains several operations that a common API usually supports.
-Bellow are the steps to setup and run the project **PetStoreServer** using **OkGenTool**.
+Bellow are the steps to setup and run the project **PetStoreServer** using **OKGenTool**.
 
 ### Before you begin
 Before you begin, note that this demo takes in consideration some assumptions, and it's important to validate them before running the demo, to ensure that everything runs as expected. If these assumptions are not verified, a developer who wants to run the demo should make the necessary adjustments by it's own.  
@@ -56,7 +56,7 @@ At this point you should have a error free running server.
 But the server is not handling requests yet.  
 In the next chapter you will implement some operations.
 
-## 4. Implement API Operations using the OkGenTool DSL
+## 4. Implement API Operations using the OKGenTool DSL
 To implement the API Operations, edit the file `PetRoute.kt` in the package `routes`of the mutable code.  
 This file has a variable `petServices` built previously for demo purposes, and it's intent is to simulate a **Services** module of a typical HTTP API server. This piece of code is mutable and of responsibility of the developer.
 
@@ -206,7 +206,7 @@ Content-Length: 0
 
 
 ## 4. Limitations
-**OkGenTool** has some limitations that are identified and planned to be solved/implemented.  
+**OKGenTool** has some limitations that are identified and planned to be solved/implemented.  
 The known limitations, by module,  are:
 ### DSL
 1. Could not handle operations with multiple query strings or path parameters

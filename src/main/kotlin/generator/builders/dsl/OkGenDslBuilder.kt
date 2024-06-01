@@ -141,7 +141,7 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
             .add("\ttry {\n")
             .add("\t\tbody = call.receive<${className.capitalize()}>()\n")
             .add("\t}catch (ex: Exception){\n")
-            .add("\t\t//do nothing\n")
+            .add("\t\t//do nothing\n") //TODO log this exception
             .add("\t}\n")
             .add("\tfunction(${operation.name.capitalize()}(body, call))")
     }
