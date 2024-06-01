@@ -39,6 +39,7 @@ paths:
         - pet
       summary: Add a new pet to the store
       description: Add a new pet to the store
+      operationId: addPet
       responses:
         '200':
           description: Successful operation
@@ -284,6 +285,7 @@ paths:
         - pet
       summary: uploads an image
       description: ''
+      operationId: uploadFile
       parameters:
         - name: petId
           in: path
@@ -607,86 +609,6 @@ externalDocs:
   url: 'http://swagger.io'
 components:
   schemas:
-    ArrayTryOut:
-      type: object
-      properties:
-        doubleArray:
-          type: array
-          items:
-            type: array
-            items:
-              type: number
-              format: double
-        tripleArray:
-          type: array
-          items:
-            type: array
-            items:
-              type: array
-              items:
-                type: number
-                format: double
-        maxMinArray:
-          type: array
-          items:
-            type: integer
-          minItems: 1
-          maxItems: 2
-        uniqueItemsArray:
-          type: array
-          items:
-            type: integer
-          uniqueItems: true
-    StringTryOut:
-      type: object
-      properties:
-        stringWithMaxMinLength:
-          type: string
-          maxLength: 10
-          minLength: 5
-        stringWithPattern:
-          type: string
-          pattern: '^\d{3}-\d{2}-\d{4}$'
-    InitTryOut:
-      type: object
-      properties:
-        intMaxMin:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 100
-        intExclusiveMaxMin:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 100
-          exclusiveMinimum: true
-          exclusiveMaximum: true
-        intMultipleOf:
-          type: integer
-          format: int32
-          multipleOf: 10
-    ComplexPet:
-      oneOf:
-        - $ref: '#/components/schemas/Cat'
-        - $ref: '#/components/schemas/Dog'
-    Cat:
-      type: object
-      properties:
-        type:
-          type: string
-          enum: [ cat ]
-        name:
-          type: string
-    Dog:
-      type: object
-      properties:
-        type:
-          type: string
-          enum: [ dog ]
-        age:
-          type: integer
-          format: int32
     Order:
       x-swagger-router-model: io.swagger.petstore.model.Order
       properties:

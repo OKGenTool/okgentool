@@ -2,16 +2,16 @@
 
 This demo demonstrates the main features of **OkGenTool**.  
 
-It's using a widely known OpenAPI Description (OAD), **[Pet Store](https://github.com/OAI/OpenAPI-Specification/blob/main/examples/v3.0/petstore.yaml)**, that contains several operations that a common API usually supports.
+It's using a widely known OpenAPI Description (OAD), **[Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)**, that contains several operations that a common API usually supports.
 
 Bellow are the steps to setup and run the project **PetStoreServer** using **OkGenTool**.
 
-## 1. Setup
+## 1. Setup and generate code
 1. Download this demo to a local folder on your computer. Example: `C:\ISEL\PS\okgentool\demo`  
 1. Open a command line window in the same folder
 1. Run the following command:
     ```
-    java -jar okgentool.jar -s "C:\ISEL\PS\okgentool\demo\PetShop.yaml"
+    java -jar okgentool.jar -s "C:\ISEL\PS\okgentool\demo\petstore.yaml"
     -ts "C:\ISEL\PS\okgentool\demo\PetStore\server\src\main\kotlin"
     -p "org.example.petstoreserver"
     ```
@@ -50,6 +50,7 @@ But the server is not handling requests yet.
 In the next chapter you will implement some operations.
 
 ## 4. Implement API Operations using the OkGenTool DSL
+To implement the API Operations edit the file `PetRoute.kt` in the package `routes`of the mutable code.
 ### Add Pet
 ### Get Pet
 ### Update Pet
