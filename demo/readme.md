@@ -111,15 +111,20 @@ fun OkGenDsl.petDSLRouting() {
 
 ## 5. Test the server
 Use an application like [**curl**](https://curl.se/) or [**postman**](https://www.postman.com/) to make HTTP requests, and test the implemented operations.  
-In this demo, will be using **curl**.
+In this demo, will be using **curl** (Windows version). 
+
+
+Run the server and let's test the implemented operations.
 
 ### Add Pet
-Execute:
+Accordingly to the OAD, the operation **Add Pet** consist in making a `POST` request to the path `/pet` passing an object in `json` or `xml` format with two required properties: `name` and `photoUrls`.  
+using curl the command should look like this:
+
 ```
 curl -X POST http://127.0.0.1:8080/pet -H "Content-Type: application/json" -d "{\"name\": \"boby\", \"photoUrls\": [\"photoUrls\"]}"
 
 ```
-Expected result:
+If everything worked as expected, this should be the result:
 ```
 {"id":1,"name":"boby","category":null,"photoUrls":["photoUrls"],"tags":null,"status":null}
 ```
