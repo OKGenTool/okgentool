@@ -1,5 +1,5 @@
 # Run Demo
-1. Download the demo to a folder. Example: `C:\ISEL\PS\okgentool\demo`  
+1. Download demo to a local folder on your computer. Example: `C:\ISEL\PS\okgentool\demo`  
 2. Open a command line window in the same folder
 3. Run the following command:
     ```

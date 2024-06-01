@@ -17,10 +17,12 @@ This is a final project of the **Computer Science and Computer Engineering BSc**
 | Dinis Laranjeira | 46081 | A46081@alunos.isel.pt; dinis.laranjeira14874@gmail.com |
 
 # How to use OKGenTool
+A demo is available in this repository, in the folder [demo](./demo/)
+
 > [!IMPORTANT]
 > This section is under construction
 
-# Block Diagram
+# System Architecture
 ![OKGenTool Block Diagram](./docs/block_diagram.png)
 
 # Third-Party Libraries
