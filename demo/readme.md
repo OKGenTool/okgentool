@@ -18,9 +18,7 @@ The assumptions are:
 1. Open a command line window in the same folder
 1. Run the following command:
     ```
-    java -jar okgentool.jar -s "C:\ISEL\PS\okgentool\demo\petstore.yaml"
-    -ts "C:\ISEL\PS\okgentool\demo\PetStore\server\src\main\kotlin"
-    -p "org.example.petstoreserver"
+    java -jar okgentool.jar -s "C:\ISEL\PS\okgentool\demo\petstore.yaml" -ts "C:\ISEL\PS\okgentool\demo\PetStore\server\src\main\kotlin" -p "org.example.petstoreserver"
     ```
     Parameters:
     - `-s <sourcePath>` is the path for the OAD file
@@ -32,7 +30,7 @@ The assumptions are:
  Use absolute paths only. Relative paths are in the roadmap here: https://github.com/OKGenTool/okgentool/issues/46
     
 
-4. Open the demo folder with an IDE (IntelliJ recommended)  
+4. Open the PetStore folder with an IDE (IntelliJ recommended)  
 >[!NOTE]
 If IDE was previously opened, you may need to reopen it to reload the indexes, of the generated files.  
 If the mutable code could not access the generatede code, and reopening the IDE does not solves the problem, the IDE needs to be repaired. In IntelliJ use this option:  `File -> Repair IDE`
@@ -49,6 +47,7 @@ This demo will guide you in implementing an HTTP API server by developing on the
 The starting point of our demo is the file `PetRoute.kt`.
 
 ## 3. Run the server
+Run the server (function `main()` in file `Application.kt`).  
 At this point you should have an error-free running server. However, the server is not handling requests yet.  
 In the next chapter you will implement some operations.
 
