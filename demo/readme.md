@@ -35,29 +35,25 @@ The assumptions are:
 4. Open the demo folder with an IDE (IntelliJ recommended)  
 >[!NOTE]
 If IDE was previously opened, you may need to reopen it to reload the indexes, of the generated files.  
-If the mutable code could not access the generatede code, and reopening the IDE, does not solves the problem, the IDE needs to be repaired. In IntelliJ use this option:  `File -> Repair IDE`
+If the mutable code could not access the generatede code, and reopening the IDE does not solves the problem, the IDE needs to be repaired. In IntelliJ use this option:  `File -> Repair IDE`
 
 ## 2. Observations
->[!CAUTION] TODO: review this chapter
-1. Observe the gen package, that contain the code that has been generated.
-1. Observe the demo package, that contain the mutable code that has been implemented
-for the propose of the demo.
+After opening the IDE you will notice, that at main package level (`org.example.petstoreserver`), there are two packages to distinguish the mutable code from the generated code: `mutable` and `gen`.  
+The package `gen` is grayed because is being ignored by git.  
+![](./img/folder_structure.png)
 
+The **mutable** code is the code for which the developer is responsible, and it is the only code that should be manually edited. On the other hand, the **generated code** should never be edited manually, as doing so may result in the loss of code if the generated code is regenerated.
 
-In this demo part of the mutable code is already implemented, for a demonstration porpose,
-but this is not the normal way to use our tool. The normal way is to generate the immutable
-code using the OKGenTool and after that start the implementation of the mutable code using
-the features that we offer. Despite we have implemented part of the mutable code we let one
-endpoint to implement in this demo. Bellow are the steps to implement the endpoint GET
-/users.
+This demo will guide you in implementing an HTTP API server by developing on the mutable code, that was previously created. It following a typical HTTP API server architecture with three main components: `routing`, `services`, and `repository`.
+
+The starting point of our demo is the file `PetRoute.kt`.
 
 ## 3. Run the server
-At this point you should have a error free running server.  
-But the server is not handling requests yet.  
+At this point you should have an error-free running server. However, the server is not handling requests yet.  
 In the next chapter you will implement some operations.
 
 ## 4. Implement API Operations using the OKGenTool DSL
-To implement the API Operations, edit the file `PetRoute.kt` in the package `routes`of the mutable code.  
+To implement the API Operations, edit the file `PetRoute.kt` in the package `routing.routes` of the mutable code.  
 This file has a variable `petServices` built previously for demo purposes, and it's intent is to simulate a **Services** module of a typical HTTP API server. This piece of code is mutable and of responsibility of the developer.
 
 In this file, we will add an extension function `petDSLRouting` to the `OkGenDsl` generated class:
@@ -278,15 +274,3 @@ If the object could no be deserialized or does not pass other validations (examp
 HTTP/1.1 405 Validation exception
 Content-Length: 0
 ```
-
-
-## 6. Limitations
-**OKGenTool** has some limitations that are identified and planned to be solved/implemented.  
-The known limitations, by module,  are:
-### DSL
-1. Could not handle operations with multiple query strings or path parameters
-2. Could not handle operations with combination of parameters in query string with path parameters and with bodies.
-
-### Components
-1.
-1.
