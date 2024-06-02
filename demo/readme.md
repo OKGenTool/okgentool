@@ -38,7 +38,7 @@ If the mutable code could not access the generatede code, and reopening the IDE 
 ## 2. Observations
 After opening the IDE you will notice, that at main package level (`org.example.petstoreserver`), there are two packages to distinguish the mutable code from the generated code: `mutable` and `gen`.  
 The package `gen` is grayed because is being ignored by git.  
-![](./img/folder_structure.png)
+![folder_structure](./img/folder_structure.png)
 
 The **mutable** code is the code for which the developer is responsible, and it is the only code that should be manually edited. On the other hand, the **generated code** should never be edited manually, as doing so may result in the loss of code if the generated code is regenerated.
 
@@ -47,9 +47,13 @@ This demo will guide you in implementing an HTTP API server by developing on the
 The starting point of our demo is the file `PetRoute.kt`.
 
 ## 3. Run the server
-Run the server (function `main()` in file `Application.kt`).  
+Run the server: function `main()` in file `Application.kt`.  
 At this point you should have an error-free running server. However, the server is not handling requests yet.  
+
+![server_run](./img/server_run.png)
+
 In the next chapter you will implement some operations.
+You can stop the server now.
 
 ## 4. Implement API Operations using the OKGenTool DSL
 To implement the API Operations, edit the file `PetRoute.kt` in the package `routing.routes` of the mutable code.  
