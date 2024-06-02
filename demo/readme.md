@@ -47,6 +47,7 @@ This demo will guide you in implementing an HTTP API server by developing on the
 The starting point of our demo is the file `PetRoute.kt`.
 
 ## 3. Run the server
+Run the server (function `main()` in file `Application.kt`).  
 At this point you should have an error-free running server. However, the server is not handling requests yet.  
 In the next chapter you will implement some operations.
 
