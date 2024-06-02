@@ -1,26 +1,17 @@
 package org.example.petstoreserver.mutable.repository
 
+import org.example.petstoreserver.gen.routing.model.Category
 import org.example.petstoreserver.gen.routing.model.Pet
-import org.example.petstoreserver.mutable.failure
-import org.example.petstoreserver.mutable.routing.routes.PetRouteError
-import org.example.petstoreserver.mutable.routing.routes.PetRouteResult
-import org.example.petstoreserver.mutable.success
+import org.example.petstoreserver.gen.routing.model.PetStatus
 import org.slf4j.LoggerFactory
 
 val logger = LoggerFactory.getLogger(Repository::class.java.simpleName)!!
 
 class Repository {
-    private val pets = mutableListOf<Pet>()
+    private val categories = initiateCategories()
+    private val pets = initiatePets(categories)
 
-    //TODO consider concurrency
-    fun addPet(pet: Pet?): Pet {
-        if (pet == null)
-            throw RuntimeException("pet is null")
-
-        //Throw exception if already as petId
-        if (pet.id != null) {
-            throw RuntimeException("Trying to add a Pet with ID")
-        }
+    fun addPet(pet: Pet): Pet {
         val petId: Long = (pets.count() + 1).toLong()
 
         val newPet = Pet(
@@ -36,20 +27,70 @@ class Repository {
         return newPet
     }
 
-    fun updatePet(pet: Pet): PetRouteResult {
-        val foundPet = getPet(pet.id!!)
-        return if (foundPet == null) failure(PetRouteError.PetNotFound)
-        else success(foundPet)
+    fun updatePet(updatedPet: Pet): Pet? {
+        val actualPet = getPet(updatedPet.id!!) ?: return null
+
+        val newPet = Pet(
+            actualPet.id,
+            updatedPet.name,
+            updatedPet.category,
+            updatedPet.photoUrls,
+            updatedPet.tags,
+            updatedPet.status,
+        )
+
+        pets.remove(actualPet)
+        pets.add(newPet)
+        return newPet
     }
 
-    fun getPet(id: Long?): Pet? {
-        if (id == null) {
-            throw RuntimeException("Id is null")
-        }
+    fun getPet(id: Long): Pet? {
         return pets.find { it.id == id }
     }
 
     fun getAllPets(): List<Pet> = pets
 
-
 }
+
+private fun initiateCategories(): List<Category> = listOf(
+    Category(1, "Dogs"),
+    Category(2, "Cats"),
+    Category(3, "Rabbits"),
+    Category(4, "GoldFish"),
+    Category(5, "Hamsters"),
+)
+
+private fun initiatePets(categories: List<Category>): MutableList<Pet> = mutableListOf(
+    Pet(
+        1,
+        "Max",
+        categories.find { it.id?.toInt() == 1 },
+        listOf("url photos"),
+        null,
+        PetStatus.available
+    ),
+    Pet(
+        2,
+        "Bella",
+        categories.find { it.id?.toInt() == 2 },
+        listOf("url photos"),
+        null,
+        PetStatus.available
+    ),
+    Pet(
+        3,
+        "Charlie",
+        categories.find { it.id?.toInt() == 3 },
+        listOf("url photos"),
+        null,
+        PetStatus.sold
+    ),
+    Pet(
+        4,
+        "Luna",
+        categories.find { it.id?.toInt() == 5 },
+        listOf("url photos"),
+        null,
+        PetStatus.pending
+    ),
+)

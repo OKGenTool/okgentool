@@ -9,30 +9,8 @@ val logger = LoggerFactory.getLogger("PetRoute.kt")
 val petServices = PetServices()
 
 
-//TODO use this function to make the demo
+// Use this function to write the demo
 fun OkGenDsl.petDSLRouting() {
-    route.addPet {
-        try {
-            val pet = request.pet
-            val newPet = petServices.addPet(pet)
-            response.addPetResponse200(newPet)
-        } catch (ex: Exception) {
-            response.addPetResponse405()
-        }
-    }
-
-    route.getPetById {
-        try {
-            val petId = request.petId
-            val pet = petServices.getPet(petId)
-            if (pet != null)
-                response.getPetByIdResponse200(pet)
-            else
-                response.getPetByIdResponse404()
-        } catch (ex: Exception) {
-            response.getPetByIdResponse400()
-        }
-    }
 
 }
 
@@ -42,25 +20,42 @@ fun OkGenDsl.petDSLRouting() {
  */
 fun OkGenDsl.demoFinalCode() {
     route.addPet {
-        try {
-            val pet = request.pet
-            val newPet = petServices.addPet(pet)
-            response.addPetResponse200(newPet)
-        } catch (ex: Exception) {
-            response.addPetResponse405()
+        val pet = request.pet
+        if (pet == null || pet.id != null) {
+            response.addPetResponse405() // Invalid input
+            return@addPet
         }
+        val newPet = petServices.addPet(pet)
+        response.addPetResponse200(newPet) // Successful operation
     }
 
     route.getPetById {
-        try {
-            val petId = request.petId
-            val pet = petServices.getPet(petId)
-            if (pet != null)
-                response.getPetByIdResponse200(pet)
-            else
-                response.getPetByIdResponse404()
-        } catch (ex: Exception) {
-            response.getPetByIdResponse400()
+        val petId = request.petId ?: run {
+            response.getPetByIdResponse400() // Invalid ID supplied
+            return@getPetById
+        }
+
+        val pet = petServices.getPet(petId)
+        if (pet != null)
+            response.getPetByIdResponse200(pet) // successful operation
+        else
+            response.getPetByIdResponse404() // Pet not found
+    }
+
+    route.updatePet {
+        val pet = request.pet ?: run {
+            response.updatePetResponse405() //Validation exception
+            return@updatePet
+        }
+
+        if (pet.id == null) {
+            response.updatePetResponse400() // Invalid ID supplied
+            return@updatePet
+        }
+
+        when (val foundPet = petServices.updatePet(pet)) {
+            null -> response.updatePetResponse404() // Pet not found
+            else -> response.updatePetResponse200(foundPet) // Successful operation
         }
     }
 }
