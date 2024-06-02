@@ -30,7 +30,7 @@ The assumptions are:
  Use absolute paths only. Relative paths are in the roadmap here: https://github.com/OKGenTool/okgentool/issues/46
     
 
-4. Open the demo folder with an IDE (IntelliJ recommended)  
+4. Open the PetStore folder with an IDE (IntelliJ recommended)  
 >[!NOTE]
 If IDE was previously opened, you may need to reopen it to reload the indexes, of the generated files.  
 If the mutable code could not access the generatede code, and reopening the IDE does not solves the problem, the IDE needs to be repaired. In IntelliJ use this option:  `File -> Repair IDE`
