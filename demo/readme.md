@@ -14,7 +14,7 @@ The assumptions are:
 
 
 ## 1. Setup and generate code
-1. Download this [demo](DownloadDemo.zip) to a local folder on your computer. Example: `C:\ISEL\PS\okgentool\demo`  
+1. Download this [demo](DownloadDemo.zip) and extract the files to a local folder on your computer. Example: `C:\ISEL\PS\okgentool\demo`  
 1. Open a command line window in the same folder
 1. Run the following command:
     ```
