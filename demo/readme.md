@@ -18,9 +18,7 @@ The assumptions are:
 1. Open a command line window in the same folder
 1. Run the following command:
     ```
-    java -jar okgentool.jar -s "C:\ISEL\PS\okgentool\demo\petstore.yaml"
-    -ts "C:\ISEL\PS\okgentool\demo\PetStore\server\src\main\kotlin"
-    -p "org.example.petstoreserver"
+    java -jar okgentool.jar -s "C:\ISEL\PS\okgentool\demo\petstore.yaml" -ts "C:\ISEL\PS\okgentool\demo\PetStore\server\src\main\kotlin" -p "org.example.petstoreserver"
     ```
     Parameters:
     - `-s <sourcePath>` is the path for the OAD file
