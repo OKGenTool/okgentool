@@ -12,7 +12,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must have a minimum length of 2"
         ) {
-            val failMin = DataClassWithRequiredArrayParameterWithMinMaxItems(
+            DataClassWithRequiredArrayParameterWithMinMaxItems(
                 listOf(1)
             )
         }
@@ -20,7 +20,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must have a maximum length of 10"
         ) {
-            val failMax = DataClassWithRequiredArrayParameterWithMinMaxItems(
+            DataClassWithRequiredArrayParameterWithMinMaxItems(
                 listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
             )
         }
@@ -37,7 +37,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must have unique items"
         ) {
-            val fail = DataClassWithRequiredArrayParameterWithUniqueItems(
+            DataClassWithRequiredArrayParameterWithUniqueItems(
                 listOf(1, 1)
             )
         }
@@ -45,7 +45,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must have unique items"
         ) {
-            val fail = DataClassWithNotRequiredArrayParameterWithUniqueItems(
+            DataClassWithNotRequiredArrayParameterWithUniqueItems(
                 listOf(1, 2, 1)
             )
         }
@@ -66,7 +66,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be greater than or equal to 1"
         ) {
-            val failMin = dataClassWithRequiredIntParameterWithMaxAndMin(
+            dataClassWithRequiredIntParameterWithMaxAndMin(
                 0
             )
         }
@@ -74,7 +74,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be less than or equal to 10"
         ) {
-            val failMax = dataClassWithRequiredIntParameterWithMaxAndMin(
+            dataClassWithRequiredIntParameterWithMaxAndMin(
                 11
             )
         }
@@ -82,7 +82,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be greater than or equal to 1"
         ) {
-            val failMin = dataClassWithNotRequiredIntParameterWithMaxAndMin(
+            dataClassWithNotRequiredIntParameterWithMaxAndMin(
                 0
             )
         }
@@ -90,9 +90,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be less than or equal to 10"
         ) {
-            val failMax = dataClassWithNotRequiredIntParameterWithMaxAndMin(
-                11
-            )
+            dataClassWithNotRequiredIntParameterWithMaxAndMin(11)
         }
 
         val success1 = dataClassWithRequiredIntParameterWithMaxAndMin(
@@ -115,7 +113,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be greater than 1"
         ) {
-            val failMin = dataClassWithNotRequiredIntParameterWithExclusiveMaxAndMin(
+            dataClassWithNotRequiredIntParameterWithExclusiveMaxAndMin(
                 1
             )
         }
@@ -123,7 +121,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be greater than 1"
         ) {
-            val failMin = dataClassWithRequiredIntParameterWithExclusiveMaxAndMin(
+            dataClassWithRequiredIntParameterWithExclusiveMaxAndMin(
                 1
             )
         }
@@ -131,7 +129,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be less than 10"
         ) {
-            val failMax = dataClassWithNotRequiredIntParameterWithExclusiveMaxAndMin(
+            dataClassWithNotRequiredIntParameterWithExclusiveMaxAndMin(
                 10
             )
         }
@@ -139,7 +137,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be less than 10"
         ) {
-            val failMax = dataClassWithRequiredIntParameterWithExclusiveMaxAndMin(
+            dataClassWithRequiredIntParameterWithExclusiveMaxAndMin(
                 10
             )
         }
@@ -166,7 +164,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be a multiple of 2"
         ) {
-            val fail = DataClassWithNotRequiredIntParameterWithMultipleOf(
+            DataClassWithNotRequiredIntParameterWithMultipleOf(
                 3
             )
         }
@@ -174,7 +172,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must be a multiple of 2"
         ) {
-            val fail = DataClassWithRequiredIntParameterWithMultipleOf(
+            DataClassWithRequiredIntParameterWithMultipleOf(
                 3
             )
         }
@@ -201,7 +199,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must have a minimum length of 2"
         ) {
-            val failMin = DataClassWithRequiredStringParameterWithMinMaxLen(
+            DataClassWithRequiredStringParameterWithMinMaxLen(
                 "a"
             )
         }
@@ -209,7 +207,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must have a maximum length of 10"
         ) {
-            val failMax = DataClassWithRequiredStringParameterWithMinMaxLen(
+            DataClassWithRequiredStringParameterWithMinMaxLen(
                 "12345678901"
             )
         }
@@ -217,7 +215,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must have a minimum length of 2"
         ) {
-            val failMin = DataClassWithNotRequiredStringParameterWithMinMaxLen(
+            DataClassWithNotRequiredStringParameterWithMinMaxLen(
                 "a"
             )
         }
@@ -225,7 +223,7 @@ class InitCodeBlockTests {
         assertFailsWith<IllegalArgumentException>(
             message = "value must have a maximum length of 10"
         ) {
-            val failMax = DataClassWithNotRequiredStringParameterWithMinMaxLen(
+            DataClassWithNotRequiredStringParameterWithMinMaxLen(
                 "12345678901"
             )
         }
