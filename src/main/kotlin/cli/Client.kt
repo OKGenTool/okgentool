@@ -9,6 +9,8 @@ var serverDestinationPath: String = ""
 var clientDestinationPath: String = ""
 var packageName: String = ""
 
+const val VERSION = "beta"
+
 fun getClient(args: Array<String>) {
     if (args.isEmpty()) {
         println(getErrorMessage("No arguments provided"))
@@ -48,7 +50,7 @@ private fun getHelpText(): String {
     return """
         
                        ==/ OKGenToll \==
-                          Version 0.1
+                          Version: $VERSION
         
                        ==/   Usage   \==
         -s <sourcePath> -ts <targetPath> -tc <targetPath>
