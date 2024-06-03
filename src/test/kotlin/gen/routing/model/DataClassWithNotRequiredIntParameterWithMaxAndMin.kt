@@ -5,10 +5,20 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 public data class dataClassWithNotRequiredIntParameterWithMaxAndMin(
-  public val `value`: Int?,
+  public val `value`: Int? = null,
 ) {
   init {
-    require(value == null || value <= 10) { "value must be less than or equal to 10" }
-    require(value == null || value >= 1) { "value must be greater than or equal to 1" }
+    require(
+      value == null ||
+              value <= 10
+    ) {
+      "value must be less than or equal to 10"
+    }
+    require(
+      value == null ||
+              value >= 1
+    ) {
+      "value must be greater than or equal to 1"
+    }
   }
 }

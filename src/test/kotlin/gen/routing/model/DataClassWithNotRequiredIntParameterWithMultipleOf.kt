@@ -5,9 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 public data class DataClassWithNotRequiredIntParameterWithMultipleOf(
-  public val `value`: Int?,
+  public val `value`: Int? = null,
 ) {
   init {
-    require(value == null || value % 2 == 0) { "value must be a multiple of 2" }
+    require(
+      value == null ||
+              value % 2 == 0
+    ) {
+      "value must be a multiple of 2"
+    }
   }
 }

@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 public data class DataClassWithNotRequiredParameters(
-  public val name: String?,
-  public val age: Int?,
+  public val name: String? = null,
+  public val age: Int? = null,
 )

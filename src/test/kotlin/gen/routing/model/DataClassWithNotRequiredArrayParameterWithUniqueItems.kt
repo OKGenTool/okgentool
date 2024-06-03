@@ -6,9 +6,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 public data class DataClassWithNotRequiredArrayParameterWithUniqueItems(
-  public val `value`: List<Int>,
+  public val `value`: List<Int>? = null,
 ) {
   init {
-    require(value == null || value.toSet().size == value.size) { "value must have unique items" }
+    require(
+      value == null ||
+              value.toSet().size == value.size
+    ) {
+      "value must have unique items"
+    }
   }
 }

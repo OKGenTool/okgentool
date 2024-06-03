@@ -6,10 +6,20 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 public data class DataClassWithNotRequiredArrayParameterWithMinMaxItems(
-  public val `value`: List<Int>,
+  public val `value`: List<Int>? = null,
 ) {
   init {
-    require(value == null || value.size >= 2) { "value must have a minimum length of 2" }
-    require(value == null || value.size <= 10) { "value must have a maximum length of 10" }
+    require(
+      value == null ||
+              value.size >= 2
+    ) {
+      "value must have a minimum length of 2"
+    }
+    require(
+      value == null ||
+              value.size <= 10
+    ) {
+      "value must have a maximum length of 10"
+    }
   }
 }
