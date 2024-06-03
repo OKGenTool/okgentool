@@ -14,8 +14,12 @@ This is a final project of the **Computer Science and Computer Engineering BSc**
 
 | Name        | Number | Contact     |
 | ----------- | ------ | ----------- |
-| Hélio Fitas | 39622  | A39622@alunos.isel.pt; heliofitas@gmail.com; [Linkedin](https://www.linkedin.com/in/heliofitas/); [Slack](https://i-on-workspace.slack.com/team/U06N9C4V75W)
+| Hélio Fitas | 39622  | A39622@alunos.isel.pt; heliofitas@gmail.com; [Linkedin](https://www.linkedin.com/in/heliofitas/)
 | Dinis Laranjeira | 46081 | A46081@alunos.isel.pt; dinis.laranjeira14874@gmail.com |
+
+**Supervisor:** Pedro Félix - ISEL
+
+
 
 # How to use OkGenTool
 A demo is available in this repository, in the folder [demo](./demo/)
