@@ -103,11 +103,18 @@ private fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSp
             .add("$KTORROUTE.${it.method.value}<$PATHSFILE.${it.name.capitalize()}>{\n")
             .getRequestCode(it)
             .add("}")
+            .build()
+
+        val commentBlock = CodeBlock.builder()
+            .add("Summary: ${it.summary}\n\n")
+            .add("Description: ${it.description}")
+            .build()
 
         functions.add(
             FunSpec.builder(it.name)
+                .addKdoc(commentBlock)
                 .addParameter("function", suspFunc)
-                .addCode(codeBlock.build())
+                .addCode(codeBlock)
                 .build()
         )
     }
@@ -191,6 +198,6 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>): FileSpec.
 
 //TODO implement these operations
 val notImplemented = setOf(
-    "postPetPetIdUploadImage", "getInventory", "placeOrder", "createUser", "createUsersWithListInput",
+    "postPetPetIdUploadImage", "placeOrder", "createUser", "createUsersWithListInput",
     "logoutUser", "updateUser", "uploadFile"
 )

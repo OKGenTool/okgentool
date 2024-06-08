@@ -50,6 +50,7 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
         HttpMethod.parse(method),
         path,
         operation.summary,
+        operation.description,
         parameters
     )
 
