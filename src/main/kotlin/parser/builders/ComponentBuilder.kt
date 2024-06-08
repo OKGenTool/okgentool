@@ -3,6 +3,7 @@ package parser.builders
 import datamodel.Component
 import datamodel.ComponentProperty
 import datamodel.DataType
+import datamodel.InlineSchema
 import generator.capitalize
 import io.swagger.v3.oas.models.media.Schema
 import org.slf4j.LoggerFactory
@@ -10,7 +11,8 @@ import parser.openAPI
 
 private val logger = LoggerFactory.getLogger("ComponentBuilder.kt")
 
-fun getComponents(): List<Component> {
+fun getComponents(inlineSchemas: List<InlineSchema>?): List<Component> {
+    //TODO handle inlineSchemas
     logger.info("Reading components")
     val components = openAPI.components.schemas ?: return emptyList()
     val res = mutableListOf<Component>()

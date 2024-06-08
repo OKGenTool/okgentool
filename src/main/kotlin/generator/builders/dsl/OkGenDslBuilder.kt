@@ -2,6 +2,7 @@ package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
 import datamodel.*
+import generator.builders.getConstructor
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize

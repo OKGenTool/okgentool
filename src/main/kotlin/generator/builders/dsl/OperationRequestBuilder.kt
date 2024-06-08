@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.DSLOperation
 import datamodel.In
+import generator.builders.getConstructor
 import generator.capitalize
 import generator.model.Parameter
 import generator.model.Packages

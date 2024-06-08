@@ -11,4 +11,5 @@ data class DSLOperation(
     val summary: String,
     val description: String,
     val parameters: List<DSLParameter>? = null,
+    val inlineSchemas: List<InlineSchema>
 )
