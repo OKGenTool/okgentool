@@ -1,11 +1,12 @@
 package parser
 
 import datamodel.DataModel
+import datamodel.InlineSchema
 import io.swagger.parser.OpenAPIParser
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.core.models.ParseOptions
 import parser.builders.buildSchemas
-import parser.builders.getOperations
+import parser.builders.buildOperations
 
 lateinit var openAPI: OpenAPI
 
@@ -31,6 +32,16 @@ class Parser(sourceFilePath: String) {
     }
 
     fun getDataModel(): DataModel {
-        return DataModel(buildSchemas(), getOperations())
+        val operations = buildOperations()
+        val inlineSchemas: MutableList<InlineSchema> = mutableListOf()
+
+        operations.map {
+            it.inlineSchemas.map {
+                inlineSchemas.add(it)
+            }
+        }
+        val components = getComponents(inlineSchemas)
+
+        return DataModel(components, operations)
     }
 }

@@ -6,6 +6,7 @@ import generator.capitalize
 import io.ktor.http.*
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.media.Schema
+import io.swagger.v3.oas.models.responses.ApiResponses
 import org.slf4j.LoggerFactory
 import parser.openAPI
 
@@ -13,7 +14,7 @@ private val logger = LoggerFactory.getLogger("OperationsBuilder.kt")
 
 private val dslOperations = mutableListOf<DSLOperation>()
 
-fun getOperations(): List<DSLOperation> {
+fun buildOperations(): List<DSLOperation> {
     for (paths in openAPI.paths) {
         val pathItem = paths.value
         addOperation(pathItem.get, paths.key, "get")
@@ -31,6 +32,8 @@ fun getOperations(): List<DSLOperation> {
 private fun addOperation(operation: Operation?, path: String, method: String) {
     if (operation == null) return
 
+    val operationName = getOperationName(operation, path, method)
+
     val parameters: List<DSLParameter>? = operation.parameters?.takeIf { it.isNotEmpty() }?.map {
         val type = DataType.fromString(it.schema.type, it.schema.format)
         DSLParameter(
@@ -43,31 +46,53 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
         )
     }
 
+    val inlineSchemas: MutableList<InlineSchema> = mutableListOf()
+
     val dslOperation = DSLOperation(
-        getOperationName(operation, path, method),
+        operationName,
         getBodyNew(operation),
-        getResponses(operation),
+        getResponses(operation.responses, operationName, inlineSchemas),
         HttpMethod.parse(method),
         path,
         operation.summary,
-        parameters
+        operation.description,
+        parameters,
+        inlineSchemas
     )
 
     dslOperations.add(dslOperation)
 }
 
-private fun getResponses(operation: Operation): List<Response>? {
-    if (operation == null) return null
+private fun getResponses(
+    apiResponses: ApiResponses,
+    operationName: String,
+    inlineSchemas: MutableList<InlineSchema>,
+): List<Response> {
     val responses: MutableList<Response> = mutableListOf()
 
-    for (response in operation.responses) {
+    for (response in apiResponses) {
         val content = response.value.content
+
+        //TODO if schema is an inline object, it's need to add it to data model
+        var schemaRef: String? = null
+        content?.let {
+            val schema = it[content.keys.first()]?.schema //TODO add all schemas, not the first only
+            if (schema?.type == "object")
+                inlineSchemas.add(
+                    InlineSchema(
+                        "${operationName.capitalize()}Obj",
+                        schema
+                    )
+                )
+            else
+                schemaRef = getSchemaProp(schema, SchemaProps.REF)
+        }
 
         val response = Response(
             response.key,
             response.value.description,
             content?.keys?.toList(),
-            getSchemaProp(content?.let { it[content.keys.first()]?.schema }, SchemaProps.REF)
+            schemaRef,
         )
         responses.add(response)
     }
