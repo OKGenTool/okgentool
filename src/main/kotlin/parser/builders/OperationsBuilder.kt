@@ -75,7 +75,6 @@ private fun getResponses(
 
         //TODO if schema is an inline object, it's need to add it to data model
         var schemaRef: String? = null
-        var inlineSchema: InlineSchema? = null
         content?.let {
             val schema = it[content.keys.first()]?.schema //TODO add all schemas, not the first only
             if (schema?.type == "object")
