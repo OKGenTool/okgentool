@@ -1,25 +1,24 @@
 package generator.model.utils
 
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.ArrayProperties
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
 
-val dataClassWithBiDimensionalArray = Component(
+val dataClassWithBiDimensionalArray = Schema(
     schemaName = "#/components/schemas/DataClassWithBiDimensionalArray",
     parameters = listOf(
-        ComponentProperty(
+        Parameter(
             name = "values",
             dataType = DataType.ARRAY,
-            arrayItemsType = DataType.ARRAY,
+            properties = ArrayProperties(
+                arrayItemsDataType = DataType.ARRAY,
+                arrayProperties = ArrayProperties(
+                    arrayItemsDataType = DataType.INTEGER
+                )
+            ),
             required = true,
             schemaName = "",
-            arrayProperties = ComponentProperty(
-                name = "values",
-                dataType = DataType.ARRAY,
-                arrayItemsType = DataType.INTEGER,
-                required = true,
-                schemaName = ""
-            )
         )
     ),
     simplifiedName = "DataClassWithBiDimensionalArray",

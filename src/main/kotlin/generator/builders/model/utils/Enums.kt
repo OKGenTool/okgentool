@@ -1,16 +1,20 @@
 package generator.builders.model.utils
 
 import com.squareup.kotlinpoet.TypeSpec
-import datamodel.Component
+import datamodel.DataType
+import datamodel.Schema
+import datamodel.StringProperties
+import generator.capitalize
 
-fun getEnumBuilders(component: Component): List<TypeSpec> {
-    val enums = component.parameters.filter { it.isEnum }
+fun getEnumBuilders(schema: Schema): List<TypeSpec> {
+    val enums = schema.parameters.filter { it.properties is StringProperties && it.properties.isEnum }
     val enumBuilders = mutableListOf<TypeSpec>()
-    component.parameters.forEach { property ->
-        if (property.values.isNotEmpty()) {
+    schema.parameters.forEach { parameter ->
+        if (parameter.properties is StringProperties && parameter.properties.values.isNotEmpty()) {
             enums.forEach { enum ->
-                val enumBuilder = TypeSpec.enumBuilder(component.simplifiedName + enum.name.capitalize())
-                enum.values.forEach { enumValue ->
+                val stringProperties = enum.properties as StringProperties
+                val enumBuilder = TypeSpec.enumBuilder(schema.simplifiedName + enum.name.capitalize())
+                stringProperties.values.forEach { enumValue ->
                     enumBuilder.addEnumConstant(enumValue)
                 }
                 enumBuilders.add(enumBuilder.build())

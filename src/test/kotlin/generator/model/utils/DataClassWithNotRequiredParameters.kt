@@ -1,19 +1,19 @@
 package generator.model.utils
 
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
 
-val dataClassWithNotRequiredParameters = Component(
+val dataClassWithNotRequiredParameters = Schema(
     schemaName = "#/components/schemas/DataClassWithNotRequiredParameters",
     parameters = listOf(
-        ComponentProperty(
+        Parameter(
             name = "name",
             dataType = DataType.STRING,
             required = false,
             schemaName = ""
         ),
-        ComponentProperty(
+        Parameter(
             name = "age",
             dataType = DataType.INTEGER,
             required = false,

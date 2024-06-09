@@ -1,19 +1,19 @@
 package generator.model.utils
 
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
 
-val dataClassWithGeneratedDataType = Component(
+val dataClassWithGeneratedDataType = Schema(
     schemaName = "#/components/schemas/DataClassWithGeneratedDataType",
     parameters = listOf(
-        ComponentProperty(
+        Parameter(
             name = "name",
             dataType = DataType.STRING,
             required = true,
             schemaName = ""
         ),
-        ComponentProperty(
+        Parameter(
             name = "value",
             dataType = DataType.OBJECT,
             required = true,

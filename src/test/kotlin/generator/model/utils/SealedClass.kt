@@ -1,10 +1,10 @@
 package generator.model.utils
 
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
 
-val sealedClass = Component(
+val sealedClass = Schema(
     schemaName = "#/components/schemas/SealedClass",
     parameters = emptyList(),
     simplifiedName = "SealedClass",
@@ -12,11 +12,11 @@ val sealedClass = Component(
         "#/components/schemas/Child1",
         "#/components/schemas/Child2"
     ),
-    superClassChildComponents = mutableListOf(
-        Component(
+    superClassChildSchemas = mutableListOf(
+        Schema(
             schemaName = "#/components/schemas/Child1",
             parameters = listOf(
-                ComponentProperty(
+                Parameter(
                     name = "name",
                     dataType = DataType.STRING,
                     required = true,
@@ -26,10 +26,10 @@ val sealedClass = Component(
             simplifiedName = "Child1",
             superClassChildSchemaNames = emptyList()
         ),
-        Component(
+        Schema(
             schemaName = "#/components/schemas/Child2",
             parameters = listOf(
-                ComponentProperty(
+                Parameter(
                     name = "age",
                     dataType = DataType.INTEGER,
                     required = true,

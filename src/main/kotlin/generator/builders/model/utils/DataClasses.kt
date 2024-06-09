@@ -1,39 +1,39 @@
 package generator.builders.model.utils
 
 import com.squareup.kotlinpoet.*
-import datamodel.Component
+import datamodel.Schema
 import generator.model.Packages
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-fun createDataClassComponent(component: Component, components: List<Component>): FileSpec {
-    return FileSpec.builder(Packages.MODEL, component.simplifiedName)
-        .addType(getDataClassBuilder(component, components))
-        .addTypes(getEnumBuilders(component))
+fun createDataClassComponent(schema: Schema, schemas: List<Schema>): FileSpec {
+    return FileSpec.builder(Packages.MODEL, schema.simplifiedName)
+        .addType(getDataClassBuilder(schema, schemas))
+        .addTypes(getEnumBuilders(schema))
         .build()
 }
 
 fun getDataClassBuilder(
-    component: Component,
-    components: List<Component>,
+    schema: Schema,
+    schemas: List<Schema>,
     superclassName: ClassName? = null,
     companionObject: TypeSpec? = null,
 ): TypeSpec {
     val properties = mutableListOf<PropertySpec>()
     val parameters = mutableListOf<ParameterSpec>()
 
-    for (property in component.parameters) {
-        val propertyType = getPropertyType(property, component.simplifiedName, components)
+    for (property in schema.parameters) {
+        val parameterType = getParameterType(property, schema.simplifiedName, schemas)
 
-        val propertySpec = PropertySpec.builder(property.name, propertyType)
+        val propertySpec = PropertySpec.builder(property.name, parameterType)
             .initializer(property.name)
             .build()
 
         val parameterSpec = if(property.required)
-            ParameterSpec.builder(property.name, propertyType)
+            ParameterSpec.builder(property.name, parameterType)
                 .build()
         else
-            ParameterSpec.builder(property.name, propertyType)
+            ParameterSpec.builder(property.name, parameterType)
                 .defaultValue("null")
                 .build()
 
@@ -45,13 +45,13 @@ fun getDataClassBuilder(
         .addParameters(parameters)
         .build()
 
-    val dataClassBuilder = TypeSpec.classBuilder(component.simplifiedName)
+    val dataClassBuilder = TypeSpec.classBuilder(schema.simplifiedName)
         .addModifiers(KModifier.DATA)
         .primaryConstructor(primaryConstructor)
         .addProperties(properties)
         .addAnnotation(Serializable::class)
 
-    val initCodeBlock = getInitCodeBlock(component)
+    val initCodeBlock = getInitCodeBlock(schema)
     if (initCodeBlock.isNotEmpty()) {
         dataClassBuilder.addInitializerBlock(initCodeBlock)
     }
@@ -60,7 +60,7 @@ fun getDataClassBuilder(
         dataClassBuilder
             .superclass(superclassName)
             .addAnnotation(AnnotationSpec.builder(SerialName::class)
-                .addMember("%S", component.simplifiedName).build())
+                .addMember("%S", schema.simplifiedName).build())
     }
 
     if (companionObject != null) {

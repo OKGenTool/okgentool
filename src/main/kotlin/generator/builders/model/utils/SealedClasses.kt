@@ -4,30 +4,30 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
-import datamodel.Component
+import datamodel.Schema
 import generator.model.Packages
 import kotlinx.serialization.Serializable
 
-fun createSealedClassComponent(component: Component, components: List<Component>): FileSpec {
-    val sealedClass = TypeSpec.classBuilder(component.simplifiedName)
+fun createSealedClassComponent(schema: Schema, schemas: List<Schema>): FileSpec {
+    val sealedClass = TypeSpec.classBuilder(schema.simplifiedName)
         .addModifiers(KModifier.SEALED)
         .addAnnotation(Serializable::class)
         .build()
 
-    return FileSpec.builder(Packages.MODEL, component.simplifiedName)
+    return FileSpec.builder(Packages.MODEL, schema.simplifiedName)
         .addType(sealedClass)
-        .addTypes(getSubclasses(component, components, component.simplifiedName))
+        .addTypes(getSubclasses(schema, schemas, schema.simplifiedName))
         .build()
 }
 
-private fun getSubclasses(superClassComponent: Component, components: List<Component>, superclassName: String): List<TypeSpec> {
+private fun getSubclasses(superClassSchema: Schema, schemas: List<Schema>, superclassName: String): List<TypeSpec> {
     val subclasses = mutableListOf<TypeSpec>()
 
-    for (component in superClassComponent.superClassChildComponents) {
+    for (component in superClassSchema.superClassChildSchemas) {
         subclasses.add(
             getDataClassBuilder(
                 component,
-                components,
+                schemas,
                 ClassName(Packages.MODEL, superclassName),
             )
         )

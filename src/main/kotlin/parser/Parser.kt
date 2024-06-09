@@ -4,7 +4,7 @@ import datamodel.DataModel
 import io.swagger.parser.OpenAPIParser
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.core.models.ParseOptions
-import parser.builders.getComponents
+import parser.builders.buildSchemas
 import parser.builders.getOperations
 
 lateinit var openAPI: OpenAPI
@@ -31,6 +31,6 @@ class Parser(sourceFilePath: String) {
     }
 
     fun getDataModel(): DataModel {
-        return DataModel(getComponents(), getOperations())
+        return DataModel(buildSchemas(), getOperations())
     }
 }
