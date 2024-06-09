@@ -97,14 +97,17 @@ fun arrayChildParameterType(arrayProperties: ParameterProperties, schemas: List<
     }
 
     if (arrayProperties.arrayItemsDataType != null && arrayProperties.arrayItemsDataType != DataType.OBJECT)
-        return  arrayProperties.arrayItemsDataType.kotlinType
+        return  DataType.ARRAY.kotlinType.parameterizedBy(
+            arrayProperties.arrayItemsDataType.kotlinType
+        )
 
     if (!arrayProperties.arrayItemsSchemaName.isNullOrBlank()) {
         val relatedComponent = schemas.find { it.schemaName == arrayProperties.arrayItemsSchemaName }
             ?: throw IllegalArgumentException("Array property must have schema name")
-        return ClassName(
+        return DataType.ARRAY.kotlinType.parameterizedBy(ClassName(
             Packages.MODEL,
             relatedComponent.simplifiedName
+            )
         )
     }
 
