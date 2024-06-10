@@ -1,4 +1,4 @@
-package generator.builders.dsl
+package generator.builders
 
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.PropertySpec

@@ -1,10 +1,10 @@
 package datamodel
 
-data class Component(
+data class Schema(
     val schemaName: String,
-    val parameters: List<ComponentProperty>,
+    val parameters: List<Parameter>,
     val simplifiedName: String,
     val superClassChildSchemaNames: List<String>,
-    val superClassChildComponents: MutableList<Component> = mutableListOf(),
+    val superClassChildSchemas: MutableList<Schema> = mutableListOf(),
     val schemaNameChildren: MutableList<String> = mutableListOf(),
 )

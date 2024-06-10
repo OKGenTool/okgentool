@@ -15,7 +15,7 @@ class Generator(private val dataModel: DataModel) {
         cleanUp(serverDestinationPath)
 
         logger.info("Build model files")
-        buildModel(dataModel.components)
+        buildModel(dataModel.schemas)
 
         logger.info("Build Paths file")
         buildPaths(dataModel.dslOperations)
@@ -23,7 +23,7 @@ class Generator(private val dataModel: DataModel) {
         logger.info("Build DSL Files")
         buildDSLOperations(
             dataModel.dslOperations,
-            dataModel.components.map { it.simplifiedName }
+            dataModel.schemas.map { it.simplifiedName }
         )
     }
 }

@@ -1,18 +1,21 @@
 package generator.model.utils
 
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
+import datamodel.StringProperties
 
-val dataClassWithRequiredStringParameterWithPattern = Component(
+val dataClassWithRequiredStringParameterWithPattern = Schema(
     schemaName = "#/components/schemas/DataClassWithRequiredStringParameterWithPattern",
     parameters = listOf(
-        ComponentProperty(
+        Parameter(
             name = "value",
             dataType = DataType.STRING,
             required = true,
             schemaName = "",
-            pattern = "^\\d{3}-\\d{2}-\\d{4}$"
+            properties = StringProperties(
+                pattern = "^\\d{3}-\\d{2}-\\d{4}$"
+            ),
         )
     ),
     simplifiedName = "DataClassWithRequiredStringParameterWithPattern",

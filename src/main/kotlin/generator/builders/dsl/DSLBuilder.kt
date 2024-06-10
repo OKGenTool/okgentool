@@ -3,6 +3,7 @@ package generator.builders.dsl
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.*
+import generator.builders.getConstructor
 import generator.builders.routing.plugins.buildSerialization
 import generator.builders.routing.routes.buildReadRequestResult
 import generator.capitalize

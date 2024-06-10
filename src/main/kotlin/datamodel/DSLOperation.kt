@@ -9,5 +9,7 @@ data class DSLOperation(
     val method: HttpMethod,
     val path: String,
     val summary: String,
+    val description: String,
     val parameters: List<DSLParameter>? = null,
+    val inlineSchemas: List<InlineSchema>
 )

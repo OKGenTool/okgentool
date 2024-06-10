@@ -1,15 +1,15 @@
 package generator.builders.model.utils
 
 import com.squareup.kotlinpoet.CodeBlock
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
 
-fun getInitCodeBlock(component: Component): CodeBlock {
+fun getInitCodeBlock(schema: Schema): CodeBlock {
     val codeBlock = CodeBlock.builder()
     val statements = mutableListOf<String>()
 
-    component.parameters.forEach { componentProperty ->
+    schema.parameters.forEach { componentProperty ->
         statements.addAll(getPropertyStatements(componentProperty))
     }
 
@@ -20,20 +20,20 @@ fun getInitCodeBlock(component: Component): CodeBlock {
     return codeBlock.build()
 }
 
-private fun getPropertyStatements(componentProperty: ComponentProperty): List<String> {
+private fun getPropertyStatements(parameter: Parameter): List<String> {
     val statements = mutableListOf<String>()
 
-    when (componentProperty.dataType) {
+    when (parameter.dataType) {
         DataType.INTEGER, DataType.DOUBLE, DataType.FLOAT, DataType.LONG, DataType.NUMBER, DataType.INT -> {
-            statements.addAll(getNumberPropertyStatements(componentProperty))
+            statements.addAll(getNumberPropertyStatements(parameter))
         }
 
         DataType.STRING -> {
-            statements.addAll(getStringPropertyStatements(componentProperty))
+            statements.addAll(getStringPropertyStatements(parameter))
         }
 
         DataType.ARRAY -> {
-            statements.addAll(getArrayPropertyStatements(componentProperty))
+            statements.addAll(getArrayPropertyStatements(parameter))
         }
 
         else -> {}
