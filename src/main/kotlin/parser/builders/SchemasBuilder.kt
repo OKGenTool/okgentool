@@ -8,7 +8,7 @@ import parser.openAPI
 
 private val logger = LoggerFactory.getLogger("SchemasBuilder.kt")
 
-fun buildSchemas(): List<datamodel.Schema> {
+fun buildSchemas(inlineSchemas: MutableList<InlineSchema>): List<datamodel.Schema> {
     logger.info("Reading schemas")
     val schemas = openAPI.components.schemas ?: return emptyList()
     val res = mutableListOf<datamodel.Schema>()
@@ -22,8 +22,17 @@ fun buildSchemas(): List<datamodel.Schema> {
         logger.info("Parsing schema: $schemaName")
         res.add(datamodel.Schema(schemaName, parameters, component.key.capitalize(), oneOfSchemaNames))
     }
+
+    for (inlineSchema in inlineSchemas) {
+        val requiredProperties = inlineSchema.schema.required ?: emptyList()
+        val parameters = getParameters(inlineSchema.schema, requiredProperties)
+        val oneOfSchemaNames = getOneOfSchemaNames(inlineSchema.schema)
+        val schemaName = inlineSchema.name
+        logger.info("Parsing schema: $schemaName")
+        res.add(datamodel.Schema(schemaName, parameters, inlineSchema.name.capitalize(), oneOfSchemaNames))
+    }
+
     return res
-//    return checkChildren(removeDuplicates(res))
 }
 
 private fun getOneOfSchemaNames(schema: Schema<Any>?): List<String> {
@@ -60,61 +69,6 @@ private fun getParameters(schema: Schema<Any>?, requiredProperties: List<String>
                     example = example
                 )
             )
-            continue
-
-//            val values = parameter.value.enum?.map { it.toString() } ?: emptyList()
-//
-//            if (dataType == DataType.ARRAY) {
-//                val arrayItems = parameter.value
-//                val arrayIndex = 0
-//                val minItems = parameter.value.minItems
-//                val maxItems = parameter.value.maxItems
-//                val uniqueItems = parameter.value.uniqueItems ?: false
-//
-//                properties.add(
-//                    getArrayProperties(
-//                        arrayItems = arrayItems,
-//                        name = name,
-//                        dataType = dataType,
-//                        required = required,
-//                        schemaName = schemaName,
-//                        values = values,
-//                        arrayIndex = arrayIndex,
-//                        minItems = minItems,
-//                        maxItems = maxItems,
-//                        uniqueItems = uniqueItems
-//                    )
-//                )
-//                continue
-//            }
-//
-//            val minimum = parameter.value.minimum?.toInt()
-//            val maximum = parameter.value.maximum?.toInt()
-//            val exclusiveMinimum = parameter.value.exclusiveMinimum ?: false
-//            val exclusiveMaximum = parameter.value.exclusiveMaximum ?: false
-//            val multipleOf = parameter.value.multipleOf?.toInt()
-//            val pattern = parameter.value.pattern
-//            val minLength = parameter.value.minLength
-//            val maxLength = parameter.value.maxLength
-//
-//            properties.add(
-//                Parameter(
-//                    name = name,
-//                    dataType = dataType,
-//                    required = required,
-//                    schemaName = schemaName,
-//                    isEnum = values.isNotEmpty(),
-//                    values = values,
-//                    minimum = minimum,
-//                    maximum = maximum,
-//                    exclusiveMinimum = exclusiveMinimum,
-//                    exclusiveMaximum = exclusiveMaximum,
-//                    multipleOf = multipleOf,
-//                    minLength = minLength,
-//                    maxLength = maxLength,
-//                    pattern = pattern
-//                )
-//            )
         }
     }
 
@@ -143,123 +97,20 @@ fun getParameterProperties(parameter: Schema<*>, dataType: DataType): ParameterP
         }
         DataType.ARRAY -> {
             val arrayItemsDataType = DataType.fromString(parameter.items.type ?: "", parameter.items.format ?: "")
+            val arrayProperties = if (arrayItemsDataType == DataType.ARRAY) {
+                getParameterProperties(parameter.items, arrayItemsDataType)
+            } else {
+                null
+            }
             return ArrayProperties(
                 arrayItemsDataType = arrayItemsDataType,
                 arrayItemsSchemaName = parameter.items.`$ref` ?: "",
                 minItems = parameter.minItems,
                 maxItems = parameter.maxItems,
                 uniqueItems = parameter.uniqueItems ?: false,
-                arrayProperties = getParameterProperties(parameter.items, arrayItemsDataType)
+                arrayProperties = arrayProperties
             )
         }
         else -> return null
     }
 }
-
-//private fun getArrayProperties(
-//    arrayItems: Schema<*>?,
-//    name: String,
-//    dataType: DataType,
-//    required: Boolean,
-//    schemaName: String,
-//    values: List<String>,
-//    arrayIndex: Int,
-//    minItems: Int?,
-//    maxItems: Int?,
-//    uniqueItems: Boolean = false
-//): Parameter {
-//    val childArrayItems = arrayItems?.items
-//    val arrayItemsType = DataType.fromString(arrayItems?.items?.type ?: "", arrayItems?.items?.format ?: "")
-//    val arrayItemsSchemaName = arrayItems?.items?.`$ref` ?: ""
-//    val childUniqueItems = arrayItems?.uniqueItems ?: false
-//    val childMinItems = arrayItems?.minItems
-//    val childMaxItems = arrayItems?.maxItems
-//    val childArrayIndex = arrayIndex + 1
-//
-//    if (arrayItemsType != DataType.ARRAY) {
-//        return Parameter(
-//            name = name,
-//            dataType = dataType,
-//            required = required,
-//            schemaName = schemaName,
-//            isEnum = values.isNotEmpty(),
-//            arrayItemsType = arrayItemsType,
-//            arrayItemsSchemaName = arrayItemsSchemaName,
-//            values = values,
-//            minItems = minItems,
-//            maxItems = maxItems,
-//            arrayIndex = arrayIndex,
-//            uniqueItems = uniqueItems
-//        )
-//    }
-//
-//    return Parameter(
-//        name = name,
-//        dataType = dataType,
-//        required = required,
-//        schemaName = schemaName,
-//        isEnum = values.isNotEmpty(),
-//        arrayItemsType = arrayItemsType,
-//        arrayItemsSchemaName = arrayItemsSchemaName,
-//        values = values,
-//        minItems = minItems,
-//        maxItems = maxItems,
-//        arrayIndex = arrayIndex,
-//        uniqueItems = uniqueItems,
-//        arrayProperties = getArrayProperties(
-//            arrayItems = childArrayItems,
-//            name = name,
-//            dataType = dataType,
-//            required = required,
-//            schemaName = schemaName,
-//            values = values,
-//            minItems = childMinItems,
-//            maxItems = childMaxItems,
-//            arrayIndex = childArrayIndex,
-//            uniqueItems = childUniqueItems
-//        )
-//    )
-//}
-
-//private fun removeDuplicates(components: MutableList<datamodel.Schema>): MutableList<datamodel.Schema> {
-//    val sealedComponents = components.filter { it.superClassChildSchemaNames.isNotEmpty() }
-//
-//    for (component in sealedComponents) {
-//        val oneOfSchemaNames = component.superClassChildSchemaNames
-//        for (schemaName in oneOfSchemaNames) {
-//            val relatedComponent = components.find { it.schemaName == schemaName } ?: continue
-//            component.superClassChildSchemas.add(relatedComponent)
-//            components.remove(relatedComponent)
-//        }
-//    }
-//
-//    return components
-//}
-
-//private fun checkChildren(components: MutableList<datamodel.Schema>): List<datamodel.Schema> {
-//    val simplifiedNames = mutableListOf<Pair<String, String>>()
-//
-//    for (component in components) {
-//        simplifiedNames.add(Pair(component.simplifiedName, component.simplifiedName.split("_").first()))
-//    }
-//
-//    for ((key, value) in simplifiedNames) {
-//        var parent = components.find { it.simplifiedName == value }
-//        val child = components.find { it.simplifiedName == key }!!
-//        if (parent != null && key != value && parent.parameters == child.parameters) {
-//            parent.schemaNameChildren.add(child.schemaName)
-//            parent.schemaNameChildren.addAll(child.schemaNameChildren)
-//            components.remove(child)
-//            continue
-//        }
-//
-//        parent = components.find { it.parameters == child.parameters && it != child }
-//        if (parent != null && ((key.contains("Body") && key.contains(parent.simplifiedName)) || key.contains("Response"))) {
-//            parent.schemaNameChildren.add(child.schemaName)
-//            parent.schemaNameChildren.addAll(child.schemaNameChildren)
-//            components.remove(child)
-//        }
-//    }
-//
-//    return components
-//}

@@ -40,8 +40,8 @@ class Parser(sourceFilePath: String) {
                 inlineSchemas.add(it)
             }
         }
-        val components = getComponents(inlineSchemas)
+        val schemas = buildSchemas(inlineSchemas)
 
-        return DataModel(components, operations)
+        return DataModel(schemas, operations)
     }
 }

@@ -62,7 +62,7 @@ class GenerationTests {
         ).toString()
 
         val referenceContent = getReferenceContent("DataClassWithBiDimensionalArray.kt")
-    
+
         assertGeneratedMatch(referenceContent, fileSpec)
     }
 
