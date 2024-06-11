@@ -45,25 +45,16 @@ fun getResponseProps(operationName: String, responses: List<Response>): List<Res
             }
 
             is ResponseInline -> {
-                logger.error("ResponseInline - NOT IMPLEMENTED YET")
+                varType = LambdaTypeName.get(
+                    parameters = arrayOf(response.type.kotlinType),
+                    returnType = UNIT
+                ).suspending()
             }
 
             is ResponseUnsupported -> {
                 logger.error("Response not supported: $response")
             }
         }
-
-
-//        if (schemaRef.isNullOrEmpty()) {
-//            varType = LambdaTypeName.get(returnType = UNIT).copy(suspending = true)
-//        } else {
-//            val simpleName = SchemaProps.getRefSimpleName(schemaRef)
-//            varType = LambdaTypeName.get(
-//                parameters = arrayOf(ClassName(Packages.MODEL, simpleName.capitalize())),
-//                returnType = UNIT
-//            ).copy(suspending = true)
-//
-//        }
         ResponseProp(
             response,
             PropertySpec

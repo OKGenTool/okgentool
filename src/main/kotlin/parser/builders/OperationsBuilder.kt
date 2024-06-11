@@ -129,14 +129,22 @@ private fun getResponses(
 
                 schema?.type?.let {
                     if (schema.type != "array") {
-                        //Unsupported Response
+                        //Inline  Response
                         responses.add(
-                            ResponseUnsupported(
+                            ResponseInline(
                                 operationName,
                                 response.key,
-                                response.value.description
+                                response.value.description,
+                                DataType.fromString(schema.type, schema.format)
                             )
                         )
+//                        responses.add(
+//                            ResponseUnsupported(
+//                                operationName,
+//                                response.key,
+//                                response.value.description
+//                            )
+//                        )
                     } else {
                         //For responses using arrays of reusable schemas
                         responses.add(

@@ -41,6 +41,7 @@ sealed class Response(
         val operationName: String,
         override val statusCodeStr: String,
         override val description: String,
+        val type: DataType
     ) : Response(statusCodeStr, description) {
         init {
             setStatusCodeInt()
