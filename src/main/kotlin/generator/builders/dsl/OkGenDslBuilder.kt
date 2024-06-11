@@ -127,27 +127,33 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
     //For Requests with query parameters
     if (!operation.parameters.isNullOrEmpty()) {
         var parameters = ""
-        operation.parameters.map {
-            when (it.`in`) {
-                In.PATH -> {
-                    this.add("\tval ${it.name} = call.parameters[\"${it.name}\"]${getConvertion(it.type)}\n")
+        operation.parameters.map { parameter ->
+            when (parameter) {
+                is PathParameter -> {
+                    this.add("\tval ${parameter.name} = call.parameters[\"${parameter.name}\"]${getConvertion(parameter.type)}\n")
                 }
 
-                In.QUERY -> {
-                    this.add("\tval ${it.name} = ${it.name.capitalize()}Param.fromString(\n")
-                        .add("\t\tcall.request.rawQueryParameters[\"${it.name}\"]\n")
+                is QueryParameterSingle -> {
+                    this.add("\tval ${parameter.name} = call.request.rawQueryParameters[\"${parameter.name}\"]\n")
+                }
+
+                is QueryParameterArray -> {
+                    this.add("\tval ${parameter.name} = call.request.rawQueryParameters[\"${parameter.name}\"]\n")
+                        .add("\t\t\t?.split(\",\")\n")
+                }
+
+                is QueryParameterEnum -> {
+                    this.add("\tval ${parameter.name} = ${parameter.name.capitalize()}Param.fromString(\n")
+                        .add("\t\tcall.request.rawQueryParameters[\"${parameter.name}\"]\n")
                         .add("\t)\n")
                 }
 
                 else -> {
-                    //TODO When this code runs?
-                    if (it.type == DataType.ARRAY)
-                        this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]?.split(\",\")\n")
-                    else
-                        this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]\n")
+                    logger.warn("${operation.name}: getRequestCode(): Code not implemented")
                 }
             }
-            parameters += "${it.name},"
+
+            parameters += "${parameter.name},"
         }
         this.add("\tfunction(${operation.name.capitalize()}($parameters call))")
     } else {
@@ -201,7 +207,7 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
         this.addImport(Packages.MODEL, it)
     }
 
-    parameters.forEach{
+    parameters.forEach {
         this.addImport(Packages.DSLOPERATIONS, "${it.name.capitalize()}Param")
     }
 
@@ -211,5 +217,6 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
 //TODO implement these operations
 val notImplemented = setOf(
     "postPetPetIdUploadImage", "createUsersWithListInput",
-    "updateUser", "uploadFile", "getInventory", "findPetsByTags", "updatePetWithForm", "loginUser", "logoutUser"
+    "updateUser", "uploadFile", "getInventory", "updatePetWithForm", "loginUser", "logoutUser",
+    "deletePet"
 )

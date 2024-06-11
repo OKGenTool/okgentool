@@ -33,21 +33,7 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
     if (operation == null) return
 
     val operationName = getOperationName(operation, path, method)
-
-    val parameters: List<DSLParameter>? = operation.parameters?.takeIf { it.isNotEmpty() }?.map {
-        val type = DataType.fromString(it.schema.type, it.schema.format)
-        DSLParameter(
-            it.name,
-            In.fromValue(it.`in`),
-            it.description,
-            it.explode,
-            type,
-//            if (type == DataType.ARRAY) DataType.fromString(it.schema.items.type, it.schema?.items?.format) else null, //TODO delete this
-            it.schema.enum,
-            it.schema.default
-        )
-    }
-
+    val parameters = getParameters(operation)
     val inlineSchemas: MutableList<InlineSchema> = mutableListOf() //TODO delete this
 
     val dslOperation = DSLOperation(
@@ -63,6 +49,58 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
     )
 
     dslOperations.add(dslOperation)
+}
+
+private fun getParameters(operation: Operation): List<DSLParameter>? {
+    return operation.parameters?.takeIf { it.isNotEmpty() }?.mapNotNull {
+        when (it.`in`) {
+            In.QUERY.value -> {
+                if (it.schema.enum != null) {
+                    QueryParameterEnum(
+                        it.name,
+                        it.description,
+                        it.explode,
+                        it.schema.enum
+                    )
+                } else if (it.schema.type == "array") {
+                    QueryParameterArray(
+                        it.name,
+                        it.description,
+                        it.explode,
+                        DataType.fromString(it.schema.items.type, it.schema.items.format)
+                    )
+                } else if (it.schema.type == "string") {
+                    QueryParameterSingle(
+                        it.name,
+                        it.description
+                    )
+                } else {
+                    logger.warn("${operation.operationId}: Parameter not supported: $it")
+                    null
+                }
+            }
+
+            In.PATH.value -> {
+                PathParameter(
+                    it.name,
+                    it.description,
+                    DataType.fromString(it.schema.type, it.schema.format)
+                )
+            }
+
+            In.HEADER.value -> {
+                HeaderParameter(
+                    it.name,
+                    it.description
+                )
+            }
+
+            else -> {
+                logger.warn("${operation.operationId}: Parameter not supported: $it")
+                null
+            }
+        }
+    }
 }
 
 private fun getResponses(

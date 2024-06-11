@@ -9,7 +9,6 @@ data class Parameter(
     val type: TypeName,
     val visibility: Visibility = Visibility.PUBLIC,
     val enum: List<String>? = null,
-    val default: String? = null
 )
 
 enum class Visibility(val modifier: KModifier) {

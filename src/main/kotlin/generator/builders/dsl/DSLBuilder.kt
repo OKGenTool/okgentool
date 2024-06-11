@@ -23,7 +23,7 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
     val paramsToImportInOkGenDSL: MutableList<Parameter> = mutableListOf()
 
     for (operation in dslOperations) {
-        if(operation.name in notImplemented) continue //TODO implement these operations
+        if (operation.name in notImplemented) continue //TODO implement these operations
 
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
 
@@ -99,8 +99,8 @@ private fun getOperationType(
     if (request != null) {
         mainClass.addProperty(
             PropertySpec.builder(
-                    "request", ClassName(Packages.DSLOPERATIONS, request.name!!)
-                ).initializer("${request.name}($reqVarName)").build()
+                "request", ClassName(Packages.DSLOPERATIONS, request.name!!)
+            ).initializer("${request.name}($reqVarName)").build()
         )
     }
 
@@ -122,15 +122,15 @@ private fun getOperationType(
 
     mainClass.addProperty(
         PropertySpec.builder(
-                "response",
-                ClassName(Packages.DSLOPERATIONS, response?.name!!),
-            ).initializer(responseCode).build()
+            "response",
+            ClassName(Packages.DSLOPERATIONS, response?.name!!),
+        ).initializer(responseCode).build()
     )
 
     //Add Response Functions
     getResponseFunctions(responseProps).map {
-            mainClass.addFunction(it)
-        }
+        mainClass.addFunction(it)
+    }
 
     return mainClass.build()
 }
@@ -196,18 +196,38 @@ fun getBodyAsParameter(body: Body): Parameter {
 private fun getParametersFromQueryOrPath(operation: DSLOperation): List<Parameter> {
     val params: MutableList<Parameter> = mutableListOf()
 
-    operation.parameters?.forEach {
-        val typeName: TypeName
+    operation.parameters?.forEach { parameter ->
+        var typeName: TypeName? = null
+        var enum: List<String>? = null
 
-        if (it.`in` == In.QUERY && it.explode) {
-            //Used with query parameters when multiple values can be used for the same parameter
-            val className = "${it.name.capitalize()}Param"
-            typeName = LIST.parameterizedBy(ClassName(Packages.DSLOPERATIONS, className))
-        } else typeName = it.type.kotlinType
+        when (parameter) {
+            is QueryParameterEnum -> {
+                val className = "${parameter.name.capitalize()}Param"
+                typeName = LIST.parameterizedBy(ClassName(Packages.DSLOPERATIONS, className))
+                enum = parameter.enum.map { it.toString() }
+            }
+
+            is QueryParameterArray -> {
+                typeName = LIST.parameterizedBy(parameter.itemsType.kotlinType)
+            }
+
+            is QueryParameterSingle -> typeName = STRING
+
+            is PathParameter -> typeName = parameter.type.kotlinType
+
+            else -> {
+                logger.warn("${operation.name}: Parameter not implemented: $parameter")
+
+            }
+//            is HeaderParameter -> TODO()
+        }
 
         params.add(
             Parameter(
-                it.name, typeName.nullable(), Visibility.PUBLIC, it.enum?.map { it.toString() }, it.default?.toString()
+                parameter.name,
+                typeName?.nullable()!!,
+                Visibility.PUBLIC,
+                enum,
             )
         )
     }
