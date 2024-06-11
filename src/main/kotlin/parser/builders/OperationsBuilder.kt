@@ -48,7 +48,7 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
         )
     }
 
-    val inlineSchemas: MutableList<InlineSchema> = mutableListOf()
+    val inlineSchemas: MutableList<InlineSchema> = mutableListOf() //TODO delete this
 
     val dslOperation = DSLOperation(
         operationName,
@@ -74,39 +74,43 @@ private fun getResponses(
 
     apiResponses.map { response ->
         val content = response.value.content
-        content?.let {
-            val schema = it[content.keys.first()]?.schema //TODO add all schemas, not the first only
-            //For responses using reusable schemas
-            schema?.`$ref`?.let {
-                responses.add(
-                    ResponseRef(
-                        schema.`$ref`,
-                        response.key,
-                        response.value.description
-                    )
-                )
-            }
-
-            schema?.type?.let {
-                if (schema.type != "array") {
-                    //Unsupported Response
+        when (content) {
+            null -> responses.add(ResponseNoContent(response.key, response.value.description))
+            else -> {
+                val schema = content[content.keys.first()]?.schema //TODO add all schemas, not the first only
+                //For responses using reusable schemas
+                schema?.`$ref`?.let {
                     responses.add(
-                        ResponseUnsupported(
-                            operationName,
-                            response.key,
-                            response.value.description
-                        )
-                    )
-                } else {
-                    //For responses using arrays of reusable schemas
-                    responses.add(
-                        ResponseRefColl(
-                            schema.items.`$ref`,
+                        ResponseRef(
+                            schema.`$ref`,
                             response.key,
                             response.value.description
                         )
                     )
                 }
+
+                schema?.type?.let {
+                    if (schema.type != "array") {
+                        //Unsupported Response
+                        responses.add(
+                            ResponseUnsupported(
+                                operationName,
+                                response.key,
+                                response.value.description
+                            )
+                        )
+                    } else {
+                        //For responses using arrays of reusable schemas
+                        responses.add(
+                            ResponseRefColl(
+                                schema.items.`$ref`,
+                                response.key,
+                                response.value.description
+                            )
+                        )
+                    }
+                }
+
             }
         }
     }

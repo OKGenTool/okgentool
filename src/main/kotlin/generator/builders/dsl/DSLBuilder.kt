@@ -91,7 +91,6 @@ private fun getOperationType(
         mainClass.getConstructor(parameters)
     }
 
-//    val reqVarName = genParameters.first()?.name
     var reqVarName = ""
     parameters.forEach {
         if (it?.name != "call") reqVarName += "${it?.name}, "

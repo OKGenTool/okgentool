@@ -38,7 +38,10 @@ fun getResponseProps(operationName: String, responses: List<Response>): List<Res
                     parameters = arrayOf(param),
                     returnType = UNIT
                 ).suspending()
+            }
 
+            is ResponseNoContent -> {
+                varType = LambdaTypeName.get(returnType = UNIT).suspending()
             }
 
             is ResponseInline -> {
@@ -48,7 +51,6 @@ fun getResponseProps(operationName: String, responses: List<Response>): List<Res
             is ResponseUnsupported -> {
                 logger.error("Response not supported: $response")
             }
-
         }
 
 

@@ -47,6 +47,15 @@ sealed class Response(
         }
     }
 
+    data class ResponseNoContent(
+        override val statusCodeStr: String,
+        override val description: String,
+    ) : Response(statusCodeStr, description) {
+        init {
+            setStatusCodeInt()
+        }
+    }
+
     data class ResponseUnsupported(
         val operationName: String,
         override val statusCodeStr: String,
