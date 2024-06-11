@@ -72,7 +72,6 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
     }
 
     buildApiOperations()
-//    buildReadRequestResult() //TODO delete this
     buildSerialization()
     buildOkGenDsl(dslOperations, componentNames, paramsToImportInOkGenDSL)
 }
