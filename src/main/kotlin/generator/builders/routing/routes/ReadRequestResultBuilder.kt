@@ -9,6 +9,7 @@ val PACKAGENAME = Packages.ROUTES
 const val READREQUESTRESULT = "ReadRequestResult"
 const val REQUESTERROR = "RequestError"
 
+//TODO delete this
 fun buildReadRequestResult() {
 
     // Define the ReadRequestResult sealed class

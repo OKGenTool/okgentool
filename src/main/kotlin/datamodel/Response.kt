@@ -4,19 +4,52 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger(Response::class.java.simpleName)
 
-data class Response(
-    val statusCodeStr: String,
-    val description: String,
-    val contentTypes: List<String>?,
-    val schemaRef: String?,
+sealed class Response(
+    open val statusCodeStr: String,
+    open val description: String,
 ) {
-    val statusCodeInt: Int
+    var statusCodeInt: Int? = null
 
-    init {
+    fun setStatusCodeInt() {
         if (statusCodeStr == "default") {
             statusCodeInt = 200
             logger.info("Mapping default status code to 200")
-        } else
-            statusCodeInt = statusCodeStr.toInt()
+        } else statusCodeInt = statusCodeStr.toInt()
     }
+
+    data class ResponseRef(
+        val schemaRef: String,
+        override val statusCodeStr: String,
+        override val description: String,
+    ) : Response(statusCodeStr, description) {
+        init {
+            setStatusCodeInt()
+        }
+    }
+
+    data class ResponseRefColl(
+        val schemaRef: String,
+        override val statusCodeStr: String,
+        override val description: String,
+    ) : Response(statusCodeStr, description) {
+        init {
+            setStatusCodeInt()
+        }
+    }
+
+    data class ResponseInline(
+        val operationName: String,
+        override val statusCodeStr: String,
+        override val description: String,
+    ) : Response(statusCodeStr, description) {
+        init {
+            setStatusCodeInt()
+        }
+    }
+
+    data class ResponseUnsupported(
+        val operationName: String,
+        override val statusCodeStr: String,
+        override val description: String,
+    ) : Response(statusCodeStr, description)
 }

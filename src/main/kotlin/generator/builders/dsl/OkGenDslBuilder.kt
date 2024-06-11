@@ -20,7 +20,7 @@ private const val OUTERCLASS = "OkGenDsl"
 private const val APIOPERATIONS = "ApiOperations"
 private const val KTORROUTE = "ktorRoute"
 
-fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>) {
+fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>, parameters: List<Parameter>) {
     logger.info("Generating $OUTERCLASS file")
 
     val logger = PropertySpec
@@ -73,7 +73,7 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
                     )
                     .build()
             )
-            .addImports(componentNames)
+            .addImports(componentNames, parameters)
 
     writeFile(fileSpec.build())
 }
@@ -133,7 +133,14 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
                     this.add("\tval ${it.name} = call.parameters[\"${it.name}\"]${getConvertion(it.type)}\n")
                 }
 
+                In.QUERY -> {
+                    this.add("\tval ${it.name} = ${it.name.capitalize()}Param.fromString(\n")
+                        .add("\t\tcall.request.rawQueryParameters[\"${it.name}\"]\n")
+                        .add("\t)\n")
+                }
+
                 else -> {
+                    //TODO When this code runs?
                     if (it.type == DataType.ARRAY)
                         this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]?.split(\",\")\n")
                     else
@@ -181,7 +188,7 @@ fun getConvertion(type: DataType): String =
         }
     }
 
-private fun FileSpec.Builder.addImports(componentNames: List<String>): FileSpec.Builder {
+private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters: List<Parameter>): FileSpec.Builder {
     this.addImport("io.ktor.server.resources", "post")
         .addImport("io.ktor.server.resources", "put")
         .addImport("io.ktor.server.resources", "get")
@@ -194,11 +201,15 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>): FileSpec.
         this.addImport(Packages.MODEL, it)
     }
 
+    parameters.forEach{
+        this.addImport(Packages.DSLOPERATIONS, "${it.name.capitalize()}Param")
+    }
+
     return this
 }
 
 //TODO implement these operations
 val notImplemented = setOf(
     "postPetPetIdUploadImage", "createUsersWithListInput",
-    "logoutUser", "updateUser", "uploadFile", "getInventory"
+    "updateUser", "uploadFile", "getInventory", "findPetsByTags", "updatePetWithForm", "loginUser", "logoutUser"
 )

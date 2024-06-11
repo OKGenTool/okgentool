@@ -1,7 +1,7 @@
 package parser.builders
 
 import datamodel.*
-import datamodel.SchemaProps.Companion.getSchemaProp
+import datamodel.Response.*
 import generator.capitalize
 import io.ktor.http.*
 import io.swagger.v3.oas.models.Operation
@@ -40,9 +40,11 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
             it.name,
             In.fromValue(it.`in`),
             it.description,
-            type!!,
-            if (type == DataType.ARRAY) DataType.fromString(it.schema.items.type, it.schema?.items?.format) else null,
-            it.schema.enum
+            it.explode,
+            type,
+//            if (type == DataType.ARRAY) DataType.fromString(it.schema.items.type, it.schema?.items?.format) else null, //TODO delete this
+            it.schema.enum,
+            it.schema.default
         )
     }
 
@@ -66,38 +68,90 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
 private fun getResponses(
     apiResponses: ApiResponses,
     operationName: String,
-    inlineSchemas: MutableList<InlineSchema>,
+    inlineSchemas: MutableList<InlineSchema>, //TODO delete this
 ): List<Response> {
     val responses: MutableList<Response> = mutableListOf()
 
-    for (response in apiResponses) {
+    apiResponses.map { response ->
         val content = response.value.content
-
-        //TODO if schema is an inline object, it's need to add it to data model
-        var schemaRef: String? = null
         content?.let {
             val schema = it[content.keys.first()]?.schema //TODO add all schemas, not the first only
-            if (schema?.type == "object")
-                inlineSchemas.add(
-                    InlineSchema(
-                        "${operationName.capitalize()}Obj",
-                        schema
+            //For responses using reusable schemas
+            schema?.`$ref`?.let {
+                responses.add(
+                    ResponseRef(
+                        schema.`$ref`,
+                        response.key,
+                        response.value.description
                     )
                 )
-            else
-                schemaRef = getSchemaProp(schema, SchemaProps.REF)
-        }
+            }
 
-        val response = Response(
-            response.key,
-            response.value.description,
-            content?.keys?.toList(),
-            schemaRef,
-        )
-        responses.add(response)
+            schema?.type?.let {
+                if (schema.type != "array") {
+                    //Unsupported Response
+                    responses.add(
+                        ResponseUnsupported(
+                            operationName,
+                            response.key,
+                            response.value.description
+                        )
+                    )
+                } else {
+                    //For responses using arrays of reusable schemas
+                    responses.add(
+                        ResponseRefColl(
+                            schema.items.`$ref`,
+                            response.key,
+                            response.value.description
+                        )
+                    )
+                }
+            }
+        }
     }
+
+
     return responses
 }
+
+
+//private fun getResponses(
+//    apiResponses: ApiResponses,
+//    operationName: String,
+//    inlineSchemas: MutableList<InlineSchema>,
+//): List<Response> {
+//    val responses: MutableList<Response> = mutableListOf()
+//
+//    for (response in apiResponses) {
+//        val content = response.value.content
+//
+//        //TODO if schema is an inline object, it's need to add it to data model
+//        var schemaRef: String? = null
+//        content?.let {
+//            val schema = it[content.keys.first()]?.schema //TODO add all schemas, not the first only
+//            if (schema?.type == "object")
+//                inlineSchemas.add(
+//                    InlineSchema(
+//                        "${operationName.capitalize()}Obj",
+//                        schema
+//                    )
+//                )
+//            else
+//                schemaRef = getSchemaProp(schema, SchemaProps.REF)
+//        }
+//
+//        val response = Response(
+//            response.key,
+//            response.value.description,
+//            content?.keys?.toList(),
+//            schemaRef,
+//        )
+//
+//        responses.add(response)
+//    }
+//    return responses
+//}
 
 /**
  * If it's a valid operation, return the operation name based on OperationId.

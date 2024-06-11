@@ -2,6 +2,7 @@ package generator
 
 import cli.serverDestinationPath
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.TypeName
 import generator.model.Packages
 import org.slf4j.LoggerFactory
@@ -9,7 +10,6 @@ import java.io.File
 import java.nio.file.Paths
 import java.util.*
 import kotlin.reflect.KClass
-import kotlin.reflect.full.primaryConstructor
 
 private val logger = LoggerFactory.getLogger("Utils.kt")
 
@@ -35,6 +35,7 @@ fun getVarNameFromParam(fullClassName: String): String =
     fullClassName
         .split(".")
         .last()
+        .replace(">","")
         .decapitalize()
 
 fun <T : Any> convertStringToType(value: String, clazz: KClass<T>): T? {
@@ -82,3 +83,4 @@ fun writeFile(fileSpec: FileSpec) {
 }
 
 fun TypeName.nullable(): TypeName = this.copy(nullable = true)
+fun LambdaTypeName.suspending(): TypeName = this.copy(suspending = true)
