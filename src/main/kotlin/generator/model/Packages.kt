@@ -11,4 +11,6 @@ object Packages {
     val PLUGINS = "$ROUTING.plugins"
     val ROUTES = "$ROUTING.routes"
     val UTILS = "$BASE.utils"
+    val DEFAULT_ROUTING = "$BASE.defaultRouting"
+    val DEFAULT_ROUTING_EXAMPLES = "$DEFAULT_ROUTING.examples"
 }

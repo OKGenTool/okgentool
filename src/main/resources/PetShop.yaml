@@ -507,6 +507,7 @@ paths:
               schema:
                 type: string
                 format: date-time
+                example: '2021-07-01T00:00:00'
           content:
             application/xml:
               schema:
@@ -624,14 +625,15 @@ components:
             items:
               type: array
               items:
-                type: number
-                format: double
+                type: string
+          example: [[["aas", "basd"], ["asdasd", "asd"]], [["e", "asdasd"], ["sadasd", "asdasd"]]]
         maxMinArray:
           type: array
           items:
             type: integer
           minItems: 1
           maxItems: 2
+          example: [1, 2]
         uniqueItemsArray:
           type: array
           items:
@@ -652,20 +654,31 @@ components:
       properties:
         intMaxMin:
           type: integer
-          format: int32
+          format: int64
           minimum: 1
           maximum: 100
+          example: 9223372036854770000
         intExclusiveMaxMin:
-          type: integer
-          format: int32
+          type: number
+          format: float
           minimum: 1
           maximum: 100
           exclusiveMinimum: true
           exclusiveMaximum: true
+          example: 22.8
         intMultipleOf:
-          type: integer
-          format: int32
+          type: number
+          format: double
           multipleOf: 10
+          example: 20.678
+        localDate:
+          type: string
+          format: date
+          example: 2021-07-01
+        localDateTime:
+          type: string
+          format: date-time
+          example: '2021-07-01T00:00:00Z'
     ComplexPet:
       oneOf:
         - $ref: '#/components/schemas/Cat'
@@ -680,6 +693,8 @@ components:
           type: string
     Dog:
       type: object
+      required:
+        - age
       properties:
         type:
           type: string
@@ -705,6 +720,7 @@ components:
         shipDate:
           type: string
           format: date-time
+          example: '2021-07-01T00:00:00Z'
         status:
           type: string
           description: Order Status
@@ -715,6 +731,7 @@ components:
           example: approved
         complete:
           type: boolean
+          example: false
       xml:
         name: order
       type: object
