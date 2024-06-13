@@ -19,8 +19,9 @@ fun buildSchemas(inlineSchemas: MutableList<InlineSchema>): List<datamodel.Schem
         val parameters = getParameters(schema, requiredProperties)
         val oneOfSchemaNames = getOneOfSchemaNames(schema)
         val schemaName = "#/components/schemas/" + component.key
+        val oneOfSchemas = schema.oneOf ?: emptyList()
         logger.info("Parsing schema: $schemaName")
-        res.add(datamodel.Schema(schemaName, parameters, component.key.capitalize(), oneOfSchemaNames))
+        res.add(datamodel.Schema(schemaName, parameters, component.key.capitalize(), oneOfSchemaNames, ))
     }
 
     for (inlineSchema in inlineSchemas) {
@@ -32,7 +33,7 @@ fun buildSchemas(inlineSchemas: MutableList<InlineSchema>): List<datamodel.Schem
         res.add(datamodel.Schema(schemaName, parameters, inlineSchema.name.capitalize(), oneOfSchemaNames))
     }
 
-    return res
+    return resolveSuperClasses(res)
 }
 
 private fun getOneOfSchemaNames(schema: Schema<Any>?): List<String> {
@@ -113,4 +114,16 @@ fun getParameterProperties(parameter: Schema<*>, dataType: DataType): ParameterP
         }
         else -> return null
     }
+}
+
+private fun resolveSuperClasses(schemas: MutableList<datamodel.Schema>): List<datamodel.Schema> {
+    val schemasCopy = ArrayList(schemas)
+    for (schema in schemasCopy) {
+        if (schema.superClassChildSchemaNames.isNotEmpty()) {
+            val childSchemas = schemas.filter { schema.superClassChildSchemaNames.contains(it.schemaName) }
+            schema.superClassChildSchemas.addAll(childSchemas)
+            schemas.removeAll(childSchemas)
+        }
+    }
+    return schemas
 }

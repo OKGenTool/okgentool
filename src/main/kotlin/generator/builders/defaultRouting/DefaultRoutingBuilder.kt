@@ -4,7 +4,6 @@ import com.squareup.kotlinpoet.*
 import datamodel.DSLOperation
 import datamodel.Schema
 import generator.builders.defaultRouting.utils.createExampleObject
-import generator.builders.defaultRouting.utils.createSealedExampleObject
 import generator.builders.defaultRouting.utils.getNeededImports
 import generator.model.Packages
 import generator.writeFile
@@ -34,10 +33,9 @@ fun buildDefaultRouting(operations: List<DSLOperation>, schemas: List<Schema>) {
     examplesFileSpec.addProperty(localDateFormaterProperty)
 
     for (schema in schemas) {
-        if (schema.superClassChildSchemaNames.isNotEmpty()) {
-            examplesFileSpec.addProperty(createSealedExampleObject(schema, schemas))
-        } else {
-            examplesFileSpec.addProperty(createExampleObject(schema))
+        val properties = createExampleObject(schema, schemas)
+        for (property in properties) {
+            examplesFileSpec.addProperty(property)
         }
 
         for (import in getNeededImports(schema)) {

@@ -11,25 +11,40 @@ import generator.capitalize
 import generator.model.Packages
 import generator.nullable
 
-fun createExampleObject(schema: Schema): PropertySpec {
+fun createExampleObject(schema: Schema, schemas: List<Schema>): List<PropertySpec> {
     if (
-        schema.parameters.isEmpty() ||
-        schema.parameters.any { it.example.toString().isBlank() && it.required }
+        schema.superClassChildSchemas.isEmpty() &&
+        (schema.parameters.isEmpty() ||
+        schema.parameters.any { it.example.toString().isBlank() && it.required })
     ) {
-        return PropertySpec.builder(
+        return listOf(PropertySpec.builder(
             "example" + schema.simplifiedName.capitalize(),
             ClassName(Packages.MODEL, schema.simplifiedName.capitalize()).nullable()
         )
             .initializer("null")
             .build()
+        )
     }
 
-    return PropertySpec.builder(
+    if (schema.superClassChildSchemas.isNotEmpty()) {
+        val propsList = mutableListOf<PropertySpec>()
+
+        for (childSchema in schema.superClassChildSchemas) {
+            propsList.add(createExampleObject(childSchema, schemas).first())
+        }
+
+        propsList.add(createSealedExampleObject(schema, schemas))
+
+        return propsList
+    }
+
+    return listOf(PropertySpec.builder(
         "example" + schema.simplifiedName.capitalize(),
         ClassName(Packages.MODEL, schema.simplifiedName.capitalize())
     )
         .initializer(getInitializerBlock(schema))
         .build()
+    )
 }
 
 fun getInitializerBlock(schema: Schema): CodeBlock {
@@ -81,9 +96,23 @@ fun getInitializerBlock(schema: Schema): CodeBlock {
     return codeBlock.build()
 }
 
-fun createSealedExampleObject(schema: Schema, schemas: List<Schema>): PropertySpec {
-    val validChildExample = schemas
-        .filter { schema.superClassChildSchemaNames.contains("#/components/schemas/" + it.simplifiedName) }
+fun getNeededImports(schema: Schema): List<Pair<String, String>> {
+    val imports = mutableListOf<Pair<String, String>>()
+    schema.parameters.forEach { param ->
+        if (
+            param.dataType == DataType.STRING &&
+            param.properties is StringProperties &&
+            param.properties.isEnum &&
+            param.example.toString().isNotBlank()
+        ) {
+            imports.add(Packages.MODEL to schema.simplifiedName.capitalize() + param.name.capitalize())
+        }
+    }
+    return imports
+}
+
+private fun createSealedExampleObject(schema: Schema, schemas: List<Schema>): PropertySpec {
+    val validChildExample = schema.superClassChildSchemas
         .firstOrNull { it.parameters.isNotEmpty() && it.parameters.all { param -> param.example.toString().isNotBlank() || !param.required } }
 
     if (validChildExample == null) {
@@ -102,21 +131,6 @@ fun createSealedExampleObject(schema: Schema, schemas: List<Schema>): PropertySp
             .initializer("example${validChildExample.simplifiedName.capitalize()}")
             .build()
 
-}
-
-fun getNeededImports(schema: Schema): List<Pair<String, String>> {
-    val imports = mutableListOf<Pair<String, String>>()
-    schema.parameters.forEach { param ->
-        if (
-            param.dataType == DataType.STRING &&
-            param.properties is StringProperties &&
-            param.properties.isEnum &&
-            param.example.toString().isNotBlank()
-        ) {
-            imports.add(Packages.MODEL to schema.simplifiedName.capitalize() + param.name.capitalize())
-        }
-    }
-    return imports
 }
 
 private fun getStringExample(codeBlock: CodeBlock.Builder, example: String, param: Parameter, simplifiedName: String): CodeBlock.Builder {

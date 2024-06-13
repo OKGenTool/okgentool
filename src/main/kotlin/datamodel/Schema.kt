@@ -6,5 +6,4 @@ data class Schema(
     val simplifiedName: String,
     val superClassChildSchemaNames: List<String>,
     val superClassChildSchemas: MutableList<Schema> = mutableListOf(),
-    val schemaNameChildren: MutableList<String> = mutableListOf(),
 )
