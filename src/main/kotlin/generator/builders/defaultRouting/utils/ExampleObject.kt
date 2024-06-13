@@ -9,13 +9,19 @@ import datamodel.Schema
 import datamodel.StringProperties
 import generator.capitalize
 import generator.model.Packages
+import generator.nullable
 
-fun createExampleObject(schema: Schema): PropertySpec? {
+fun createExampleObject(schema: Schema): PropertySpec {
     if (
         schema.parameters.isEmpty() ||
         schema.parameters.any { it.example.toString().isBlank() && it.required }
     ) {
-        return null
+        return PropertySpec.builder(
+            "example" + schema.simplifiedName.capitalize(),
+            ClassName(Packages.MODEL, schema.simplifiedName.capitalize()).nullable()
+        )
+            .initializer("null")
+            .build()
     }
 
     return PropertySpec.builder(
@@ -73,6 +79,29 @@ fun getInitializerBlock(schema: Schema): CodeBlock {
     codeBlock.add(")")
 
     return codeBlock.build()
+}
+
+fun createSealedExampleObject(schema: Schema, schemas: List<Schema>): PropertySpec {
+    val validChildExample = schemas
+        .filter { schema.superClassChildSchemaNames.contains("#/components/schemas/" + it.simplifiedName) }
+        .firstOrNull { it.parameters.isNotEmpty() && it.parameters.all { param -> param.example.toString().isNotBlank() || !param.required } }
+
+    if (validChildExample == null) {
+        return PropertySpec.builder(
+            "example" + schema.simplifiedName.capitalize(),
+            ClassName(Packages.MODEL, schema.simplifiedName.capitalize()).nullable()
+        )
+            .initializer("null")
+            .build()
+    }
+
+    return PropertySpec.builder(
+            "example" + schema.simplifiedName.capitalize(),
+            ClassName(Packages.MODEL, schema.simplifiedName.capitalize())
+        )
+            .initializer("example${validChildExample.simplifiedName.capitalize()}")
+            .build()
+
 }
 
 fun getNeededImports(schema: Schema): List<Pair<String, String>> {
