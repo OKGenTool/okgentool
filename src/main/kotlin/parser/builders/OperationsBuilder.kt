@@ -1,7 +1,7 @@
 package parser.builders
 
 import datamodel.*
-import datamodel.SchemaProps.Companion.getSchemaProp
+import datamodel.Response.*
 import generator.capitalize
 import io.ktor.http.*
 import io.swagger.v3.oas.models.Operation
@@ -33,24 +33,12 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
     if (operation == null) return
 
     val operationName = getOperationName(operation, path, method)
-
-    val parameters: List<DSLParameter>? = operation.parameters?.takeIf { it.isNotEmpty() }?.map {
-        val type = DataType.fromString(it.schema.type, it.schema.format)
-        DSLParameter(
-            it.name,
-            In.fromValue(it.`in`),
-            it.description,
-            type!!,
-            if (type == DataType.ARRAY) DataType.fromString(it.schema.items.type, it.schema?.items?.format) else null,
-            it.schema.enum
-        )
-    }
-
-    val inlineSchemas: MutableList<InlineSchema> = mutableListOf()
+    val parameters = getParameters(operation)
+    val inlineSchemas: MutableList<InlineSchema> = mutableListOf() //TODO delete this
 
     val dslOperation = DSLOperation(
         operationName,
-        getBodyNew(operation),
+        getBody(operation),
         getResponses(operation.responses, operationName, inlineSchemas),
         HttpMethod.parse(method),
         path,
@@ -63,38 +51,107 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
     dslOperations.add(dslOperation)
 }
 
+private fun getParameters(operation: Operation): List<DSLParameter>? {
+    return operation.parameters?.takeIf { it.isNotEmpty() }?.mapNotNull {
+        when (it.`in`) {
+            In.QUERY.value -> {
+                if (it.schema.enum != null) {
+                    QueryParameterEnum(
+                        it.name,
+                        it.description,
+                        it.explode,
+                        it.schema.enum
+                    )
+                } else if (it.schema.type == "array") {
+                    QueryParameterArray(
+                        it.name,
+                        it.description,
+                        it.explode,
+                        DataType.fromString(it.schema.items.type, it.schema.items.format)
+                    )
+                } else if (it.schema.type == "string") {
+                    QueryParameterSingle(
+                        it.name,
+                        it.description
+                    )
+                } else {
+                    logger.warn("${operation.operationId}: Parameter not supported: $it")
+                    null
+                }
+            }
+
+            In.PATH.value -> {
+                PathParameter(
+                    it.name,
+                    it.description,
+                    DataType.fromString(it.schema.type, it.schema.format)
+                )
+            }
+
+            In.HEADER.value -> {
+                HeaderParameter(
+                    it.name,
+                    it.description
+                )
+            }
+
+            else -> {
+                logger.warn("${operation.operationId}: Parameter not supported: $it")
+                null
+            }
+        }
+    }
+}
+
 private fun getResponses(
     apiResponses: ApiResponses,
     operationName: String,
-    inlineSchemas: MutableList<InlineSchema>,
+    inlineSchemas: MutableList<InlineSchema>, //TODO delete this
 ): List<Response> {
     val responses: MutableList<Response> = mutableListOf()
 
-    for (response in apiResponses) {
+    apiResponses.map { response ->
         val content = response.value.content
-
-        //TODO if schema is an inline object, it's need to add it to data model
-        var schemaRef: String? = null
-        content?.let {
-            val schema = it[content.keys.first()]?.schema //TODO add all schemas, not the first only
-            if (schema?.type == "object")
-                inlineSchemas.add(
-                    InlineSchema(
-                        "${operationName.capitalize()}Obj",
-                        schema
+        when (content) {
+            null -> responses.add(ResponseNoContent(response.key, response.value.description))
+            else -> {
+                val schema = content[content.keys.first()]?.schema //TODO add all schemas, not the first only
+                //For responses using reusable schemas
+                schema?.`$ref`?.let {
+                    responses.add(
+                        ResponseRef(
+                            schema.`$ref`,
+                            response.key,
+                            response.value.description
+                        )
                     )
-                )
-            else
-                schemaRef = getSchemaProp(schema, SchemaProps.REF)
-        }
+                }
 
-        val response = Response(
-            response.key,
-            response.value.description,
-            content?.keys?.toList(),
-            schemaRef,
-        )
-        responses.add(response)
+                schema?.type?.let {
+                    if (schema.type != "array") {
+                        //Inline  Response
+                        responses.add(
+                            ResponseInline(
+                                operationName,
+                                response.key,
+                                response.value.description,
+                                DataType.fromString(schema.type, schema.format)
+                            )
+                        )
+                    } else {
+                        //For responses using arrays of reusable schemas
+                        responses.add(
+                            ResponseRefColl(
+                                schema.items.`$ref`,
+                                response.key,
+                                response.value.description
+                            )
+                        )
+                    }
+                }
+
+            }
+        }
     }
     return responses
 }
@@ -125,7 +182,7 @@ private fun getComposedOperationName(path: String, method: String): String {
     return "${method}$finalPath"
 }
 
-private fun getBodyNew(operation: Operation): Body? {
+private fun getBody(operation: Operation): Body? {
     val requestBody = operation.requestBody ?: return null
 
     val contentTypes = requestBody.content.keys.toList()

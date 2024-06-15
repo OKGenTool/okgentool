@@ -1,33 +1,64 @@
 package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.Response
+import datamodel.Response.*
 import datamodel.SchemaProps
 import generator.capitalize
 import generator.getVarNameFromParam
 import generator.model.Packages
 import generator.model.ResponseProp
+import generator.suspending
+import org.slf4j.LoggerFactory
+
+private val logger = LoggerFactory.getLogger("OperationResponseBuilder.kt")
 
 fun getResponseProps(operationName: String, responses: List<Response>): List<ResponseProp> {
-    return responses.map {
-        val varName = "${operationName}Response${it.statusCodeStr.capitalize()}"
+    return responses.map { response ->
+        val varName = "${operationName}Response${response.statusCodeStr.capitalize()}"
 
-        val varType: TypeName
-        val schemaRef = it.schemaRef
-        if (schemaRef.isNullOrEmpty()) {
-            varType = LambdaTypeName.get(returnType = UNIT).copy(suspending = true)
-        } else {
-            val simpleName = SchemaProps.getRefSimpleName(schemaRef)
-            varType = LambdaTypeName.get(
-                parameters = arrayOf(ClassName(Packages.MODEL, simpleName.capitalize())),
-                returnType = UNIT
-            ).copy(suspending = true)
+        var varType: TypeName? = null
 
+        when (response) {
+            is ResponseRef -> {
+                val simpleName = SchemaProps.getRefSimpleName(response.schemaRef)
+                varType = LambdaTypeName.get(
+                    parameters = arrayOf(ClassName(Packages.MODEL, simpleName.capitalize())),
+                    returnType = UNIT
+                ).suspending()
+            }
+
+            is ResponseRefColl -> {
+                val simpleName = SchemaProps.getRefSimpleName(response.schemaRef)
+                val param = LIST.parameterizedBy(
+                    ClassName(Packages.MODEL, simpleName.capitalize())
+                )
+                varType = LambdaTypeName.get(
+                    parameters = arrayOf(param),
+                    returnType = UNIT
+                ).suspending()
+            }
+
+            is ResponseNoContent -> {
+                varType = LambdaTypeName.get(returnType = UNIT).suspending()
+            }
+
+            is ResponseInline -> {
+                varType = LambdaTypeName.get(
+                    parameters = arrayOf(response.type.kotlinType),
+                    returnType = UNIT
+                ).suspending()
+            }
+
+            is ResponseUnsupported -> {
+                logger.error("Response not supported: $response")
+            }
         }
         ResponseProp(
-            it,
+            response,
             PropertySpec
-                .builder(varName, varType)
+                .builder(varName, varType!!)
                 .initializer(varName)
                 .build()
         )

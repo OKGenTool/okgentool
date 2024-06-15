@@ -2,10 +2,12 @@ package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
 import datamodel.*
-import generator.builders.getConstructor
+import generator.builders.buildConstructor
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
+import generator.model.Imports.*
+import generator.model.Imports.Companion.addCustomImport
 import generator.model.Packages
 import generator.model.Parameter
 import generator.model.Visibility
@@ -20,7 +22,7 @@ private const val OUTERCLASS = "OkGenDsl"
 private const val APIOPERATIONS = "ApiOperations"
 private const val KTORROUTE = "ktorRoute"
 
-fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>) {
+fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>, parameters: List<Parameter>) {
     logger.info("Generating $OUTERCLASS file")
 
     val logger = PropertySpec
@@ -44,7 +46,7 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
             .addType(
                 //Build outer class
                 TypeSpec.classBuilder(OUTERCLASS)
-                    .getConstructor(listOf(route))
+                    .buildConstructor(listOf(route))
                     .addProperty(
                         PropertySpec.builder(
                             "route",
@@ -68,29 +70,27 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
                             .build()
                     )
                     //Build inner Class
-                    .addType(
-                        getInnerClass(dslOperations)
-                    )
+                    .addType(buildInnerClass(dslOperations))
                     .build()
             )
-            .addImports(componentNames)
+            .addImports(componentNames, parameters)
 
     writeFile(fileSpec.build())
 }
 
-private fun getInnerClass(dslOperations: List<DSLOperation>): TypeSpec =
+private fun buildInnerClass(dslOperations: List<DSLOperation>): TypeSpec =
     TypeSpec.classBuilder(INNERCLASS).apply {
         addModifiers(KModifier.INNER)
-        getOperationFunctions(dslOperations).forEach {
+        buildOperationFunctions(dslOperations).forEach {
             addFunction(it)
         }
     }.build()
 
-private fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSpec> {
+private fun buildOperationFunctions(dslOperations: List<DSLOperation>): List<FunSpec> {
     val functions = mutableListOf<FunSpec>()
 
     dslOperations.map {
-        if (it.name in notImplemented) return@map //TODO implement these operations
+        if (it.name in notImplemented) return@map
 
         //Define suspend function for operation parameter
         val suspFunc = LambdaTypeName.get(
@@ -124,27 +124,42 @@ private fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSp
 }
 
 private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock.Builder {
+    var parameters = ""
+
     //For Requests with query parameters
     if (!operation.parameters.isNullOrEmpty()) {
-        var parameters = ""
-        operation.parameters.map {
-            when (it.`in`) {
-                In.PATH -> {
-                    this.add("\tval ${it.name} = call.parameters[\"${it.name}\"]${getConvertion(it.type)}\n")
+        operation.parameters.map { parameter ->
+            when (parameter) {
+                is PathParameter -> {
+                    this.add("\tval ${parameter.name} = call.parameters[\"${parameter.name}\"]${getConvertion(parameter.type)}\n")
+                }
+
+                is QueryParameterSingle -> {
+                    this.add("\tval ${parameter.name} = call.request.rawQueryParameters[\"${parameter.name}\"]\n")
+                }
+
+                is QueryParameterArray -> {
+                    this.add("\tval ${parameter.name} = call.request.rawQueryParameters[\"${parameter.name}\"]\n")
+                        .add("\t\t\t?.split(\",\")\n")
+                }
+
+                is QueryParameterEnum -> {
+                    this.add("\tval ${parameter.name} = ${parameter.name.capitalize()}Param.fromString(\n")
+                        .add("\t\tcall.request.rawQueryParameters[\"${parameter.name}\"]\n")
+                        .add("\t)\n")
                 }
 
                 else -> {
-                    if (it.type == DataType.ARRAY)
-                        this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]?.split(\",\")\n")
-                    else
-                        this.add("\tval ${it.name} = call.request.rawQueryParameters[\"${it.name}\"]\n")
+                    logger.warn("${operation.name}: getRequestCode(): Code not implemented")
                 }
             }
-            parameters += "${it.name},"
+
+            parameters += "${parameter.name},"
         }
-        this.add("\tfunction(${operation.name.capitalize()}($parameters call))")
-    } else {
-        //For requests with body
+    }
+
+    //For requests with body
+    if (operation.requestBody != null) {
         val body = operation.requestBody
         var className: String = ""
 
@@ -161,8 +176,10 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
             .add("\t}catch (ex: Exception){\n")
             .add("\t\tlogger.error(ex.message)\n")
             .add("\t}\n")
-            .add("\tfunction(${operation.name.capitalize()}(body, call))")
+        parameters = "body, $parameters"
     }
+
+    this.add("\tfunction(${operation.name.capitalize()}($parameters call))")
     return this
 }
 
@@ -181,17 +198,22 @@ fun getConvertion(type: DataType): String =
         }
     }
 
-private fun FileSpec.Builder.addImports(componentNames: List<String>): FileSpec.Builder {
-    this.addImport("io.ktor.server.resources", "post")
-        .addImport("io.ktor.server.resources", "put")
-        .addImport("io.ktor.server.resources", "get")
-        .addImport("io.ktor.server.resources", "delete")
-        .addImport("io.ktor.server.application", "call")
-        .addImport("io.ktor.server.request", "receive")
+private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters: List<Parameter>): FileSpec.Builder {
+    this
+        .addCustomImport(KTOR_SERVER_POST)
+        .addCustomImport(KTOR_SERVER_PUT)
+        .addCustomImport(KTOR_SERVER_GET)
+        .addCustomImport(KTOR_SERVER_DELETE)
+        .addCustomImport(KTOR_APPLICATION_CALL)
+        .addCustomImport(KTOR_SERVER_RECEIVE)
         .addImport(Packages.ROUTES, PATHSFILE)
 
     componentNames.forEach {
         this.addImport(Packages.MODEL, it)
+    }
+
+    parameters.forEach {
+        this.addImport(Packages.DSLOPERATIONS, "${it.name.capitalize()}Param")
     }
 
     return this
@@ -200,5 +222,6 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>): FileSpec.
 //TODO implement these operations
 val notImplemented = setOf(
     "postPetPetIdUploadImage", "createUsersWithListInput",
-    "logoutUser", "updateUser", "uploadFile", "getInventory"
+    "uploadFile", "getInventory", "updatePetWithForm",
+    "deletePet"
 )

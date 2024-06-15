@@ -5,7 +5,7 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import generator.model.Parameter
 
-fun TypeSpec.Builder.getConstructor(parameters: List<Parameter?>): TypeSpec.Builder {
+fun TypeSpec.Builder.buildConstructor(parameters: List<Parameter?>): TypeSpec.Builder {
     val constructor = FunSpec.constructorBuilder()
     val properties: MutableList<PropertySpec> = mutableListOf()
 
