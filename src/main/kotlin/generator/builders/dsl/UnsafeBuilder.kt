@@ -6,6 +6,7 @@ import generator.model.Imports.Companion.addCustomImport
 import generator.model.Imports.KTOR_HTTP_STATUS_CODE
 import generator.model.Packages
 import generator.writeFile
+import io.ktor.http.*
 import org.slf4j.LoggerFactory
 
 
@@ -28,12 +29,11 @@ fun buildUnsafe() {
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         )
-        .addFunction(
-            FunSpec.builder("notImplemented")
-                .addModifiers(KModifier.SUSPEND)
-                .addStatement("call.respond(HttpStatusCode.NotImplemented)")
-                .build()
-        )
+        .addFunction(buildUnsafeFunction("NotImplemented"))
+        .addFunction(buildUnsafeFunction("InternalServerError"))
+        .addFunction(buildUnsafeFunction("OK"))
+        .addFunction(buildUnsafeFunction("NotFound"))
+        .addFunction(buildUnsafeFunction("BadRequest"))
         .build()
 
     // File specification
@@ -46,4 +46,16 @@ fun buildUnsafe() {
 
     // Write the file
     writeFile(fileSpec)
+}
+
+fun buildUnsafeFunction(name: String): FunSpec {
+    return FunSpec.builder("respond$name")
+        .addModifiers(KModifier.SUSPEND)
+        .addParameter(
+            ParameterSpec.builder("description", STRING)
+                .defaultValue("%T.$name.description", HttpStatusCode.javaClass.asTypeName())
+                .build()
+        )
+        .addStatement("call.respond(HttpStatusCode.$name.description(description))")
+        .build()
 }
