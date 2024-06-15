@@ -222,7 +222,7 @@ private fun getParametersFromQueryOrPath(operation: DSLOperation): List<Paramete
                 typeName = LIST.parameterizedBy(parameter.itemsType.kotlinType)
             }
 
-            is QueryParameterSingle -> typeName = STRING
+            is QueryParameterSingle, is HeaderParameter -> typeName = STRING
 
             is PathParameter -> typeName = parameter.type.kotlinType
 
@@ -230,7 +230,6 @@ private fun getParametersFromQueryOrPath(operation: DSLOperation): List<Paramete
                 logger.warn("${operation.name}: Parameter not implemented: $parameter")
 
             }
-//            is HeaderParameter -> TODO()
         }
 
         params.add(

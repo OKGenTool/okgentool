@@ -149,8 +149,8 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
                         .add("\t)\n")
                 }
 
-                else -> {
-                    logger.warn("${operation.name}: getRequestCode(): Code not implemented")
+                is HeaderParameter -> {
+                    this.add("\tval ${parameter.name} = call.request.header(\"${parameter.name}\")\n")
                 }
             }
 
@@ -206,6 +206,7 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
         .addCustomImport(KTOR_SERVER_DELETE)
         .addCustomImport(KTOR_APPLICATION_CALL)
         .addCustomImport(KTOR_SERVER_RECEIVE)
+        .addCustomImport(KTOR_SERVER_HEADER)
         .addImport(Packages.ROUTES, PATHSFILE)
 
     componentNames.forEach {
@@ -223,5 +224,4 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
 val notImplemented = setOf(
     "postPetPetIdUploadImage", "createUsersWithListInput",
     "uploadFile", "getInventory", "updatePetWithForm",
-    "deletePet"
 )

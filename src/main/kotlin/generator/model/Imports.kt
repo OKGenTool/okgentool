@@ -12,6 +12,7 @@ enum class Imports(
     KTOR_SERVER_GET("io.ktor.server.resources", "get"),
     KTOR_SERVER_DELETE("io.ktor.server.resources", "delete"),
     KTOR_SERVER_RECEIVE("io.ktor.server.request", "receive"),
+    KTOR_SERVER_HEADER("io.ktor.server.request", "header"),
     KTOR_HTTP_STATUS_CODE("io.ktor.http", "HttpStatusCode"),
     KTOR_APPLICATION_APPLICATIONCALL("io.ktor.server.application", "ApplicationCall"),
     KTOR_APPLICATION_CALL("io.ktor.server.application", "call"),
