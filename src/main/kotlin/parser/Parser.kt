@@ -5,8 +5,8 @@ import datamodel.InlineSchema
 import io.swagger.parser.OpenAPIParser
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.core.models.ParseOptions
+import parser.builders.buildSchemas
 import parser.builders.buildOperations
-import parser.builders.getComponents
 
 lateinit var openAPI: OpenAPI
 
@@ -40,8 +40,8 @@ class Parser(sourceFilePath: String) {
                 inlineSchemas.add(it)
             }
         }
-        val components = getComponents(inlineSchemas)
+        val schemas = buildSchemas(inlineSchemas)
 
-        return DataModel(components, operations)
+        return DataModel(schemas, operations)
     }
 }

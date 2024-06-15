@@ -1,18 +1,21 @@
 package generator.model.utils
 
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
+import datamodel.NumberProperties
 
-val dataClassWithNotRequiredIntParameterWithMultipleOf = Component(
+val dataClassWithNotRequiredIntParameterWithMultipleOf = Schema(
     schemaName = "#/components/schemas/DataClassWithNotRequiredIntParameterWithMultipleOf",
     parameters = listOf(
-        ComponentProperty(
+        Parameter(
             name = "value",
             dataType = DataType.INTEGER,
             required = false,
             schemaName = "",
-            multipleOf = 2
+            properties = NumberProperties(
+                multipleOf = 2
+            ),
         )
     ),
     simplifiedName = "DataClassWithNotRequiredIntParameterWithMultipleOf",

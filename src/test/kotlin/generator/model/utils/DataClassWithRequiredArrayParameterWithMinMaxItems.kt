@@ -1,20 +1,23 @@
 package generator.model.utils
 
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.ArrayProperties
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
 
-val dataClassWithRequiredArrayParameterWithMinMaxItems = Component(
+val dataClassWithRequiredArrayParameterWithMinMaxItems = Schema(
     schemaName = "#/components/schemas/DataClassWithRequiredArrayParameterWithMinMaxItems",
     parameters = listOf(
-        ComponentProperty(
+        Parameter(
             name = "value",
             dataType = DataType.ARRAY,
-            arrayItemsType = DataType.INTEGER,
+            properties = ArrayProperties(
+                arrayItemsDataType = DataType.INTEGER,
+                minItems = 2,
+                maxItems = 10
+            ),
             required = true,
             schemaName = "",
-            minItems = 2,
-            maxItems = 10
         )
     ),
     simplifiedName = "DataClassWithRequiredArrayParameterWithMinMaxItems",

@@ -1,22 +1,25 @@
 package generator.model.utils
 
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.ArrayProperties
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
 
-val dataClassWithArray = Component(
+val dataClassWithArray = Schema(
     schemaName = "#/components/schemas/DataClassWithArray",
     parameters = listOf(
-        ComponentProperty(
+        Parameter(
             name = "name",
             dataType = DataType.STRING,
             required = true,
             schemaName = ""
         ),
-        ComponentProperty(
+        Parameter(
             name = "values",
             dataType = DataType.ARRAY,
-            arrayItemsType = DataType.INTEGER,
+            properties = ArrayProperties(
+                arrayItemsDataType = DataType.INTEGER
+            ),
             required = true,
             schemaName = ""
         )

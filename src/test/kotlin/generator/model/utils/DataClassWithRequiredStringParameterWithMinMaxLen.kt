@@ -1,19 +1,22 @@
 package generator.model.utils
 
-import datamodel.Component
-import datamodel.ComponentProperty
+import datamodel.Schema
+import datamodel.Parameter
 import datamodel.DataType
+import datamodel.StringProperties
 
-val dataClassWithRequiredStringParameterWithMinMaxLen = Component(
+val dataClassWithRequiredStringParameterWithMinMaxLen = Schema(
     schemaName = "#/components/schemas/DataClassWithRequiredStringParameterWithMinMaxLen",
     parameters = listOf(
-        ComponentProperty(
+        Parameter(
             name = "value",
             dataType = DataType.STRING,
             required = true,
             schemaName = "",
-            minLength = 2,
-            maxLength = 10
+            properties = StringProperties(
+                minLength = 2,
+                maxLength = 10
+            ),
         )
     ),
     simplifiedName = "DataClassWithRequiredStringParameterWithMinMaxLen",
