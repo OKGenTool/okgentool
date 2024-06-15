@@ -223,5 +223,5 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
 //TODO implement these operations
 val notImplemented = setOf(
     "createUsersWithListInput",
-    "getInventory", "updatePetWithForm",
+    "getInventory",
 )
