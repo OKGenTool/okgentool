@@ -222,6 +222,6 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
 
 //TODO implement these operations
 val notImplemented = setOf(
-    "postPetPetIdUploadImage", "createUsersWithListInput",
-    "uploadFile", "getInventory", "updatePetWithForm",
+    "createUsersWithListInput",
+    "getInventory", "updatePetWithForm",
 )
