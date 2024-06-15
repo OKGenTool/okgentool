@@ -3,7 +3,7 @@ package generator.builders.dsl
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.*
-import generator.builders.getConstructor
+import generator.builders.buildConstructor
 import generator.builders.routing.plugins.buildSerialization
 import generator.capitalize
 import generator.getVarNameFromParam
@@ -26,7 +26,7 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
     val paramsToImportInOkGenDSL: MutableList<Parameter> = mutableListOf()
 
     for (operation in dslOperations) {
-        if (operation.name in notImplemented) continue //TODO implement these operations
+        if (operation.name in notImplemented) continue
 
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
 
@@ -91,7 +91,7 @@ private fun getOperationType(
     val mainClass = TypeSpec.classBuilder(operationName.capitalize())
 
     if (!parameters.isEmpty()) {
-        mainClass.getConstructor(parameters)
+        mainClass.buildConstructor(parameters)
     }
 
     var reqVarName = ""

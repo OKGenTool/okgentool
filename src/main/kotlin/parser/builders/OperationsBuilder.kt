@@ -38,7 +38,7 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
 
     val dslOperation = DSLOperation(
         operationName,
-        getBodyNew(operation),
+        getBody(operation),
         getResponses(operation.responses, operationName, inlineSchemas),
         HttpMethod.parse(method),
         path,
@@ -138,13 +138,6 @@ private fun getResponses(
                                 DataType.fromString(schema.type, schema.format)
                             )
                         )
-//                        responses.add(
-//                            ResponseUnsupported(
-//                                operationName,
-//                                response.key,
-//                                response.value.description
-//                            )
-//                        )
                     } else {
                         //For responses using arrays of reusable schemas
                         responses.add(
@@ -160,48 +153,8 @@ private fun getResponses(
             }
         }
     }
-
-
     return responses
 }
-
-
-//private fun getResponses(
-//    apiResponses: ApiResponses,
-//    operationName: String,
-//    inlineSchemas: MutableList<InlineSchema>,
-//): List<Response> {
-//    val responses: MutableList<Response> = mutableListOf()
-//
-//    for (response in apiResponses) {
-//        val content = response.value.content
-//
-//        //TODO if schema is an inline object, it's need to add it to data model
-//        var schemaRef: String? = null
-//        content?.let {
-//            val schema = it[content.keys.first()]?.schema //TODO add all schemas, not the first only
-//            if (schema?.type == "object")
-//                inlineSchemas.add(
-//                    InlineSchema(
-//                        "${operationName.capitalize()}Obj",
-//                        schema
-//                    )
-//                )
-//            else
-//                schemaRef = getSchemaProp(schema, SchemaProps.REF)
-//        }
-//
-//        val response = Response(
-//            response.key,
-//            response.value.description,
-//            content?.keys?.toList(),
-//            schemaRef,
-//        )
-//
-//        responses.add(response)
-//    }
-//    return responses
-//}
 
 /**
  * If it's a valid operation, return the operation name based on OperationId.
@@ -229,7 +182,7 @@ private fun getComposedOperationName(path: String, method: String): String {
     return "${method}$finalPath"
 }
 
-private fun getBodyNew(operation: Operation): Body? {
+private fun getBody(operation: Operation): Body? {
     val requestBody = operation.requestBody ?: return null
 
     val contentTypes = requestBody.content.keys.toList()

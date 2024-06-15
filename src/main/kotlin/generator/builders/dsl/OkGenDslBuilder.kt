@@ -2,7 +2,7 @@ package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
 import datamodel.*
-import generator.builders.getConstructor
+import generator.builders.buildConstructor
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
@@ -46,7 +46,7 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
             .addType(
                 //Build outer class
                 TypeSpec.classBuilder(OUTERCLASS)
-                    .getConstructor(listOf(route))
+                    .buildConstructor(listOf(route))
                     .addProperty(
                         PropertySpec.builder(
                             "route",
@@ -70,9 +70,7 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
                             .build()
                     )
                     //Build inner Class
-                    .addType(
-                        getInnerClass(dslOperations)
-                    )
+                    .addType(buildInnerClass(dslOperations))
                     .build()
             )
             .addImports(componentNames, parameters)
@@ -80,19 +78,19 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
     writeFile(fileSpec.build())
 }
 
-private fun getInnerClass(dslOperations: List<DSLOperation>): TypeSpec =
+private fun buildInnerClass(dslOperations: List<DSLOperation>): TypeSpec =
     TypeSpec.classBuilder(INNERCLASS).apply {
         addModifiers(KModifier.INNER)
-        getOperationFunctions(dslOperations).forEach {
+        buildOperationFunctions(dslOperations).forEach {
             addFunction(it)
         }
     }.build()
 
-private fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSpec> {
+private fun buildOperationFunctions(dslOperations: List<DSLOperation>): List<FunSpec> {
     val functions = mutableListOf<FunSpec>()
 
     dslOperations.map {
-        if (it.name in notImplemented) return@map //TODO implement these operations
+        if (it.name in notImplemented) return@map
 
         //Define suspend function for operation parameter
         val suspFunc = LambdaTypeName.get(
@@ -126,9 +124,10 @@ private fun getOperationFunctions(dslOperations: List<DSLOperation>): List<FunSp
 }
 
 private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock.Builder {
+    var parameters = ""
+
     //For Requests with query parameters
     if (!operation.parameters.isNullOrEmpty()) {
-        var parameters = ""
         operation.parameters.map { parameter ->
             when (parameter) {
                 is PathParameter -> {
@@ -157,9 +156,10 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
 
             parameters += "${parameter.name},"
         }
-        this.add("\tfunction(${operation.name.capitalize()}($parameters call))")
-    } else {
-        //For requests with body
+    }
+
+    //For requests with body
+    if (operation.requestBody != null) {
         val body = operation.requestBody
         var className: String = ""
 
@@ -176,8 +176,10 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
             .add("\t}catch (ex: Exception){\n")
             .add("\t\tlogger.error(ex.message)\n")
             .add("\t}\n")
-            .add("\tfunction(${operation.name.capitalize()}(body, call))")
+        parameters = "body, $parameters"
     }
+
+    this.add("\tfunction(${operation.name.capitalize()}($parameters call))")
     return this
 }
 
@@ -220,6 +222,6 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
 //TODO implement these operations
 val notImplemented = setOf(
     "postPetPetIdUploadImage", "createUsersWithListInput",
-    "updateUser", "uploadFile", "getInventory", "updatePetWithForm", "logoutUser",
+    "uploadFile", "getInventory", "updatePetWithForm", "logoutUser",
     "deletePet"
 )
