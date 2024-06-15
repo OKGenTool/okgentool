@@ -3,6 +3,8 @@ package generator.builders.routing.plugins
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
+import generator.model.Imports.Companion.addCustomImport
+import generator.model.Imports.*
 import generator.model.Packages
 import generator.writeFile
 import org.slf4j.LoggerFactory
@@ -31,10 +33,11 @@ fun buildSerialization() {
     // Create the Kotlin file
     val file = FileSpec.builder(Packages.PLUGINS, SERIALIZATION_FILE)
         .addFunction(functionSpec)
-        .addImport("io.ktor.server.application", "Application", "install")
-        .addImport("io.ktor.server.plugins.contentnegotiation", "ContentNegotiation")
-        .addImport("io.ktor.serialization.kotlinx.json", "json")
-        .addImport("io.ktor.serialization.kotlinx.xml", "xml")
+        .addCustomImport(KTOR_APPLICATION_APPLICATION)
+        .addCustomImport(KTOR_APPLICATION_INSTALL)
+        .addCustomImport(KTOR_CONTENT_NEGOTIATION)
+        .addCustomImport(KTOR_SERIALIZATION_JSON)
+        .addCustomImport(KTOR_SERIALIZATION_XML)
         .build()
 
     writeFile(file)

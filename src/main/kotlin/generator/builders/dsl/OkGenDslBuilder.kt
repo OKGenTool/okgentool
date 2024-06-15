@@ -6,6 +6,8 @@ import generator.builders.getConstructor
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
+import generator.model.Imports.*
+import generator.model.Imports.Companion.addCustomImport
 import generator.model.Packages
 import generator.model.Parameter
 import generator.model.Visibility
@@ -195,12 +197,13 @@ fun getConvertion(type: DataType): String =
     }
 
 private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters: List<Parameter>): FileSpec.Builder {
-    this.addImport("io.ktor.server.resources", "post")
-        .addImport("io.ktor.server.resources", "put")
-        .addImport("io.ktor.server.resources", "get")
-        .addImport("io.ktor.server.resources", "delete")
-        .addImport("io.ktor.server.application", "call")
-        .addImport("io.ktor.server.request", "receive")
+    this
+        .addCustomImport(KTOR_SERVER_POST)
+        .addCustomImport(KTOR_SERVER_PUT)
+        .addCustomImport(KTOR_SERVER_GET)
+        .addCustomImport(KTOR_SERVER_DELETE)
+        .addCustomImport(KTOR_APPLICATION_CALL)
+        .addCustomImport(KTOR_SERVER_RECEIVE)
         .addImport(Packages.ROUTES, PATHSFILE)
 
     componentNames.forEach {

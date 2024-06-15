@@ -7,6 +7,9 @@ import generator.builders.getConstructor
 import generator.builders.routing.plugins.buildSerialization
 import generator.capitalize
 import generator.getVarNameFromParam
+import generator.model.Imports.Companion.addCustomImport
+import generator.model.Imports.KTOR_HTTP_STATUS_CODE
+import generator.model.Imports.KTOR_SERVER_RESPOND
 import generator.model.Packages
 import generator.model.Parameter
 import generator.model.ResponseProp
@@ -64,14 +67,15 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
             fileSpec.addType(it)
         }
 
-
-        fileSpec.addImport("io.ktor.server.response", "respond").addImport("io.ktor.http", "HttpStatusCode")
-//            .addImport(Packages.ROUTES, "ReadRequestResult", "RequestErrorInvalidArgument")
+        fileSpec
+            .addCustomImport(KTOR_SERVER_RESPOND)
+            .addCustomImport(KTOR_HTTP_STATUS_CODE)
 
         writeFile(fileSpec.build())
     }
 
     buildApiOperations()
+    buildUnsafe()
     buildSerialization()
     buildOkGenDsl(dslOperations, componentNames, paramsToImportInOkGenDSL)
 }
@@ -119,6 +123,13 @@ private fun getOperationType(
         }
     }
     responseCode += "\n)"
+
+    //Add unsafe var
+    mainClass.addProperty(
+        PropertySpec.builder(
+            "unsafe", ClassName(Packages.DSLOPERATIONS, "Unsafe")
+        ).initializer("Unsafe(call)").build()
+    )
 
     mainClass.addProperty(
         PropertySpec.builder(
