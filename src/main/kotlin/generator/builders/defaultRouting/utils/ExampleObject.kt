@@ -11,7 +11,7 @@ import generator.capitalize
 import generator.model.Packages
 import generator.nullable
 
-fun createExampleObject(schema: Schema, schemas: List<Schema>): List<PropertySpec> {
+fun getExampleObject(schema: Schema): List<PropertySpec> {
     if (
         schema.superClassChildSchemas.isEmpty() &&
         (schema.parameters.isEmpty() ||
@@ -30,10 +30,10 @@ fun createExampleObject(schema: Schema, schemas: List<Schema>): List<PropertySpe
         val propsList = mutableListOf<PropertySpec>()
 
         for (childSchema in schema.superClassChildSchemas) {
-            propsList.add(createExampleObject(childSchema, schemas).first())
+            propsList.add(getExampleObject(childSchema).first())
         }
 
-        propsList.add(createSealedExampleObject(schema, schemas))
+        propsList.add(createSealedExampleObject(schema))
 
         return propsList
     }
@@ -111,7 +111,7 @@ fun getNeededImports(schema: Schema): List<Pair<String, String>> {
     return imports
 }
 
-private fun createSealedExampleObject(schema: Schema, schemas: List<Schema>): PropertySpec {
+private fun createSealedExampleObject(schema: Schema): PropertySpec {
     val validChildExample = schema.superClassChildSchemas
         .firstOrNull { it.parameters.isNotEmpty() && it.parameters.all { param -> param.example.toString().isNotBlank() || !param.required } }
 
