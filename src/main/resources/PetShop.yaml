@@ -667,10 +667,10 @@ components:
           exclusiveMaximum: true
           example: 22.8
         intMultipleOf:
-          type: number
-          format: double
+          type: integer
+          format: int64
           multipleOf: 10
-          example: 20.678
+          example: 20
         localDate:
           type: string
           format: date

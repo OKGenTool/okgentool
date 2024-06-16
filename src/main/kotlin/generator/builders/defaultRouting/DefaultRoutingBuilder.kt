@@ -7,6 +7,7 @@ import generator.builders.defaultRouting.utils.createOperationStatement
 import generator.builders.defaultRouting.utils.getExampleObject
 import generator.builders.defaultRouting.utils.getExampleImports
 import generator.builders.defaultRouting.utils.getRoutingImports
+import generator.builders.dsl.notImplemented
 import generator.model.Packages
 import generator.writeFile
 import org.slf4j.LoggerFactory
@@ -24,6 +25,7 @@ fun buildDefaultRouting(operations: List<DSLOperation>, schemas: List<Schema>) {
 private fun writeDefaultRoutingExamplesFile(schemas: List<Schema>) {
     val examplesFileSpec = FileSpec.builder(Packages.DEFAULT_ROUTING_EXAMPLES, "DefaultRoutingExamples")
         .addImport("java.time", "LocalDate")
+        .addImport("java.time", "LocalDateTime")
 
     val dataTimeFormaterProperty = PropertySpec.builder("dateTimeFormatter", DateTimeFormatter::class)
         .initializer("%T.ISO_LOCAL_DATE_TIME", DateTimeFormatter::class)
@@ -60,6 +62,8 @@ private fun writeDefaultRoutingFile(operations: List<DSLOperation>, schemas: Lis
         .receiver(ClassName(Packages.DSL, "OkGenDsl"))
 
     for (operation in operations) {
+        if(operation.name in notImplemented) continue
+
         val operationStatement = createOperationStatement(operation, schemas)
         defaultRoutingFunction.addCode(operationStatement)
 
