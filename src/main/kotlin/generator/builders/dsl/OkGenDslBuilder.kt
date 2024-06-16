@@ -206,7 +206,7 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
         .addCustomImport(KTOR_SERVER_DELETE)
         .addCustomImport(KTOR_APPLICATION_CALL)
         .addCustomImport(KTOR_SERVER_RECEIVE)
-        .addCustomImport(KTOR_SERVER_HEADER)
+        .addCustomImport(KTOR_SERVER_REQUEST_HEADER)
         .addImport(Packages.ROUTES, PATHSFILE)
 
     componentNames.forEach {

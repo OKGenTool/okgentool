@@ -7,6 +7,7 @@ private val logger = LoggerFactory.getLogger(Response::class.java.simpleName)
 sealed class Response(
     open val statusCodeStr: String,
     open val description: String,
+    open val headers: List<DSLHeader>?
 ) {
     var statusCodeInt: Int? = null
 
@@ -24,7 +25,8 @@ sealed class Response(
         val schemaRef: String,
         override val statusCodeStr: String,
         override val description: String,
-    ) : Response(statusCodeStr, description) {
+        override val headers: List<DSLHeader>?
+    ) : Response(statusCodeStr, description, headers) {
         init {
             setStatusCodeInt()
         }
@@ -37,7 +39,8 @@ sealed class Response(
         val schemaRef: String,
         override val statusCodeStr: String,
         override val description: String,
-    ) : Response(statusCodeStr, description) {
+        override val headers: List<DSLHeader>?
+    ) : Response(statusCodeStr, description, headers) {
         init {
             setStatusCodeInt()
         }
@@ -50,8 +53,9 @@ sealed class Response(
         val operationName: String,
         override val statusCodeStr: String,
         override val description: String,
-        val type: DataType
-    ) : Response(statusCodeStr, description) {
+        val type: DataType,
+        override val headers: List<DSLHeader>?
+    ) : Response(statusCodeStr, description, headers) {
         init {
             setStatusCodeInt()
         }
@@ -63,7 +67,8 @@ sealed class Response(
     data class ResponseNoContent(
         override val statusCodeStr: String,
         override val description: String,
-    ) : Response(statusCodeStr, description) {
+        override val headers: List<DSLHeader>?
+    ) : Response(statusCodeStr, description, headers) {
         init {
             setStatusCodeInt()
         }
