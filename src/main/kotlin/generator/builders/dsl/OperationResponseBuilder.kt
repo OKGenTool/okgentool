@@ -50,15 +50,11 @@ fun getResponseProps(operationName: String, responses: List<Response>): List<Res
                     returnType = UNIT
                 ).suspending()
             }
-
-            is ResponseUnsupported -> {
-                logger.error("Response not supported: $response")
-            }
         }
         ResponseProp(
             response,
             PropertySpec
-                .builder(varName, varType!!)
+                .builder(varName, varType)
                 .initializer(varName)
                 .build()
         )

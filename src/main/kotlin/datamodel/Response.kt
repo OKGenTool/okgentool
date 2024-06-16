@@ -17,6 +17,9 @@ sealed class Response(
         } else statusCodeInt = statusCodeStr.toInt()
     }
 
+    /**
+     * Response with a referenced schema
+     */
     data class ResponseRef(
         val schemaRef: String,
         override val statusCodeStr: String,
@@ -27,6 +30,9 @@ sealed class Response(
         }
     }
 
+    /**
+     * Response with a collection of referenced schemas
+     */
     data class ResponseRefColl(
         val schemaRef: String,
         override val statusCodeStr: String,
@@ -37,6 +43,9 @@ sealed class Response(
         }
     }
 
+    /**
+     * Response with inline content (not using reusable schemas)
+     */
     data class ResponseInline(
         val operationName: String,
         override val statusCodeStr: String,
@@ -48,6 +57,9 @@ sealed class Response(
         }
     }
 
+    /**
+     * Response with no content
+     */
     data class ResponseNoContent(
         override val statusCodeStr: String,
         override val description: String,
@@ -56,10 +68,4 @@ sealed class Response(
             setStatusCodeInt()
         }
     }
-
-    data class ResponseUnsupported(
-        val operationName: String,
-        override val statusCodeStr: String,
-        override val description: String,
-    ) : Response(statusCodeStr, description)
 }

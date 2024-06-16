@@ -10,11 +10,12 @@ import io.swagger.v3.oas.models.responses.ApiResponses
 import org.slf4j.LoggerFactory
 import parser.openAPI
 
-private val logger = LoggerFactory.getLogger("OperationsBuilder.kt")
+private val logger = LoggerFactory.getLogger("OperationsBuilder")
 
 private val dslOperations = mutableListOf<DSLOperation>()
 
 fun buildOperations(): List<DSLOperation> {
+    logger.info("Start parsing the paths branch of the OAD file, to build an Operations model ")
     for (paths in openAPI.paths) {
         val pathItem = paths.value
         addOperation(pathItem.get, paths.key, "get")
@@ -26,6 +27,8 @@ fun buildOperations(): List<DSLOperation> {
         addOperation(pathItem.options, paths.key, "options")
         addOperation(pathItem.trace, paths.key, "trace")
     }
+    logger.info("End parsing the Operations model. Where found these operations:")
+    dslOperations.forEach { logger.info(it.name) }
     return dslOperations
 }
 
