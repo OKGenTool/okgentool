@@ -5,6 +5,7 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.*
 import generator.*
 import generator.builders.buildConstructor
+import generator.builders.notImplemented
 import generator.builders.routing.plugins.buildSerialization
 import generator.model.Imports.*
 import generator.model.Imports.Companion.addCustomImport

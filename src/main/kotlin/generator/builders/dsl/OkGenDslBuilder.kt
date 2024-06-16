@@ -3,6 +3,7 @@ package generator.builders.dsl
 import com.squareup.kotlinpoet.*
 import datamodel.*
 import generator.builders.buildConstructor
+import generator.builders.notImplemented
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
@@ -220,5 +221,5 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
     return this
 }
 
-//TODO implement these operations
-val notImplemented = setOf("getInventory")
+////TODO implement these operations
+//val notImplemented = setOf("getInventory")

@@ -24,3 +24,5 @@ fun TypeSpec.Builder.buildConstructor(parameters: List<Parameter?>): TypeSpec.Bu
         constructor.build()
     ).addProperties(properties)
 }
+
+val notImplemented = setOf("getInventory")

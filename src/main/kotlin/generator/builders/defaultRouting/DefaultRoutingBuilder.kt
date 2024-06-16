@@ -7,7 +7,7 @@ import generator.builders.defaultRouting.utils.createOperationStatement
 import generator.builders.defaultRouting.utils.getExampleObject
 import generator.builders.defaultRouting.utils.getExampleImports
 import generator.builders.defaultRouting.utils.getRoutingImports
-import generator.builders.dsl.notImplemented
+import generator.builders.notImplemented
 import generator.model.Packages
 import generator.writeFile
 import org.slf4j.LoggerFactory
