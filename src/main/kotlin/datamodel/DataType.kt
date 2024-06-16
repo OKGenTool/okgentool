@@ -2,8 +2,11 @@ package datamodel
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.asTypeName
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
+
+private val logger = LoggerFactory.getLogger(DataType::class.java.simpleName)
 
 //TODO this enum is compromised with kotlinpoet
 enum class DataType(val type: String, val format: String, val kotlinType: ClassName) {
@@ -26,8 +29,19 @@ enum class DataType(val type: String, val format: String, val kotlinType: ClassN
 
     companion object {
         fun fromString(type: String, format: String?): DataType {
-            return entries.firstOrNull { it.type == type && (it.format == format || it.format == "") }
-                ?: OBJECT
+            logger.debug("Get dataType for type: $type and format: $format")
+
+            // Find exact match
+            var dataType = entries.firstOrNull { it.type == type && it.format == format }
+
+            // Find match with empty format
+            if (dataType == null) {
+                dataType = entries.firstOrNull { it.type == type && it.format == "" } ?: OBJECT
+            }
+
+            logger.debug("DataType found: $dataType")
+
+            return dataType
         }
 
         fun getFormats(type: String): List<String> {
