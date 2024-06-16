@@ -2,10 +2,12 @@ package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import datamodel.DSLHeader
 import datamodel.Response
 import datamodel.Response.*
 import datamodel.SchemaProps
 import generator.capitalize
+import generator.decapitalize
 import generator.getVarNameFromParam
 import generator.model.Packages
 import generator.model.ResponseProp
@@ -20,46 +22,61 @@ fun getResponseProps(operationName: String, responses: List<Response>): List<Res
 
         var varType: TypeName? = null
 
+        //TODO build parameters of lambda with headers
+        val headersParams = getHeadersParams(response.headers)
+        val propKdoc: CodeBlock.Builder = CodeBlock.builder()
+
         when (response) {
             is ResponseRef -> {
                 val simpleName = SchemaProps.getRefSimpleName(response.schemaRef)
+                //TODO test this
+
                 varType = LambdaTypeName.get(
-                    parameters = arrayOf(ClassName(Packages.MODEL, simpleName.capitalize())),
+                    parameters = arrayOf(ClassName(Packages.MODEL, simpleName.capitalize())) + headersParams,
                     returnType = UNIT
                 ).suspending()
+                propKdoc.add("@param $simpleName\n")
             }
 
             is ResponseRefColl -> {
                 val simpleName = SchemaProps.getRefSimpleName(response.schemaRef)
-                val param = LIST.parameterizedBy(
+                val param: TypeName = LIST.parameterizedBy(
                     ClassName(Packages.MODEL, simpleName.capitalize())
                 )
+
+                //TODO test this
                 varType = LambdaTypeName.get(
-                    parameters = arrayOf(param),
+                    parameters = arrayOf(param) + headersParams,
                     returnType = UNIT
                 ).suspending()
+                propKdoc.add("@param $simpleName\n")
             }
 
             is ResponseNoContent -> {
-                varType = LambdaTypeName.get(returnType = UNIT).suspending()
-            }
-
-            is ResponseInline -> {
+                //TODO test this
                 varType = LambdaTypeName.get(
-                    parameters = arrayOf(response.type.kotlinType),
+                    parameters = headersParams,
                     returnType = UNIT
                 ).suspending()
             }
 
-            is ResponseUnsupported -> {
-                logger.error("Response not supported: $response")
+            is ResponseInline -> {
+                //TODO test this
+                varType = LambdaTypeName.get(
+                    parameters = arrayOf(response.type.kotlinType) + headersParams,
+                    returnType = UNIT
+                ).suspending()
+                propKdoc.add("@param ${response.type.name}\n")
             }
         }
+        propKdoc.addHeaders(response.headers)
+
         ResponseProp(
             response,
             PropertySpec
-                .builder(varName, varType!!)
+                .builder(varName, varType)
                 .initializer(varName)
+                .addKdoc(propKdoc.build())
                 .build()
         )
     }
@@ -84,9 +101,9 @@ fun getResponseType(operationName: String, propertySpecs: List<PropertySpec>): T
 fun getResponseFunctions(responseProps: List<ResponseProp>): List<FunSpec> {
     val functions = mutableListOf<FunSpec>()
 
-    responseProps.map {
-        val propParams = (it.responseType.type as LambdaTypeName).parameters
-        val respFun = FunSpec.builder(it.responseType.name)
+    responseProps.map { responseProp ->
+        val propParams = (responseProp.responseType.type as LambdaTypeName).parameters
+        val respFun = FunSpec.builder(responseProp.responseType.name)
             .addModifiers(KModifier.PRIVATE, KModifier.SUSPEND)
         var param: ParameterSpec? = null
         var paramName: String? = null
@@ -99,10 +116,21 @@ fun getResponseFunctions(responseProps: List<ResponseProp>): List<FunSpec> {
             )
         }
 
+        responseProp.response.headers?.let {
+            it.map { header ->
+                val nameVal = header.name.replace("-", "").decapitalize()
+                respFun.addParameter(
+                    nameVal,
+                    header.dataType.kotlinType
+                )
+                respFun.addCode("call.response.header(\"${header.name}\", $nameVal)\n")
+            }
+        }
+
         respFun.addCode(
             """
             call.respond(
-                HttpStatusCode(${it.response.statusCodeInt}, "${it.response.description}"),
+                HttpStatusCode(${responseProp.response.statusCodeInt}, "${responseProp.response.description}"),
                 ${paramName ?: ""}
             )
             """.trimIndent()
@@ -111,5 +139,25 @@ fun getResponseFunctions(responseProps: List<ResponseProp>): List<FunSpec> {
         functions.add(respFun.build())
     }
     return functions
+}
+
+fun getHeadersParams(headers: List<DSLHeader>?): Array<ClassName> {
+    if (headers == null) return arrayOf()
+    val headersList: MutableList<ClassName> = mutableListOf()
+
+    headers.map {
+        headersList.add(it.dataType.kotlinType)
+    }
+
+    return headersList.toTypedArray()
+}
+
+fun CodeBlock.Builder.addHeaders(headers: List<DSLHeader>?): CodeBlock.Builder {
+    if (headers == null) return this
+
+    headers.map {
+        this.add("@param ${it.name.replace("-", "")} ${it.description}\n")
+    }
+    return this
 }
 

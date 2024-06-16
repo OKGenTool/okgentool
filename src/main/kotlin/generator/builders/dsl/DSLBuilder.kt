@@ -3,19 +3,15 @@ package generator.builders.dsl
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.*
+import generator.*
 import generator.builders.buildConstructor
 import generator.builders.routing.plugins.buildSerialization
-import generator.capitalize
-import generator.getVarNameFromParam
+import generator.model.Imports.*
 import generator.model.Imports.Companion.addCustomImport
-import generator.model.Imports.KTOR_HTTP_STATUS_CODE
-import generator.model.Imports.KTOR_SERVER_RESPOND
 import generator.model.Packages
 import generator.model.Parameter
 import generator.model.ResponseProp
 import generator.model.Visibility
-import generator.nullable
-import generator.writeFile
 import io.ktor.http.ContentType.Application.OctetStream
 import io.ktor.server.application.*
 import org.slf4j.LoggerFactory
@@ -70,6 +66,7 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
         fileSpec
             .addCustomImport(KTOR_SERVER_RESPOND)
             .addCustomImport(KTOR_HTTP_STATUS_CODE)
+            .addCustomImport(KTOR_SERVER_RESPONSE_HEADER)
 
         writeFile(fileSpec.build())
     }
@@ -114,8 +111,16 @@ private fun getOperationType(
         val propParams = (it.type as LambdaTypeName).parameters
         if (!propParams.isEmpty()) {
             var propParamsCode = ""
-            propParams.map {
-                propParamsCode += "${getVarNameFromParam(it.toString())},"
+            val firstParam = propParams.first()
+            propParamsCode += "${getVarNameFromParam(firstParam.toString())}, "
+
+            responseProps.map { responseProp ->
+                responseProp.response.headers?.let {
+                    it.map { header ->
+                        val headerName = header.name.replace("-", "").decapitalize()
+                        propParamsCode += "$headerName, "
+                    }
+                }
             }
             responseCode += "\n${it.name} = { $propParamsCode -> ${it.name}($propParamsCode)},\n"
         } else {
@@ -222,7 +227,7 @@ private fun getParametersFromQueryOrPath(operation: DSLOperation): List<Paramete
                 typeName = LIST.parameterizedBy(parameter.itemsType.kotlinType)
             }
 
-            is QueryParameterSingle -> typeName = STRING
+            is QueryParameterSingle, is HeaderParameter -> typeName = STRING
 
             is PathParameter -> typeName = parameter.type.kotlinType
 
@@ -230,7 +235,6 @@ private fun getParametersFromQueryOrPath(operation: DSLOperation): List<Paramete
                 logger.warn("${operation.name}: Parameter not implemented: $parameter")
 
             }
-//            is HeaderParameter -> TODO()
         }
 
         params.add(

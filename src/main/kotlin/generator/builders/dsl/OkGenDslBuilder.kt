@@ -149,8 +149,8 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
                         .add("\t)\n")
                 }
 
-                else -> {
-                    logger.warn("${operation.name}: getRequestCode(): Code not implemented")
+                is HeaderParameter -> {
+                    this.add("\tval ${parameter.name} = call.request.header(\"${parameter.name}\")\n")
                 }
             }
 
@@ -166,7 +166,7 @@ private fun CodeBlock.Builder.getRequestCode(operation: DSLOperation): CodeBlock
         when (body) {
             is BodyObj -> className = body.dataType.kotlinType.simpleName
             is BodyRef -> className = SchemaProps.getRefSimpleName(body.schemaRef)
-            is BodyCollRef -> className = body.className
+            is BodyCollRef -> className = "List<${body.className.capitalize()}>"
             is BodyCollPojo -> className = body.dataType.kotlinType.simpleName
         }
 
@@ -206,6 +206,7 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
         .addCustomImport(KTOR_SERVER_DELETE)
         .addCustomImport(KTOR_APPLICATION_CALL)
         .addCustomImport(KTOR_SERVER_RECEIVE)
+        .addCustomImport(KTOR_SERVER_REQUEST_HEADER)
         .addImport(Packages.ROUTES, PATHSFILE)
 
     componentNames.forEach {
@@ -220,8 +221,4 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
 }
 
 //TODO implement these operations
-val notImplemented = setOf(
-    "postPetPetIdUploadImage", "createUsersWithListInput",
-    "uploadFile", "getInventory", "updatePetWithForm",
-    "deletePet"
-)
+val notImplemented = setOf("getInventory")

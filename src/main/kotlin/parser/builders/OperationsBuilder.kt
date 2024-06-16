@@ -5,16 +5,18 @@ import datamodel.Response.*
 import generator.capitalize
 import io.ktor.http.*
 import io.swagger.v3.oas.models.Operation
+import io.swagger.v3.oas.models.headers.Header
 import io.swagger.v3.oas.models.media.Schema
 import io.swagger.v3.oas.models.responses.ApiResponses
 import org.slf4j.LoggerFactory
 import parser.openAPI
 
-private val logger = LoggerFactory.getLogger("OperationsBuilder.kt")
+private val logger = LoggerFactory.getLogger("OperationsBuilder")
 
 private val dslOperations = mutableListOf<DSLOperation>()
 
 fun buildOperations(): List<DSLOperation> {
+    logger.info("Start parsing the paths branch of the OAD file, to build an Operations model ")
     for (paths in openAPI.paths) {
         val pathItem = paths.value
         addOperation(pathItem.get, paths.key, "get")
@@ -26,6 +28,8 @@ fun buildOperations(): List<DSLOperation> {
         addOperation(pathItem.options, paths.key, "options")
         addOperation(pathItem.trace, paths.key, "trace")
     }
+    logger.info("End parsing the Operations model. Where found these operations:")
+    dslOperations.forEach { logger.info(it.name) }
     return dslOperations
 }
 
@@ -34,7 +38,7 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
 
     val operationName = getOperationName(operation, path, method)
     val parameters = getParameters(operation)
-    val inlineSchemas: MutableList<InlineSchema> = mutableListOf() //TODO delete this
+    val inlineSchemas: MutableList<InlineSchema> = mutableListOf() //TODO Inline Schema
 
     val dslOperation = DSLOperation(
         operationName,
@@ -106,14 +110,15 @@ private fun getParameters(operation: Operation): List<DSLParameter>? {
 private fun getResponses(
     apiResponses: ApiResponses,
     operationName: String,
-    inlineSchemas: MutableList<InlineSchema>, //TODO delete this
+    inlineSchemas: MutableList<InlineSchema>, //TODO Inline Schema
 ): List<Response> {
     val responses: MutableList<Response> = mutableListOf()
 
     apiResponses.map { response ->
+        val headers = getHeaders(response.value.headers)
         val content = response.value.content
         when (content) {
-            null -> responses.add(ResponseNoContent(response.key, response.value.description))
+            null -> responses.add(ResponseNoContent(response.key, response.value.description, headers))
             else -> {
                 val schema = content[content.keys.first()]?.schema //TODO add all schemas, not the first only
                 //For responses using reusable schemas
@@ -122,7 +127,8 @@ private fun getResponses(
                         ResponseRef(
                             schema.`$ref`,
                             response.key,
-                            response.value.description
+                            response.value.description,
+                            headers
                         )
                     )
                 }
@@ -135,16 +141,25 @@ private fun getResponses(
                                 operationName,
                                 response.key,
                                 response.value.description,
-                                DataType.fromString(schema.type, schema.format)
+                                DataType.fromString(schema.type, schema.format),
+                                headers
                             )
                         )
+                        //TODO add inlineSchema do DSLOperation. Delete this?
+//                        inlineSchemas.add(
+//                            InlineSchema(
+//                                "${operationName.capitalize()}InlineResponse",
+//                                schema
+//                            )
+//                        )
                     } else {
                         //For responses using arrays of reusable schemas
                         responses.add(
                             ResponseRefColl(
                                 schema.items.`$ref`,
                                 response.key,
-                                response.value.description
+                                response.value.description,
+                                headers
                             )
                         )
                     }
@@ -218,14 +233,14 @@ fun getBodyCollPojo(tags: List<String>?, schema: Schema<Any>?, contentTypes: Lis
     val type = SchemaProps.getSchemaProp(schema, SchemaProps.ARRAYTYPE)
     val format = SchemaProps.getSchemaProp(schema, SchemaProps.ARRAYFORMAT)
     val dataType = DataType.fromString(type!!, format)
-    return BodyCollPojo(contentTypes, tags, dataType!!)
+    return BodyCollPojo(contentTypes, tags, dataType)
 }
 
 fun getBodyObj(schema: Schema<Any>?, contentTypes: List<String>): BodyObj {
     val type = SchemaProps.getSchemaProp(schema, SchemaProps.TYPE)
     val format = SchemaProps.getSchemaProp(schema, SchemaProps.FORMAT)
     val dataType = DataType.fromString(type!!, format)
-    return BodyObj(contentTypes, dataType!!)
+    return BodyObj(contentTypes, dataType)
 }
 
 fun getBodyRef(schemaRef: String, contentTypes: List<String>): BodyRef {
@@ -233,6 +248,21 @@ fun getBodyRef(schemaRef: String, contentTypes: List<String>): BodyRef {
         contentTypes,
         SchemaProps.getRefSimpleName(schemaRef)
     )
+}
+
+fun getHeaders(headers: Map<String, Header>?): List<DSLHeader>? {
+    if (headers == null) return null
+    val headersList: MutableList<DSLHeader> = mutableListOf()
+    headers.map {
+        headersList.add(
+            DSLHeader(
+                it.key,
+                it.value.description,
+                DataType.fromString(it.value.schema.type, it.value.schema.format)
+            )
+        )
+    }
+    return headersList
 }
 
 
