@@ -34,7 +34,7 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
 
     val operationName = getOperationName(operation, path, method)
     val parameters = getParameters(operation)
-    val inlineSchemas: MutableList<InlineSchema> = mutableListOf() //TODO delete this
+    val inlineSchemas: MutableList<InlineSchema> = mutableListOf() //TODO Inline Schema
 
     val dslOperation = DSLOperation(
         operationName,
@@ -106,7 +106,7 @@ private fun getParameters(operation: Operation): List<DSLParameter>? {
 private fun getResponses(
     apiResponses: ApiResponses,
     operationName: String,
-    inlineSchemas: MutableList<InlineSchema>, //TODO delete this
+    inlineSchemas: MutableList<InlineSchema>, //TODO Inline Schema
 ): List<Response> {
     val responses: MutableList<Response> = mutableListOf()
 
@@ -138,6 +138,13 @@ private fun getResponses(
                                 DataType.fromString(schema.type, schema.format)
                             )
                         )
+                        //TODO add inlineSchema do DSLOperation. Delete this?
+//                        inlineSchemas.add(
+//                            InlineSchema(
+//                                "${operationName.capitalize()}InlineResponse",
+//                                schema
+//                            )
+//                        )
                     } else {
                         //For responses using arrays of reusable schemas
                         responses.add(
