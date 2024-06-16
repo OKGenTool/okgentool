@@ -1,10 +1,12 @@
 package generator.builders.model.utils
 
 import com.squareup.kotlinpoet.*
+import datamodel.DataType
 import datamodel.Schema
 import generator.model.Packages
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Contextual
 
 fun createDataClassComponent(schema: Schema, schemas: List<Schema>): FileSpec {
     return FileSpec.builder(Packages.MODEL, schema.simplifiedName)
@@ -29,13 +31,16 @@ fun getDataClassBuilder(
             .initializer(property.name)
             .build()
 
-        val parameterSpec = if(property.required)
-            ParameterSpec.builder(property.name, parameterType)
-                .build()
-        else
-            ParameterSpec.builder(property.name, parameterType)
-                .defaultValue("null")
-                .build()
+        val parameterSpecBuilder = ParameterSpec.builder(property.name, parameterType)
+        if (!property.required) {
+            parameterSpecBuilder.defaultValue("null")
+        }
+
+        if (property.dataType == DataType.DATE_TIME || property.dataType == DataType.DATE) {
+            parameterSpecBuilder.addAnnotation(Contextual::class)
+        }
+
+        val parameterSpec = parameterSpecBuilder.build()
 
         properties.add(propertySpec)
         parameters.add(parameterSpec)
