@@ -3,9 +3,10 @@ package generator.builders.defaultRouting
 import com.squareup.kotlinpoet.*
 import datamodel.DSLOperation
 import datamodel.Schema
+import generator.builders.defaultRouting.utils.createOperationStatement
 import generator.builders.defaultRouting.utils.getExampleObject
-import generator.builders.defaultRouting.utils.getNeededImports
-import generator.capitalize
+import generator.builders.defaultRouting.utils.getExampleImports
+import generator.builders.defaultRouting.utils.getRoutingImports
 import generator.model.Packages
 import generator.writeFile
 import org.slf4j.LoggerFactory
@@ -44,7 +45,7 @@ private fun writeDefaultRoutingExamplesFile(schemas: List<Schema>) {
             examplesFileSpec.addProperty(property)
         }
 
-        for (import in getNeededImports(schema)) {
+        for (import in getExampleImports(schema)) {
             examplesFileSpec.addImport(import.first, import.second)
         }
 
@@ -61,38 +62,14 @@ private fun writeDefaultRoutingFile(operations: List<DSLOperation>, schemas: Lis
     for (operation in operations) {
         val operationStatement = createOperationStatement(operation, schemas)
         defaultRoutingFunction.addCode(operationStatement)
+
+        for (import in getRoutingImports(operation, schemas)) {
+            routingFileSpec.addImport(import.first, import.second)
+        }
     }
 
     routingFileSpec.addFunction(defaultRoutingFunction.build())
     writeFile(routingFileSpec.build())
 }
 
-fun createOperationStatement(operation: DSLOperation, schemas: List<Schema>): CodeBlock {
-    val code = CodeBlock.builder()
-    code.add("route.${operation.name} {\n")
-    code.add("\t\ttry {\n")
 
-    if (operation.parameters != null) {
-        for (parameter in operation.parameters) {
-            code.add("\t\t\tval ${parameter.name} = request.${parameter.name}\n")
-        }
-    }
-
-    if (operation.requestBody != null) {
-        // TODO: Add support for request body
-//        code.add("\t\t\tval ${operation.} = request.body\n")
-    }
-
-    code.add("\t\t\tif (example${operation.name.capitalize()} != null) {\n")
-    code.add("\t\t\t\tcall.respond(example${operation.name.capitalize()})\n")
-    code.add("\t\t\t} else {\n")
-    code.add("\t\t\tunsafe.notImplemented()\n")
-    code.add("\t\t\t}\n")
-    code.add("\t\t} catch (e: Exception) {\n")
-    code.add("\t\t\t\tunsafe.error(e)\n")
-    code.add("\t\t}\n")
-
-    code.add("}\n\n")
-
-    return code.build()
-}

@@ -96,7 +96,7 @@ fun getInitializerBlock(schema: Schema): CodeBlock {
     return codeBlock.build()
 }
 
-fun getNeededImports(schema: Schema): List<Pair<String, String>> {
+fun getExampleImports(schema: Schema): List<Pair<String, String>> {
     val imports = mutableListOf<Pair<String, String>>()
     schema.parameters.forEach { param ->
         if (
