@@ -22,8 +22,10 @@ enum class Imports(
     KTOR_CONTENT_NEGOTIATION("io.ktor.server.plugins.contentnegotiation", "ContentNegotiation"),
     KTOR_SERIALIZATION_JSON("io.ktor.serialization.kotlinx.json", "json"),
     KTOR_SERIALIZATION_XML("io.ktor.serialization.kotlinx.xml", "xml"),
-
-
+    KTOR_HTTP_CLIENT("io.ktor.client", "HttpClient"),
+    KTOR_CLIENT_ENGINE_CIO("io.ktor.client.engine.cio", "CIO"),
+    KTOR_CLIENT_DEFAULT_REQUEST("io.ktor.client.plugins", "defaultRequest"),
+    KTOR_CLIENT_CONTENT_NEGOTIATION("io.ktor.client.plugins.contentnegotiation", "ContentNegotiation"),
 
     ;
 
