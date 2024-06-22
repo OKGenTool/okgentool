@@ -13,4 +13,5 @@ object Packages {
     val UTILS = "$BASE.utils"
     val DEFAULT_ROUTING = "$BASE.defaultRouting"
     val DEFAULT_ROUTING_EXAMPLES = "$DEFAULT_ROUTING.examples"
+    val CLIENT = "$BASE.client"
 }

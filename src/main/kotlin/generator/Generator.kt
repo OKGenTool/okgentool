@@ -2,6 +2,7 @@ package generator
 
 import cli.serverDestinationPath
 import datamodel.DataModel
+import generator.builders.client.buildClient
 import generator.builders.defaultRouting.buildDefaultRouting
 import generator.builders.dsl.buildDSLOperations
 import generator.builders.model.buildModel
@@ -29,5 +30,11 @@ class Generator(private val dataModel: DataModel) {
 
         logger.info("Build default routing files")
         buildDefaultRouting(dataModel.dslOperations, dataModel.schemas)
+
+        logger.info("Build Client files")
+        buildClient(
+            dataModel.dslOperations,
+            dataModel.schemas.map { it.simplifiedName }
+        )
     }
 }
