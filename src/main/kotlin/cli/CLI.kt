@@ -11,9 +11,11 @@ var packageName: String = ""
 
 const val VERSION = "beta"
 
-//TODO rename this. CLI stands for Command Line Interface, not Client.
+/**
+ * CLI - Command Line Interface module
+ */
 
-fun getClient(args: Array<String>) {
+fun getCli(args: Array<String>) {
     if (args.isEmpty()) {
         println(getErrorMessage("No arguments provided"))
         exitProcess(1)

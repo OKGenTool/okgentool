@@ -1,4 +1,4 @@
-import cli.getClient
+import cli.getCli
 import cli.sourcePath
 import generator.Generator
 import org.slf4j.LoggerFactory
@@ -8,7 +8,7 @@ private val logger = LoggerFactory.getLogger("Main.kt")
 
 fun main(args: Array<String>) {
     logger.info("Reading arguments from the command line")
-    getClient(args)
+    getCli(args)
 
     logger.info("Start parsing the OAD file")
     val dataModel = Parser(sourcePath).getDataModel()
