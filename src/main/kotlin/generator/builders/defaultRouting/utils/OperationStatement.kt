@@ -60,7 +60,7 @@ private fun getErrorResponse(operation: DSLOperation, schemas: List<Schema>): Re
     }
 
     for (response in operation.responses) {
-        response.setStatusCodeInt()
+        //response.setStatusCodeInt()
         if (response.statusCodeInt in 400..599) {
             return response
         }
@@ -75,7 +75,7 @@ private fun getSuccessResponse(operation: DSLOperation, schemas: List<Schema>): 
     }
 
     for (response in operation.responses) {
-        response.setStatusCodeInt()
+//        response.setStatusCodeInt()
         if (response.statusCodeInt in 200..299) {
             return response
         }

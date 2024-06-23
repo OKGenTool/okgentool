@@ -33,14 +33,7 @@ class Parser(sourceFilePath: String) {
 
     fun getDataModel(): DataModel {
         val operations = buildOperations()
-        val inlineSchemas: MutableList<InlineSchema> = mutableListOf()
-
-        operations.map {
-            it.inlineSchemas.map {
-                inlineSchemas.add(it)
-            }
-        }
-        val schemas = buildSchemas(inlineSchemas)
+        val schemas = buildSchemas()
 
         return DataModel(schemas, operations)
     }

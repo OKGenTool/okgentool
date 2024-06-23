@@ -8,7 +8,6 @@ import java.time.LocalDateTime
 
 private val logger = LoggerFactory.getLogger(DataType::class.java.simpleName)
 
-//TODO this enum is compromised with kotlinpoet
 enum class DataType(val type: String, val format: String, val kotlinType: ClassName) {
     INTEGER("integer", "int32", Int::class.asTypeName()),
     LONG("integer", "int64", Long::class.asTypeName()),

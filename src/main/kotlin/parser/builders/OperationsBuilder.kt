@@ -38,18 +38,16 @@ private fun addOperation(operation: Operation?, path: String, method: String) {
 
     val operationName = getOperationName(operation, path, method)
     val parameters = getParameters(operation)
-    val inlineSchemas: MutableList<InlineSchema> = mutableListOf() //TODO Inline Schema
 
     val dslOperation = DSLOperation(
         operationName,
         getBody(operation),
-        getResponses(operation.responses, operationName, inlineSchemas),
+        getResponses(operation.responses, operationName),
         HttpMethod.parse(method),
         path,
         operation.summary,
         operation.description,
         parameters,
-        inlineSchemas
     )
 
     dslOperations.add(dslOperation)
@@ -110,10 +108,8 @@ private fun getParameters(operation: Operation): List<DSLParameter>? {
 private fun getResponses(
     apiResponses: ApiResponses,
     operationName: String,
-    inlineSchemas: MutableList<InlineSchema>, //TODO Inline Schema
 ): List<Response> {
     val responses: MutableList<Response> = mutableListOf()
-
     apiResponses.map { response ->
         val headers = getHeaders(response.value.headers)
         val content = response.value.content
@@ -145,13 +141,6 @@ private fun getResponses(
                                 headers
                             )
                         )
-                        //TODO add inlineSchema do DSLOperation. Delete this?
-//                        inlineSchemas.add(
-//                            InlineSchema(
-//                                "${operationName.capitalize()}InlineResponse",
-//                                schema
-//                            )
-//                        )
                     } else {
                         //For responses using arrays of reusable schemas
                         responses.add(
