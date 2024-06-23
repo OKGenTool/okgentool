@@ -27,3 +27,14 @@ dependencies {
     testImplementation(libs.kotlin.test.junit)
 
 }
+
+tasks.register("runOkgenTool", Exec::class) {
+    commandLine("java", "-jar", "C:\\ISEL\\PS\\okgentool\\demo\\okgentool.jar",
+        "-s", "C:\\ISEL\\PS\\okgentool\\demo\\petstore.yaml",
+        "-ts","C:\\ISEL\\PS\\okgentool\\demo\\PetStore\\server\\src\\main\\kotlin",
+        "-p", "org.example.petstoreserver")
+}
+
+tasks.named("build") {
+    dependsOn(tasks.named("runOkgenTool"))
+}
