@@ -11,6 +11,8 @@ var packageName: String = ""
 
 const val VERSION = "beta"
 
+//TODO rename this. CLI stands for Command Line Interface, not Client.
+
 fun getClient(args: Array<String>) {
     if (args.isEmpty()) {
         println(getErrorMessage("No arguments provided"))

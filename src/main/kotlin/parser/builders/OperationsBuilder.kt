@@ -28,13 +28,15 @@ fun buildOperations(): List<DSLOperation> {
         addOperation(pathItem.options, paths.key, "options")
         addOperation(pathItem.trace, paths.key, "trace")
     }
-    logger.info("End parsing the Operations model. Where found these operations:")
+    logger.info("Parsing of the Operations model has ended. The following operations were found:")
     dslOperations.forEach { logger.info(it.name) }
     return dslOperations
 }
 
 private fun addOperation(operation: Operation?, path: String, method: String) {
-    if (operation == null) return
+    if (operation == null ||
+        operation.operationId in notImplemented
+    ) return
 
     val operationName = getOperationName(operation, path, method)
     val parameters = getParameters(operation)
@@ -253,5 +255,7 @@ fun getHeaders(headers: Map<String, Header>?): List<DSLHeader>? {
     }
     return headersList
 }
+
+val notImplemented = setOf("getInventory")
 
 

@@ -4,8 +4,6 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.*
 import generator.*
-import generator.builders.buildConstructor
-import generator.builders.notImplemented
 import generator.builders.routing.plugins.buildSerialization
 import generator.model.Imports.*
 import generator.model.Imports.Companion.addCustomImport
@@ -23,8 +21,6 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
     val paramsToImportInOkGenDSL: MutableList<Parameter> = mutableListOf()
 
     for (operation in dslOperations) {
-        if (operation.name in notImplemented) continue
-
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
 
         val parameters: MutableList<Parameter> = getParameters(operation)

@@ -2,8 +2,7 @@ package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
 import datamodel.*
-import generator.builders.buildConstructor
-import generator.builders.notImplemented
+import generator.buildConstructor
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
 import generator.decapitalize
@@ -91,8 +90,6 @@ private fun buildOperationFunctions(dslOperations: List<DSLOperation>): List<Fun
     val functions = mutableListOf<FunSpec>()
 
     dslOperations.map {
-        if (it.name in notImplemented) return@map
-
         //Define suspend function for operation parameter
         val suspFunc = LambdaTypeName.get(
             receiver = ClassName(Packages.DSLOPERATIONS, it.name.capitalize()),
