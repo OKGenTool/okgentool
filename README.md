@@ -61,13 +61,13 @@ The parameters are the same when using the command line:
 
 Now, every time you need to regenerate files, just execute:
 ```
-./gradlew runOkgenTool
+./gradlew runOKGenTool
 ```
 
 Additionally, if you want to regenerate the files every time you build your application, you can customize task dependencies to make it run before the build task. Add the following to your `build.gradle(.kts)` file:
 ```
 tasks.named("build") {
-    dependsOn(tasks.named("runOkgenTool"))
+    dependsOn(tasks.named("runOKGenTool"))
 }
 ```
 
