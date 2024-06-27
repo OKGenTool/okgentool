@@ -8,31 +8,40 @@ import datamodel.Response
 import generator.capitalize
 import generator.model.Packages
 
-fun getReturnType(responses: List<Response>?): TypeName {
+fun getReturnType(responses: List<Response>?): Pair<TypeName, String> {
     if (responses.isNullOrEmpty()) {
-        return Any::class.asTypeName()
+        return Pair(Any::class.asTypeName(), "Any")
     }
 
     val responseState = ClassName(Packages.CLIENT, "ResponseState")
 
     val responseRef = responses.firstOrNull() { it is Response.ResponseRef } as Response.ResponseRef?
     if (responseRef != null) {
-        return responseState.parameterizedBy(
-            ClassName(Packages.MODEL, responseRef.schemaRef.substringAfterLast("/").capitalize())
+        val name = responseRef.schemaRef.substringAfterLast("/").capitalize()
+        return Pair(
+            responseState.parameterizedBy(
+                ClassName(Packages.MODEL, name)
+            ),
+            name
         )
     }
 
     val responseCollRef = responses.firstOrNull() { it is Response.ResponseRefColl } as Response.ResponseRefColl?
     if (responseCollRef != null) {
-        return responseState.parameterizedBy(List::class.asTypeName()
-            .parameterizedBy(
-                ClassName(
-                    Packages.MODEL,
-                    responseCollRef.schemaRef.substringAfterLast("/").capitalize()
+        val name = responseCollRef.schemaRef.substringAfterLast("/").capitalize()
+        return Pair(
+            responseState.parameterizedBy(List::class.asTypeName()
+                .parameterizedBy(
+                    ClassName(
+                        Packages.MODEL,
+                        name
+                    )
                 )
-            ))
+            ),
+            "List<${name}>"
+        )
     }
 
-    return responseState.parameterizedBy(Any::class.asTypeName())
+    return Pair(responseState.parameterizedBy(Any::class.asTypeName()), "List<Any>")
     // TODO: Add support for Response.ResponseNoContent and ResponseInline
 }

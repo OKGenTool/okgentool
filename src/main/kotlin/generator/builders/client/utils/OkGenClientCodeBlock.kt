@@ -2,12 +2,11 @@ package generator.builders.client.utils
 
 import com.squareup.kotlinpoet.CodeBlock
 import datamodel.DSLOperation
-import generator.capitalize
 import generator.decapitalize
 import generator.model.ClientFunctionParameter
 import generator.model.ContentType
 
-fun getCodeBlock(operation: DSLOperation, schemaNames: List<String>, parametersObject: List<ClientFunctionParameter>): CodeBlock {
+fun getCodeBlock(operation: DSLOperation, parametersObject: List<ClientFunctionParameter>, returnTypeName: String): CodeBlock {
     val codeBlock = CodeBlock.builder()
 
     codeBlock.beginControlFlow("try {")
@@ -42,12 +41,12 @@ fun getCodeBlock(operation: DSLOperation, schemaNames: List<String>, parametersO
 
     val bodyReturnType = bodyParameter?.name
     if (bodyReturnType != null) {
-        codeBlock.addStatement("val ${bodyReturnType.decapitalize()}Response = response.body<${bodyParameter.dataType.toString().substringAfterLast(".")}>()")
-        codeBlock.addStatement("val status = response.status.value")
-        codeBlock.addStatement("return getResponseState(${bodyReturnType.decapitalize()}Response, status)")
+        codeBlock.addStatement("val ${bodyReturnType.decapitalize()}Response = response.body<${returnTypeName}>()")
+        codeBlock.addStatement("val ResponseStatusCode = response.status.value")
+        codeBlock.addStatement("return getResponseState(${bodyReturnType.decapitalize()}Response, ResponseStatusCode)")
     } else {
-        codeBlock.addStatement("val status = response.status.value")
-        codeBlock.addStatement("return getResponseState(null, status)")
+        codeBlock.addStatement("val ResponseStatusCode = response.status.value")
+        codeBlock.addStatement("return getResponseState(null, ResponseStatusCode)")
     }
     codeBlock.endControlFlow()
 
