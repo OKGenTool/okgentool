@@ -8,6 +8,7 @@ import generator.model.Packages
 
 fun createOkGenClientFile(operations: List<DSLOperation>, schemaNames: List<String>): FileSpec {
     return FileSpec.builder(Packages.CLIENT, "OkGenClient")
+        .indent("    ")
         .addType(createOkGenClientType(operations, schemaNames))
         .addCustomImport(Imports.KTOR_HTTP_CLIENT)
         .addCustomImport(Imports.KTOR_CLIENT_ENGINE_CIO)
@@ -15,6 +16,15 @@ fun createOkGenClientFile(operations: List<DSLOperation>, schemaNames: List<Stri
         .addCustomImport(Imports.KTOR_CLIENT_CONTENT_NEGOTIATION)
         .addCustomImport(Imports.KTOR_SERIALIZATION_JSON)
         .addCustomImport(Imports.KTOR_SERIALIZATION_XML)
+        .addCustomImport(Imports.KTOR_CLIENT_REQUEST_GET)
+        .addCustomImport(Imports.KTOR_CLIENT_REQUEST_POST)
+        .addCustomImport(Imports.KTOR_CLIENT_REQUEST_PUT)
+        .addCustomImport(Imports.KTOR_CLIENT_REQUEST_DELETE)
+        .addCustomImport(Imports.KTOR_CLIENT_REQUEST_SET_BODY)
+        .addCustomImport(Imports.KTOR_HTTP_APPEND_PATH_SEGMENTS)
+        .addCustomImport(Imports.KTOR_HTTP_CONTENT_TYPE)
+        .addCustomImport(Imports.KTOR_HTTP_CONTENT_TYPE_FUNCTION)
+        .addCustomImport(Imports.KTOR_CLIENT_CALL_BODY)
         .build()
 }
 
