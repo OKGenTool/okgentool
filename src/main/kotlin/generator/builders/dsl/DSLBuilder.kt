@@ -17,8 +17,20 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("DSLBuilder.kt")
 
-fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<String>) {
+fun buildDSL(dslOperations: List<DSLOperation>, componentNames: List<String>) {
     val paramsToImportInOkGenDSL: MutableList<Parameter> = mutableListOf()
+
+    buildDSLOperations(dslOperations,paramsToImportInOkGenDSL)
+    buildApiOperations()
+    buildUnsafe()
+    buildSerialization()
+    buildOkGenDsl(dslOperations, componentNames, paramsToImportInOkGenDSL)
+}
+
+private fun buildDSLOperations(
+    dslOperations: List<DSLOperation>,
+    paramsToImportInOkGenDSL: MutableList<Parameter>
+) {
 
     for (operation in dslOperations) {
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
@@ -28,19 +40,16 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
             !it.enum.isNullOrEmpty()
         })
 
-        var requestType: TypeSpec?
-        var responseType: TypeSpec?
-
         //Build Params Classes
-        var paramsTypes: List<TypeSpec>? = buildOperationsParams(operation.name, parameters)
+        val paramsTypes: List<TypeSpec> = buildOperationsParams(operation.name, parameters)
 
         //Build Request class
-        requestType = buildRequestClass(operation, parameters)
+        val requestType = buildRequestClass(operation, parameters)
         requestType?.let { fileSpec.addType(requestType) }
 
         //Build Response Class
         val responseProps = getResponseProps(operation.name, operation.responses!!)
-        responseType = getResponseType(operation.name, responseProps.map { it.responseType })
+        val responseType = getResponseType(operation.name, responseProps.map { it.responseType })
         fileSpec.addType(responseType)
 
         //Build Operation main class
@@ -56,7 +65,7 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
         )
 
         //Add Param Classes to Operation
-        paramsTypes?.map {
+        paramsTypes.map {
             fileSpec.addType(it)
         }
 
@@ -67,11 +76,6 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
 
         writeFile(fileSpec.build())
     }
-
-    buildApiOperations()
-    buildUnsafe()
-    buildSerialization()
-    buildOkGenDsl(dslOperations, componentNames, paramsToImportInOkGenDSL)
 }
 
 

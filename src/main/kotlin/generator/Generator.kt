@@ -3,7 +3,7 @@ package generator
 import cli.serverDestinationPath
 import datamodel.DataModel
 import generator.builders.defaultRouting.buildDefaultRouting
-import generator.builders.dsl.buildDSLOperations
+import generator.builders.dsl.buildDSL
 import generator.builders.model.buildModel
 import generator.builders.routing.routes.buildPaths
 import org.slf4j.LoggerFactory
@@ -22,7 +22,7 @@ class Generator(private val dataModel: DataModel) {
         buildPaths(dataModel.dslOperations)
 
         logger.info("Build DSL Files")
-        buildDSLOperations(
+        buildDSL(
             dataModel.dslOperations,
             dataModel.schemas.map { it.simplifiedName }
         )

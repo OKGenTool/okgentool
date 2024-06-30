@@ -1,7 +1,6 @@
 package parser
 
 import datamodel.DataModel
-import datamodel.InlineSchema
 import io.swagger.parser.OpenAPIParser
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.core.models.ParseOptions
@@ -31,7 +30,7 @@ class Parser(sourceFilePath: String) {
         openAPI = OpenAPIParser().readLocation(sourceFilePath, null, parseOptions).openAPI
     }
 
-    fun getDataModel(): DataModel {
+    fun buildDataModel(): DataModel {
         val operations = buildOperations()
         val schemas = buildSchemas()
 

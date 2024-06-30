@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
     getCli(args)
 
     logger.info("Start parsing the OAD file")
-    val dataModel = Parser(sourcePath).getDataModel()
+    val dataModel = Parser(sourcePath).buildDataModel()
 
     logger.info("Start code generation")
     Generator(dataModel)
