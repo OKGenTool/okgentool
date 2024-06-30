@@ -6,12 +6,15 @@ import generator.model.Packages
 import generator.writeFile
 import org.slf4j.LoggerFactory
 
-private val logger = LoggerFactory.getLogger("ApiOperationsBuilder.kt")
+private val logger = LoggerFactory.getLogger("DslControlsBuilder.kt")
 
-fun buildApiOperations() {
-    // Define the apiOperations property
+const val DSL_CONTROLS_CAP = "DslControls"
+const val DSL_CONTROLS = "dslControls"
+
+fun buildDslControls() {
+    // Define the dslControls property
     val apiOperationsProperty = PropertySpec.builder(
-        "apiOperations",
+        DSL_CONTROLS,
         ClassName("kotlin.collections", "MutableList")
             .parameterizedBy(ClassName("kotlin", "String"))
     )
@@ -24,21 +27,21 @@ fun buildApiOperations() {
         .addParameter("operation", String::class)
         .addCode(
             """
-            val found = apiOperations.find { it == operation }
-            if (found == null) apiOperations.add(operation)
+            val found = ${DSL_CONTROLS}.find { it == operation }
+            if (found == null) ${DSL_CONTROLS}.add(operation)
             else throw RuntimeException("This operation was already created: '$'operation")
         """.trimIndent()
         )
         .build()
 
-    // Define the ApiOperations class
-    val apiOperationsClass = TypeSpec.classBuilder("ApiOperations")
+    // Define the DslControls class
+    val apiOperationsClass = TypeSpec.classBuilder(DSL_CONTROLS_CAP)
         .addProperty(apiOperationsProperty)
         .addFunction(addOperationFunSpec)
         .build()
 
     // Define the Kotlin file
-    val fileSpec = FileSpec.builder(Packages.DSL, "ApiOperations")
+    val fileSpec = FileSpec.builder(Packages.DSL, DSL_CONTROLS_CAP)
         .addType(apiOperationsClass)
         .build()
 

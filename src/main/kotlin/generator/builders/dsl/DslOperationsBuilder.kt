@@ -4,7 +4,6 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.*
 import generator.*
-import generator.builders.routing.plugins.buildSerialization
 import generator.model.Imports.*
 import generator.model.Imports.Companion.addCustomImport
 import generator.model.Packages
@@ -15,19 +14,9 @@ import io.ktor.http.ContentType.Application.OctetStream
 import io.ktor.server.application.*
 import org.slf4j.LoggerFactory
 
-private val logger = LoggerFactory.getLogger("DSLBuilder.kt")
+private val logger = LoggerFactory.getLogger("DslOperationsBuilder.kt")
 
-fun buildDSL(dslOperations: List<DSLOperation>, componentNames: List<String>) {
-    val paramsToImportInOkGenDSL: MutableList<Parameter> = mutableListOf()
-
-    buildDSLOperations(dslOperations,paramsToImportInOkGenDSL)
-    buildApiOperations()
-    buildUnsafe()
-    buildSerialization()
-    buildOkGenDsl(dslOperations, componentNames, paramsToImportInOkGenDSL)
-}
-
-private fun buildDSLOperations(
+fun buildDSLOperations(
     dslOperations: List<DSLOperation>,
     paramsToImportInOkGenDSL: MutableList<Parameter>
 ) {
@@ -152,7 +141,7 @@ private fun getOperationType(
     return mainClass.build()
 }
 
-fun getParameters(operation: DSLOperation): MutableList<Parameter> {
+private fun getParameters(operation: DSLOperation): MutableList<Parameter> {
     val parameters: MutableList<Parameter> = mutableListOf()
 
     //When using body
@@ -168,7 +157,7 @@ fun getParameters(operation: DSLOperation): MutableList<Parameter> {
     return parameters
 }
 
-fun getBodyAsParameter(body: Body): Parameter {
+private fun getBodyAsParameter(body: Body): Parameter {
     var name: String = ""
     var type: TypeName? = null
 

@@ -19,7 +19,6 @@ private val logger = LoggerFactory.getLogger("OkGenDslBuilder.kt")
 
 private const val INNERCLASS = "OKGenRoute"
 private const val OUTERCLASS = "OkGenDsl"
-private const val APIOPERATIONS = "ApiOperations"
 private const val KTORROUTE = "ktorRoute"
 
 fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>, parameters: List<Parameter>) {
@@ -59,13 +58,13 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
                     )
                     .addProperty(
                         PropertySpec.builder(
-                            APIOPERATIONS.decapitalize(),
+                            DSL_CONTROLS,
                             ClassName(
                                 Packages.DSL,
-                                APIOPERATIONS
+                                DSL_CONTROLS_CAP
                             )
                         )
-                            .initializer("$APIOPERATIONS()")
+                            .initializer("$DSL_CONTROLS_CAP()")
                             .addModifiers(KModifier.PRIVATE)
                             .build()
                     )
@@ -98,7 +97,7 @@ private fun buildOperationFunctions(dslOperations: List<DSLOperation>): List<Fun
 
 
         val codeBlock = CodeBlock.builder()
-            .add("${APIOPERATIONS.decapitalize()}.addOperation(\"${it.name}\")\n")
+            .add("${DSL_CONTROLS}.addOperation(\"${it.name}\")\n")
             .add("$KTORROUTE.${it.method.value}<$PATHSFILE.${it.name.capitalize()}>{\n")
             .getRequestCode(it)
             .add("}")

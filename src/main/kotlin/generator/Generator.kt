@@ -5,6 +5,7 @@ import datamodel.DataModel
 import generator.builders.defaultRouting.buildDefaultRouting
 import generator.builders.dsl.buildDSL
 import generator.builders.model.buildModel
+import generator.builders.routing.plugins.buildSerialization
 import generator.builders.routing.routes.buildPaths
 import org.slf4j.LoggerFactory
 
@@ -26,6 +27,9 @@ class Generator(private val dataModel: DataModel) {
             dataModel.dslOperations,
             dataModel.schemas.map { it.simplifiedName }
         )
+
+        logger.info("Build Serialization File")
+        buildSerialization()
 
         logger.info("Build default routing files")
         buildDefaultRouting(dataModel.dslOperations, dataModel.schemas)
