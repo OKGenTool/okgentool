@@ -6,11 +6,15 @@ import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
 import datamodel.Response
 import generator.capitalize
+import generator.model.ClientResponse
 import generator.model.Packages
 
-fun getReturnType(responses: List<Response>?): Pair<TypeName, String> {
+fun getReturnType(responses: List<Response>?): Pair<TypeName, ClientResponse> {
     if (responses.isNullOrEmpty()) {
-        return Pair(Any::class.asTypeName(), "Any")
+        return Pair(
+            Any::class.asTypeName(),
+            ClientResponse("Any", noContent = true)
+        )
     }
 
     val responseState = ClassName(Packages.CLIENT, "ResponseState")
@@ -22,7 +26,7 @@ fun getReturnType(responses: List<Response>?): Pair<TypeName, String> {
             responseState.parameterizedBy(
                 ClassName(Packages.MODEL, name)
             ),
-            name
+            ClientResponse(name, schemaName = name)
         )
     }
 
@@ -38,10 +42,20 @@ fun getReturnType(responses: List<Response>?): Pair<TypeName, String> {
                     )
                 )
             ),
-            "List<${name}>"
+            ClientResponse(
+                "List<${name}>",
+                isList = true,
+                schemaName = name
+            )
         )
     }
 
-    return Pair(responseState.parameterizedBy(Any::class.asTypeName()), "List<Any>")
+    return Pair(
+        responseState.parameterizedBy(Any::class.asTypeName()),
+        ClientResponse(
+            "List<Any>",
+            noContent = true
+        )
+    )
     // TODO: Add support for Response.ResponseNoContent and ResponseInline
 }

@@ -4,9 +4,10 @@ import com.squareup.kotlinpoet.CodeBlock
 import datamodel.DSLOperation
 import generator.decapitalize
 import generator.model.ClientFunctionParameter
+import generator.model.ClientResponse
 import generator.model.ContentType
 
-fun getCodeBlock(operation: DSLOperation, parametersObject: List<ClientFunctionParameter>, returnTypeName: String): CodeBlock {
+fun getCodeBlock(operation: DSLOperation, parametersObject: List<ClientFunctionParameter>, responseReturn: ClientResponse): CodeBlock {
     val codeBlock = CodeBlock.builder()
 
     codeBlock.beginControlFlow("try {")
@@ -39,15 +40,23 @@ fun getCodeBlock(operation: DSLOperation, parametersObject: List<ClientFunctionP
     }
     codeBlock.endControlFlow()
 
-    val bodyReturnType = bodyParameter?.name
-    if (bodyReturnType != null) {
-        codeBlock.addStatement("val ${bodyReturnType.decapitalize()}Response = response.body<${returnTypeName}>()")
-        codeBlock.addStatement("val ResponseStatusCode = response.status.value")
-        codeBlock.addStatement("return getResponseState(${bodyReturnType.decapitalize()}Response, ResponseStatusCode)")
-    } else {
+    if (responseReturn.noContent) {
         codeBlock.addStatement("val ResponseStatusCode = response.status.value")
         codeBlock.addStatement("return getResponseState(null, ResponseStatusCode)")
     }
+
+    if (responseReturn.dataType != null) {
+        codeBlock.addStatement("val httpResponse = response.body<${if(!responseReturn.isList) responseReturn.dataType.name else "List<${responseReturn.dataType.name}>"}>()")
+        codeBlock.addStatement("val responseStatusCode = response.status.value")
+        codeBlock.addStatement("return getResponseState(httpResponse, responseStatusCode)")
+    }
+
+    if (responseReturn.schemaName != null) {
+        codeBlock.addStatement("val httpResponse = response.body<${if(!responseReturn.isList) responseReturn.schemaName else "List<${responseReturn.schemaName}>"}>()")
+        codeBlock.addStatement("val responseStatusCode = response.status.value")
+        codeBlock.addStatement("return getResponseState(httpResponse, responseStatusCode)")
+    }
+
     codeBlock.endControlFlow()
 
     codeBlock.beginControlFlow("catch (e: Exception) {")
