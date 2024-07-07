@@ -5,7 +5,6 @@ import datamodel.*
 import generator.buildConstructor
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
-import generator.decapitalize
 import generator.model.Imports.*
 import generator.model.Imports.Companion.addCustomImport
 import generator.model.Packages
@@ -17,7 +16,7 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("OkGenDslBuilder.kt")
 
-private const val INNERCLASS = "OKGenRoute"
+private const val INNERCLASS = "OkGenRoute"
 private const val OUTERCLASS = "OkGenDsl"
 private const val KTORROUTE = "ktorRoute"
 
