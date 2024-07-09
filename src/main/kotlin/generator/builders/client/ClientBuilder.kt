@@ -5,10 +5,10 @@ import generator.builders.client.utils.createOkGenClientFile
 import generator.builders.client.utils.createResponseStateFile
 import generator.writeFile
 
-fun buildClient(operations: List<DSLOperation>, schemaNames: List<String>) {
+fun buildClient(operations: List<DSLOperation>, schemaNames: List<String>, destinationPath: String) {
     val responseStateFileSpec = createResponseStateFile()
-    writeFile(responseStateFileSpec)
+    writeFile(responseStateFileSpec, destinationPath)
 
     val okGenClientFileSpec = createOkGenClientFile(operations, schemaNames)
-    writeFile(okGenClientFileSpec)
+    writeFile(okGenClientFileSpec, destinationPath)
 }

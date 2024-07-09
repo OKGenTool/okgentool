@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("DSLBuilder.kt")
 
-fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<String>) {
+fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<String>, destinationPath: String) {
     val paramsToImportInOkGenDSL: MutableList<Parameter> = mutableListOf()
 
     for (operation in dslOperations) {
@@ -68,13 +68,13 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
             .addCustomImport(KTOR_HTTP_STATUS_CODE)
             .addCustomImport(KTOR_SERVER_RESPONSE_HEADER)
 
-        writeFile(fileSpec.build())
+        writeFile(fileSpec.build(), destinationPath)
     }
 
-    buildApiOperations()
-    buildUnsafe()
-    buildSerialization()
-    buildOkGenDsl(dslOperations, componentNames, paramsToImportInOkGenDSL)
+    buildApiOperations(destinationPath)
+    buildUnsafe(destinationPath)
+    buildSerialization(destinationPath)
+    buildOkGenDsl(dslOperations, componentNames, paramsToImportInOkGenDSL, destinationPath)
 }
 
 

@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("ModelBuilder.kt")
 
-fun buildModel(schemas: List<Schema>) {
+fun buildModel(schemas: List<Schema>, destinationPath: String) {
     logger.info("Start building model")
     for (schema in schemas) {
         val fileSpec = createModelComponent(schema, schemas)
-        writeFile(fileSpec)
+        writeFile(fileSpec, destinationPath)
     }
 }
 

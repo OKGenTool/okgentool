@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("ApiOperationsBuilder.kt")
 
-fun buildApiOperations() {
+fun buildApiOperations(destinationPath: String) {
     // Define the apiOperations property
     val apiOperationsProperty = PropertySpec.builder(
         "apiOperations",
@@ -42,5 +42,5 @@ fun buildApiOperations() {
         .addType(apiOperationsClass)
         .build()
 
-    writeFile(fileSpec)
+    writeFile(fileSpec, destinationPath)
 }

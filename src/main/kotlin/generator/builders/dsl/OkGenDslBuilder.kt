@@ -22,7 +22,12 @@ private const val OUTERCLASS = "OkGenDsl"
 private const val APIOPERATIONS = "ApiOperations"
 private const val KTORROUTE = "ktorRoute"
 
-fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String>, parameters: List<Parameter>) {
+fun buildOkGenDsl(
+    dslOperations: List<DSLOperation>,
+    componentNames: List<String>,
+    parameters: List<Parameter>,
+    destinationPath: String
+) {
     logger.info("Generating $OUTERCLASS file")
 
     val logger = PropertySpec
@@ -75,7 +80,7 @@ fun buildOkGenDsl(dslOperations: List<DSLOperation>, componentNames: List<String
             )
             .addImports(componentNames, parameters)
 
-    writeFile(fileSpec.build())
+    writeFile(fileSpec.build(), destinationPath)
 }
 
 private fun buildInnerClass(dslOperations: List<DSLOperation>): TypeSpec =

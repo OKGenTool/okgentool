@@ -15,14 +15,14 @@ import java.time.format.DateTimeFormatter
 
 private val logger = LoggerFactory.getLogger("DefaultRoutingBuilder.kt")
 
-fun buildDefaultRouting(operations: List<DSLOperation>, schemas: List<Schema>) {
+fun buildDefaultRouting(operations: List<DSLOperation>, schemas: List<Schema>, destinationPath: String) {
     logger.info("Start building default routing")
 
-    writeDefaultRoutingExamplesFile(schemas)
-    writeDefaultRoutingFile(operations, schemas)
+    writeDefaultRoutingExamplesFile(schemas, destinationPath)
+    writeDefaultRoutingFile(operations, schemas, destinationPath)
 }
 
-private fun writeDefaultRoutingExamplesFile(schemas: List<Schema>) {
+private fun writeDefaultRoutingExamplesFile(schemas: List<Schema>, destinationPath: String) {
     val examplesFileSpec = FileSpec.builder(Packages.DEFAULT_ROUTING_EXAMPLES, "DefaultRoutingExamples")
         .addImport("java.time", "LocalDate")
         .addImport("java.time", "LocalDateTime")
@@ -52,10 +52,10 @@ private fun writeDefaultRoutingExamplesFile(schemas: List<Schema>) {
         }
 
     }
-    writeFile(examplesFileSpec.build())
+    writeFile(examplesFileSpec.build(), destinationPath)
 }
 
-private fun writeDefaultRoutingFile(operations: List<DSLOperation>, schemas: List<Schema>) {
+private fun writeDefaultRoutingFile(operations: List<DSLOperation>, schemas: List<Schema>, destinationPath: String) {
     val routingFileSpec = FileSpec.builder(Packages.DEFAULT_ROUTING, "DefaultRouting")
 
     val defaultRoutingFunction = FunSpec.builder("defaultRouting")
@@ -73,7 +73,7 @@ private fun writeDefaultRoutingFile(operations: List<DSLOperation>, schemas: Lis
     }
 
     routingFileSpec.addFunction(defaultRoutingFunction.build())
-    writeFile(routingFileSpec.build())
+    writeFile(routingFileSpec.build(), destinationPath)
 }
 
 
