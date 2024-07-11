@@ -41,26 +41,26 @@ fun getCodeBlock(operation: DSLOperation, parametersObject: List<ClientFunctionP
     codeBlock.endControlFlow()
 
     if (responseReturn.noContent) {
-        codeBlock.addStatement("val ResponseStatusCode = response.status.value")
-        codeBlock.addStatement("return getResponseState(null, ResponseStatusCode)")
+        codeBlock.addStatement("val responseStatusCode = response.status.value")
+        codeBlock.addStatement("return ResponseState(null, responseStatusCode)")
     }
 
     if (responseReturn.dataType != null) {
         codeBlock.addStatement("val httpResponse = response.body<${if(!responseReturn.isList) responseReturn.dataType.name else "List<${responseReturn.dataType.name}>"}>()")
         codeBlock.addStatement("val responseStatusCode = response.status.value")
-        codeBlock.addStatement("return getResponseState(httpResponse, responseStatusCode)")
+        codeBlock.addStatement("return ResponseState(httpResponse, responseStatusCode)")
     }
 
     if (responseReturn.schemaName != null) {
         codeBlock.addStatement("val httpResponse = response.body<${if(!responseReturn.isList) responseReturn.schemaName else "List<${responseReturn.schemaName}>"}>()")
         codeBlock.addStatement("val responseStatusCode = response.status.value")
-        codeBlock.addStatement("return getResponseState(httpResponse, responseStatusCode)")
+        codeBlock.addStatement("return ResponseState(httpResponse, responseStatusCode)")
     }
 
     codeBlock.endControlFlow()
 
     codeBlock.beginControlFlow("catch (e: Exception) {")
-    codeBlock.addStatement("return getResponseState(null, null)")
+    codeBlock.addStatement("return ResponseState(null, null)")
     codeBlock.endControlFlow()
 
     return codeBlock.build()

@@ -1,14 +1,18 @@
 package generator.builders.client.utils
 
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.DSLOperation
 import generator.model.Imports
 import generator.model.Imports.Companion.addCustomImport
 import generator.model.Packages
+import io.ktor.client.engine.HttpClientEngineConfig
+import io.ktor.client.engine.HttpClientEngineFactory
 
 fun createOkGenClientFile(operations: List<DSLOperation>, schemaNames: List<String>): FileSpec {
     return FileSpec.builder(Packages.CLIENT, "OkGenClient")
         .indent("    ")
+        .addTypeAlias(createHttpClientConfigBlockTypeAlias())
         .addType(createOkGenClientType(operations, schemaNames))
         .addCustomImport(Imports.KTOR_HTTP_CLIENT)
         .addCustomImport(Imports.KTOR_CLIENT_ENGINE_CIO)
@@ -33,6 +37,16 @@ fun createOkGenClientType(operations: List<DSLOperation>, schemaNames: List<Stri
         .addProperties(getOkGenClientProperties())
         .primaryConstructor(FunSpec.constructorBuilder()
             .addParameter("baseURL", String::class)
+            .addParameter(
+                ParameterSpec.builder("engineFactory", HttpClientEngineFactory::class.asTypeName().parameterizedBy(HttpClientEngineConfig::class.asTypeName()))
+                    .defaultValue("CIO")
+                    .build()
+            )
+            .addParameter(
+                ParameterSpec.builder("clientAdditionalConfigurations", ClassName(Packages.CLIENT, "HttpClientConfigBlock"))
+                    .defaultValue("{}")
+                    .build()
+            )
             .build()
         )
 
@@ -41,4 +55,17 @@ fun createOkGenClientType(operations: List<DSLOperation>, schemaNames: List<Stri
     }
 
     return typeSpec.build()
+}
+
+private fun createHttpClientConfigBlockTypeAlias(): TypeAliasSpec {
+    return TypeAliasSpec
+        .builder(
+            "HttpClientConfigBlock",
+            LambdaTypeName
+                .get(receiver = ClassName("io.ktor.client", "HttpClientConfig")
+                    .parameterizedBy(HttpClientEngineConfig::class.asTypeName()),
+                    returnType = UNIT
+                )
+        )
+        .build()
 }

@@ -38,7 +38,7 @@ fun getClient(args: Array<String>): CliModel {
 
     if (
         sourcePath.isEmpty() ||
-        (serverDestinationPath.isEmpty() && clientDestinationPath.isEmpty())
+        (serverDestinationPath.isEmpty() && clientDestinationPath.isEmpty() && destinationPath.isEmpty())
     ) {
         println(getErrorMessage("Invalid command line arguments"))
         exitProcess(1)
