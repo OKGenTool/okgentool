@@ -1,20 +1,22 @@
+
 package cli
 
-import datamodel.CliModel
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.system.exitProcess
 
-const val VERSION = "beta"
-
+var sourcePath: String = ""
+var serverDestinationPath: String = ""
+var clientDestinationPath: String = ""
 var packageName: String = ""
 
-fun getClient(args: Array<String>): CliModel {
-    var sourcePath = ""
-    var destinationPath = ""
-    var serverDestinationPath = ""
-    var clientDestinationPath = ""
+const val VERSION = "beta"
 
+/**
+ * CLI - Command Line Interface module
+ */
+
+fun getCli(args: Array<String>) {
     if (args.isEmpty()) {
         println(getErrorMessage("No arguments provided"))
         exitProcess(1)
@@ -28,7 +30,6 @@ fun getClient(args: Array<String>): CliModel {
     for (i in args.indices) {
         when (args[i]) {
             "-s" -> sourcePath = args[i + 1]
-            "-t" -> destinationPath = args[i + 1]
             "-ts" -> serverDestinationPath = args[i + 1]
             "-tc" -> clientDestinationPath = args[i + 1]
             "-p" -> packageName = args[i + 1]
@@ -38,54 +39,16 @@ fun getClient(args: Array<String>): CliModel {
 
     if (
         sourcePath.isEmpty() ||
-        (serverDestinationPath.isEmpty() && clientDestinationPath.isEmpty() && destinationPath.isEmpty())
+        (serverDestinationPath.isEmpty() && clientDestinationPath.isEmpty())
     ) {
         println(getErrorMessage("Invalid command line arguments"))
         exitProcess(1)
     }
 
     checkSourcePath(sourcePath)
-    checkDestinationPath(destinationPath)
     checkDestinationPath(serverDestinationPath)
     checkDestinationPath(clientDestinationPath)
     packageName = formatPackageName(packageName)
-
-    if (destinationPath.isEmpty() && serverDestinationPath.isEmpty() && clientDestinationPath.isEmpty()) {
-        println(getErrorMessage("Destination Path not provided"))
-        exitProcess(1)
-    }
-
-    return getCli(
-        sourcePath,
-        destinationPath,
-        serverDestinationPath,
-        clientDestinationPath
-    )
-}
-
-fun getCli(
-    sourcePath: String,
-    destinationPath: String,
-    serverDestinationPath: String,
-    clientDestinationPath: String
-): CliModel {
-    if (destinationPath.isNotEmpty()) {
-        return CliModel(
-            sourcePath = sourcePath,
-            serverDestinationPath = destinationPath,
-            clientDestinationPath = destinationPath,
-            isServer = true,
-            isClient = true
-        )
-    }
-
-    return CliModel(
-        sourcePath = sourcePath,
-        serverDestinationPath = serverDestinationPath,
-        clientDestinationPath = clientDestinationPath,
-        isClient = clientDestinationPath.isNotEmpty(),
-        isServer = serverDestinationPath.isNotEmpty()
-    )
 }
 
 private fun getHelpText(): String {
@@ -133,9 +96,6 @@ private fun checkSourcePath(sourcePath: String) {
 }
 
 private fun checkDestinationPath(serverDestinationPath: String) {
-    if (serverDestinationPath.isEmpty()) {
-        return
-    }
     val path = Paths.get(serverDestinationPath)
 //    if (!Files.exists(path)) {
 //        println(getErrorMessage("Directory $serverDestinationPath does not exist"))

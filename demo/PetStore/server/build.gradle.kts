@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.ktor)
     application
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22" //TODO this is not KMP
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
 }
 
 group = "org.example.petstoreserver"
@@ -13,7 +13,6 @@ application {
 }
 
 dependencies {
-    //TODO is KMP?
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
     implementation("io.ktor:ktor-server-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
@@ -27,4 +26,15 @@ dependencies {
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
 
+}
+
+tasks.register("runOkgenTool", Exec::class) {
+    commandLine("java", "-jar", "C:\\ISEL\\PS\\okgentool\\demo\\okgentool.jar",
+        "-s", "C:\\ISEL\\PS\\okgentool\\demo\\petstore.yaml",
+        "-ts","C:\\ISEL\\PS\\okgentool\\demo\\PetStore\\server\\src\\main\\kotlin",
+        "-p", "org.example.petstoreserver")
+}
+
+tasks.named("build") {
+    dependsOn(tasks.named("runOkgenTool"))
 }

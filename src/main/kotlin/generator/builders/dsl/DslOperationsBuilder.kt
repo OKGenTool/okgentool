@@ -4,8 +4,6 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import datamodel.*
 import generator.*
-import generator.builders.buildConstructor
-import generator.builders.routing.plugins.buildSerialization
 import generator.model.Imports.*
 import generator.model.Imports.Companion.addCustomImport
 import generator.model.Packages
@@ -16,14 +14,14 @@ import io.ktor.http.ContentType.Application.OctetStream
 import io.ktor.server.application.*
 import org.slf4j.LoggerFactory
 
-private val logger = LoggerFactory.getLogger("DSLBuilder.kt")
+private val logger = LoggerFactory.getLogger("DslOperationsBuilder.kt")
 
-fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<String>, destinationPath: String) {
-    val paramsToImportInOkGenDSL: MutableList<Parameter> = mutableListOf()
+fun buildDSLOperations(
+    dslOperations: List<DSLOperation>,
+    paramsToImportInOkGenDSL: MutableList<Parameter>
+) {
 
     for (operation in dslOperations) {
-        if (operation.name in notImplemented) continue
-
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
 
         val parameters: MutableList<Parameter> = getParameters(operation)
@@ -31,19 +29,16 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
             !it.enum.isNullOrEmpty()
         })
 
-        var requestType: TypeSpec?
-        var responseType: TypeSpec?
-
         //Build Params Classes
-        var paramsTypes: List<TypeSpec>? = buildOperationsParams(operation.name, parameters)
+        val paramsTypes: List<TypeSpec> = buildOperationsParams(operation.name, parameters)
 
         //Build Request class
-        requestType = buildRequestClass(operation, parameters)
+        val requestType = buildRequestClass(operation, parameters)
         requestType?.let { fileSpec.addType(requestType) }
 
         //Build Response Class
         val responseProps = getResponseProps(operation.name, operation.responses!!)
-        responseType = getResponseType(operation.name, responseProps.map { it.responseType })
+        val responseType = getResponseType(operation.name, responseProps.map { it.responseType })
         fileSpec.addType(responseType)
 
         //Build Operation main class
@@ -59,7 +54,7 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
         )
 
         //Add Param Classes to Operation
-        paramsTypes?.map {
+        paramsTypes.map {
             fileSpec.addType(it)
         }
 
@@ -68,13 +63,8 @@ fun buildDSLOperations(dslOperations: List<DSLOperation>, componentNames: List<S
             .addCustomImport(KTOR_HTTP_STATUS_CODE)
             .addCustomImport(KTOR_SERVER_RESPONSE_HEADER)
 
-        writeFile(fileSpec.build(), destinationPath)
+        writeFile(fileSpec.build())
     }
-
-    buildApiOperations(destinationPath)
-    buildUnsafe(destinationPath)
-    buildSerialization(destinationPath)
-    buildOkGenDsl(dslOperations, componentNames, paramsToImportInOkGenDSL, destinationPath)
 }
 
 
@@ -151,7 +141,7 @@ private fun getOperationType(
     return mainClass.build()
 }
 
-fun getParameters(operation: DSLOperation): MutableList<Parameter> {
+private fun getParameters(operation: DSLOperation): MutableList<Parameter> {
     val parameters: MutableList<Parameter> = mutableListOf()
 
     //When using body
@@ -167,7 +157,7 @@ fun getParameters(operation: DSLOperation): MutableList<Parameter> {
     return parameters
 }
 
-fun getBodyAsParameter(body: Body): Parameter {
+private fun getBodyAsParameter(body: Body): Parameter {
     var name: String = ""
     var type: TypeName? = null
 

@@ -1,4 +1,5 @@
-import cli.getClient
+import cli.getCli
+import cli.sourcePath
 import generator.Generator
 import org.slf4j.LoggerFactory
 import parser.Parser

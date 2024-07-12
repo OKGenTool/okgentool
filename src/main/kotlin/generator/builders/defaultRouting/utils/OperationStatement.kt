@@ -38,29 +38,13 @@ fun createOperationStatement(operation: DSLOperation, schemas: List<Schema>): Co
     return code.build()
 }
 
-fun getRoutingImports(operation: DSLOperation, schemas: List<Schema>, ): List<Pair<String, String>> {
-    val imports = mutableListOf<Pair<String, String>>()
-    val successResponse = getSuccessResponse(operation, schemas)
-    val errorResponse = getErrorResponse(operation, schemas)
-
-    if (successResponse != null && successResponse is Response.ResponseRef) {
-        imports.add(Packages.DEFAULT_ROUTING_EXAMPLES to "example${successResponse.schemaRef.split('/').last().capitalize()}")
-    }
-
-    if (errorResponse != null && errorResponse is Response.ResponseRef) {
-        imports.add(Packages.DEFAULT_ROUTING_EXAMPLES to "example${errorResponse.schemaRef.split('/').last().capitalize()}")
-    }
-
-    return imports
-}
-
 private fun getErrorResponse(operation: DSLOperation, schemas: List<Schema>): Response? {
     if (operation.responses == null) {
         return null
     }
 
     for (response in operation.responses) {
-        response.setStatusCodeInt()
+        //response.setStatusCodeInt()
         if (response.statusCodeInt in 400..599) {
             return response
         }
@@ -75,7 +59,7 @@ private fun getSuccessResponse(operation: DSLOperation, schemas: List<Schema>): 
     }
 
     for (response in operation.responses) {
-        response.setStatusCodeInt()
+//        response.setStatusCodeInt()
         if (response.statusCodeInt in 200..299) {
             return response
         }

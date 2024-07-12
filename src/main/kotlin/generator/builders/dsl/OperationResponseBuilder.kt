@@ -22,15 +22,12 @@ fun getResponseProps(operationName: String, responses: List<Response>): List<Res
 
         var varType: TypeName? = null
 
-        //TODO build parameters of lambda with headers
         val headersParams = getHeadersParams(response.headers)
         val propKdoc: CodeBlock.Builder = CodeBlock.builder()
 
         when (response) {
             is ResponseRef -> {
                 val simpleName = SchemaProps.getRefSimpleName(response.schemaRef)
-                //TODO test this
-
                 varType = LambdaTypeName.get(
                     parameters = arrayOf(ClassName(Packages.MODEL, simpleName.capitalize())) + headersParams,
                     returnType = UNIT
@@ -44,7 +41,6 @@ fun getResponseProps(operationName: String, responses: List<Response>): List<Res
                     ClassName(Packages.MODEL, simpleName.capitalize())
                 )
 
-                //TODO test this
                 varType = LambdaTypeName.get(
                     parameters = arrayOf(param) + headersParams,
                     returnType = UNIT
@@ -53,7 +49,6 @@ fun getResponseProps(operationName: String, responses: List<Response>): List<Res
             }
 
             is ResponseNoContent -> {
-                //TODO test this
                 varType = LambdaTypeName.get(
                     parameters = headersParams,
                     returnType = UNIT
@@ -61,7 +56,6 @@ fun getResponseProps(operationName: String, responses: List<Response>): List<Res
             }
 
             is ResponseInline -> {
-                //TODO test this
                 varType = LambdaTypeName.get(
                     parameters = arrayOf(response.type.kotlinType) + headersParams,
                     returnType = UNIT

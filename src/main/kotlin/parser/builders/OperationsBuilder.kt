@@ -28,28 +28,28 @@ fun buildOperations(): List<DSLOperation> {
         addOperation(pathItem.options, paths.key, "options")
         addOperation(pathItem.trace, paths.key, "trace")
     }
-    logger.info("End parsing the Operations model. Where found these operations:")
+    logger.info("Parsing of the Operations model has ended. The following operations were found:")
     dslOperations.forEach { logger.info(it.name) }
     return dslOperations
 }
 
 private fun addOperation(operation: Operation?, path: String, method: String) {
-    if (operation == null) return
+    if (operation == null ||
+        operation.operationId in notImplemented
+    ) return
 
     val operationName = getOperationName(operation, path, method)
     val parameters = getParameters(operation)
-    val inlineSchemas: MutableList<InlineSchema> = mutableListOf() //TODO Inline Schema
 
     val dslOperation = DSLOperation(
         operationName,
         getBody(operation),
-        getResponses(operation.responses, operationName, inlineSchemas),
+        getResponses(operation.responses, operationName),
         HttpMethod.parse(method),
         path,
         operation.summary,
         operation.description,
         parameters,
-        inlineSchemas
     )
 
     dslOperations.add(dslOperation)
@@ -110,10 +110,8 @@ private fun getParameters(operation: Operation): List<DSLParameter>? {
 private fun getResponses(
     apiResponses: ApiResponses,
     operationName: String,
-    inlineSchemas: MutableList<InlineSchema>, //TODO Inline Schema
 ): List<Response> {
     val responses: MutableList<Response> = mutableListOf()
-
     apiResponses.map { response ->
         val headers = getHeaders(response.value.headers)
         val content = response.value.content
@@ -145,13 +143,6 @@ private fun getResponses(
                                 headers
                             )
                         )
-                        //TODO add inlineSchema do DSLOperation. Delete this?
-//                        inlineSchemas.add(
-//                            InlineSchema(
-//                                "${operationName.capitalize()}InlineResponse",
-//                                schema
-//                            )
-//                        )
                     } else {
                         //For responses using arrays of reusable schemas
                         responses.add(
@@ -264,5 +255,7 @@ fun getHeaders(headers: Map<String, Header>?): List<DSLHeader>? {
     }
     return headersList
 }
+
+val notImplemented = setOf("getInventory")
 
 

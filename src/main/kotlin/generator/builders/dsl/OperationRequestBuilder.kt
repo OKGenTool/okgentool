@@ -1,8 +1,9 @@
 package generator.builders.dsl
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.TypeSpec
 import datamodel.DSLOperation
-import generator.builders.buildConstructor
+import generator.buildConstructor
 import generator.capitalize
 import generator.model.Parameter
 

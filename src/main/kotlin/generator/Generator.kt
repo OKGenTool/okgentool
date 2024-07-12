@@ -4,8 +4,9 @@ import datamodel.CliModel
 import datamodel.DataModel
 import generator.builders.client.buildClient
 import generator.builders.defaultRouting.buildDefaultRouting
-import generator.builders.dsl.buildDSLOperations
+import generator.builders.dsl.buildDSL
 import generator.builders.model.buildModel
+import generator.builders.routing.plugins.buildSerialization
 import generator.builders.routing.routes.buildPaths
 import org.slf4j.LoggerFactory
 
@@ -31,12 +32,15 @@ class Generator(private val dataModel: DataModel, private val cli: CliModel) {
 
         if (cli.isServer) {
             logger.info("Build DSL Files")
-            buildDSLOperations(
+            buildDSL(
                 dataModel.dslOperations,
                 dataModel.schemas.map { it.simplifiedName },
                 cli.serverDestinationPath
             )
         }
+
+        logger.info("Build Serialization File")
+        buildSerialization()
 
         if(cli.isServer) {
             logger.info("Build default routing files")

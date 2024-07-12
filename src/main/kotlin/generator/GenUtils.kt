@@ -1,16 +1,16 @@
 package generator
 
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.LambdaTypeName
-import com.squareup.kotlinpoet.TypeName
+import cli.serverDestinationPath
+import com.squareup.kotlinpoet.*
 import generator.model.Packages
+import generator.model.Parameter
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
 import kotlin.reflect.KClass
 
-private val logger = LoggerFactory.getLogger("Utils.kt")
+private val logger = LoggerFactory.getLogger("GenUtils.kt")
 
 fun String.capitalize(): String {
     return this.replaceFirstChar {
@@ -64,7 +64,7 @@ fun cleanUp(path: String) {
     }
 }
 
-fun writeFile(fileSpec: FileSpec, destinationPath: String) {
+fun writeFile(fileSpec: FileSpec) {
     logger.info("Writing file: ${fileSpec.relativePath}")
     fileSpec.toBuilder()
         .addFileComment(
@@ -78,8 +78,30 @@ fun writeFile(fileSpec: FileSpec, destinationPath: String) {
         """.trimIndent(),
         )
         .build()
-        .writeTo(Paths.get(destinationPath).toFile())
+        .writeTo(Paths.get(serverDestinationPath).toFile())
 }
+
+fun TypeSpec.Builder.buildConstructor(parameters: List<Parameter?>): TypeSpec.Builder {
+    val constructor = FunSpec.constructorBuilder()
+    val properties: MutableList<PropertySpec> = mutableListOf()
+
+    parameters.map {
+        if (it != null) {
+            constructor.addParameter(it.name, it.type)
+            properties.add(
+                PropertySpec.builder(it.name, it.type, it.visibility.modifier)
+                    .initializer(it.name)
+                    .build()
+            )
+        }
+    }
+
+    return this.primaryConstructor(
+        constructor.build()
+    ).addProperties(properties)
+}
+
+
 
 fun TypeName.nullable(): TypeName = this.copy(nullable = true)
 fun LambdaTypeName.suspending(): TypeName = this.copy(suspending = true)

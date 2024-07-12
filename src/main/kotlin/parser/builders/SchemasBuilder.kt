@@ -8,7 +8,7 @@ import parser.openAPI
 
 private val logger = LoggerFactory.getLogger("SchemasBuilder.kt")
 
-fun buildSchemas(inlineSchemas: MutableList<InlineSchema>): List<datamodel.Schema> {
+fun buildSchemas(): List<datamodel.Schema> {
     logger.info("Reading schemas")
     val schemas = openAPI.components.schemas ?: return emptyList()
     val res = mutableListOf<datamodel.Schema>()
@@ -22,15 +22,6 @@ fun buildSchemas(inlineSchemas: MutableList<InlineSchema>): List<datamodel.Schem
         val oneOfSchemas = schema.oneOf ?: emptyList()
         logger.info("Parsing schema: $schemaName")
         res.add(datamodel.Schema(schemaName, parameters, component.key.capitalize(), oneOfSchemaNames, ))
-    }
-
-    for (inlineSchema in inlineSchemas) {
-        val requiredProperties = inlineSchema.schema.required ?: emptyList()
-        val parameters = getParameters(inlineSchema.schema, requiredProperties)
-        val oneOfSchemaNames = getOneOfSchemaNames(inlineSchema.schema)
-        val schemaName = inlineSchema.name
-        logger.info("Parsing schema: $schemaName")
-        res.add(datamodel.Schema(schemaName, parameters, inlineSchema.name.capitalize(), oneOfSchemaNames))
     }
 
     return resolveSuperClasses(res)

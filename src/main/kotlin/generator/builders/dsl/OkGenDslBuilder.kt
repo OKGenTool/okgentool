@@ -2,10 +2,9 @@ package generator.builders.dsl
 
 import com.squareup.kotlinpoet.*
 import datamodel.*
-import generator.builders.buildConstructor
+import generator.buildConstructor
 import generator.builders.routing.routes.PATHSFILE
 import generator.capitalize
-import generator.decapitalize
 import generator.model.Imports.*
 import generator.model.Imports.Companion.addCustomImport
 import generator.model.Packages
@@ -17,9 +16,8 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("OkGenDslBuilder.kt")
 
-private const val INNERCLASS = "OKGenRoute"
+private const val INNERCLASS = "OkGenRoute"
 private const val OUTERCLASS = "OkGenDsl"
-private const val APIOPERATIONS = "ApiOperations"
 private const val KTORROUTE = "ktorRoute"
 
 fun buildOkGenDsl(
@@ -64,13 +62,13 @@ fun buildOkGenDsl(
                     )
                     .addProperty(
                         PropertySpec.builder(
-                            APIOPERATIONS.decapitalize(),
+                            DSL_CONTROLS,
                             ClassName(
                                 Packages.DSL,
-                                APIOPERATIONS
+                                DSL_CONTROLS_CAP
                             )
                         )
-                            .initializer("$APIOPERATIONS()")
+                            .initializer("$DSL_CONTROLS_CAP()")
                             .addModifiers(KModifier.PRIVATE)
                             .build()
                     )
@@ -95,8 +93,6 @@ private fun buildOperationFunctions(dslOperations: List<DSLOperation>): List<Fun
     val functions = mutableListOf<FunSpec>()
 
     dslOperations.map {
-        if (it.name in notImplemented) return@map
-
         //Define suspend function for operation parameter
         val suspFunc = LambdaTypeName.get(
             receiver = ClassName(Packages.DSLOPERATIONS, it.name.capitalize()),
@@ -105,7 +101,7 @@ private fun buildOperationFunctions(dslOperations: List<DSLOperation>): List<Fun
 
 
         val codeBlock = CodeBlock.builder()
-            .add("${APIOPERATIONS.decapitalize()}.addOperation(\"${it.name}\")\n")
+            .add("${DSL_CONTROLS}.addOperation(\"${it.name}\")\n")
             .add("$KTORROUTE.${it.method.value}<$PATHSFILE.${it.name.capitalize()}>{\n")
             .getRequestCode(it)
             .add("}")
@@ -225,5 +221,5 @@ private fun FileSpec.Builder.addImports(componentNames: List<String>, parameters
     return this
 }
 
-//TODO implement these operations
-val notImplemented = setOf("getInventory")
+////TODO implement these operations
+//val notImplemented = setOf("getInventory")
