@@ -1,9 +1,9 @@
 package generator.model
 
-import cli.packageName
+import cli.cliPackageName
 
 object Packages {
-    val BASE = "${packageName}gen"
+    val BASE = "${cliPackageName}gen"
     val DSL = "${BASE}.dsl"
     val DSLOPERATIONS = "$DSL.operations"
     val ROUTING = "$BASE.routing"

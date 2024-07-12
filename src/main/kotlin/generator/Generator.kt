@@ -37,12 +37,10 @@ class Generator(private val dataModel: DataModel, private val cli: CliModel) {
                 dataModel.schemas.map { it.simplifiedName },
                 cli.serverDestinationPath
             )
-        }
 
-        logger.info("Build Serialization File")
-        buildSerialization()
+            logger.info("Build Serialization File")
+            buildSerialization(cli.serverDestinationPath)
 
-        if(cli.isServer) {
             logger.info("Build default routing files")
             buildDefaultRouting(dataModel.dslOperations, dataModel.schemas, cli.serverDestinationPath)
         }

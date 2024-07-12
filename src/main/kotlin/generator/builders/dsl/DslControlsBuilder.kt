@@ -11,7 +11,7 @@ private val logger = LoggerFactory.getLogger("DslControlsBuilder.kt")
 const val DSL_CONTROLS_CAP = "DslControls"
 const val DSL_CONTROLS = "dslControls"
 
-fun buildDslControls() {
+fun buildDslControls(destinationPath: String) {
     // Define the dslControls property
     val apiOperationsProperty = PropertySpec.builder(
         DSL_CONTROLS,
@@ -45,5 +45,5 @@ fun buildDslControls() {
         .addType(apiOperationsClass)
         .build()
 
-    writeFile(fileSpec)
+    writeFile(fileSpec, destinationPath)
 }

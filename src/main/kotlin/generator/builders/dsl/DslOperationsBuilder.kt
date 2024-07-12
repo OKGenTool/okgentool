@@ -18,13 +18,14 @@ private val logger = LoggerFactory.getLogger("DslOperationsBuilder.kt")
 
 fun buildDSLOperations(
     dslOperations: List<DSLOperation>,
-    paramsToImportInOkGenDSL: MutableList<Parameter>
+    paramsToImportInOkGenDSL: MutableList<Parameter>,
+    destinationPath: String
 ) {
 
     for (operation in dslOperations) {
         val fileSpec = FileSpec.builder(Packages.DSLOPERATIONS, operation.name.capitalize())
 
-        val parameters: MutableList<Parameter> = getParameters(operation)
+        val parameters: MutableList<Parameter> = getOperationParameters(operation)
         paramsToImportInOkGenDSL.addAll(parameters.filter {
             !it.enum.isNullOrEmpty()
         })
@@ -63,7 +64,7 @@ fun buildDSLOperations(
             .addCustomImport(KTOR_HTTP_STATUS_CODE)
             .addCustomImport(KTOR_SERVER_RESPONSE_HEADER)
 
-        writeFile(fileSpec.build())
+        writeFile(fileSpec.build(), destinationPath)
     }
 }
 
@@ -77,7 +78,7 @@ private fun getOperationType(
 ): TypeSpec {
     val mainClass = TypeSpec.classBuilder(operationName.capitalize())
 
-    if (!parameters.isEmpty()) {
+    if (parameters.isNotEmpty()) {
         mainClass.buildConstructor(parameters)
     }
 
@@ -99,7 +100,7 @@ private fun getOperationType(
     var responseCode = "${response?.name}("
     response?.propertySpecs?.map {
         val propParams = (it.type as LambdaTypeName).parameters
-        if (!propParams.isEmpty()) {
+        if (propParams.isNotEmpty()) {
             var propParamsCode = ""
             val firstParam = propParams.first()
             propParamsCode += "${getVarNameFromParam(firstParam.toString())}, "
@@ -141,12 +142,12 @@ private fun getOperationType(
     return mainClass.build()
 }
 
-private fun getParameters(operation: DSLOperation): MutableList<Parameter> {
+private fun getOperationParameters(operation: DSLOperation): MutableList<Parameter> {
     val parameters: MutableList<Parameter> = mutableListOf()
 
     //When using body
     operation.requestBody?.let {
-        parameters.add(getBodyAsParameter(it))
+        parameters.add(getBodyParameter(it))
     }
 
     //Parameters when using query string
@@ -157,7 +158,7 @@ private fun getParameters(operation: DSLOperation): MutableList<Parameter> {
     return parameters
 }
 
-private fun getBodyAsParameter(body: Body): Parameter {
+private fun getBodyParameter(body: Body): Parameter {
     var name: String = ""
     var type: TypeName? = null
 
