@@ -668,7 +668,7 @@ components:
           example: 22.8
         intMultipleOf:
           type: integer
-          format: int64
+          format: int32
           multipleOf: 10
           example: 20
         localDate:

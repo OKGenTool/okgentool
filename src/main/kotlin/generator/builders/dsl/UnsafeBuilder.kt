@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("UnsafeBuilder.kt")
 
-fun buildUnsafe() {
+fun buildUnsafe(destinationPath: String) {
     // Class definition
     val className = "Unsafe"
     val callParameter = ParameterSpec.builder("call", ClassName("io.ktor.server.application", "ApplicationCall"))
@@ -45,7 +45,7 @@ fun buildUnsafe() {
         .build()
 
     // Write the file
-    writeFile(fileSpec)
+    writeFile(fileSpec, destinationPath)
 }
 
 fun buildUnsafeFunction(name: String): FunSpec {

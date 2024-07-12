@@ -1,6 +1,5 @@
 package generator
 
-import cli.serverDestinationPath
 import com.squareup.kotlinpoet.*
 import generator.model.Packages
 import generator.model.Parameter
@@ -64,7 +63,7 @@ fun cleanUp(path: String) {
     }
 }
 
-fun writeFile(fileSpec: FileSpec) {
+fun writeFile(fileSpec: FileSpec, destinationPath: String) {
     logger.info("Writing file: ${fileSpec.relativePath}")
     fileSpec.toBuilder()
         .addFileComment(
@@ -78,7 +77,7 @@ fun writeFile(fileSpec: FileSpec) {
         """.trimIndent(),
         )
         .build()
-        .writeTo(Paths.get(serverDestinationPath).toFile())
+        .writeTo(Paths.get(destinationPath).toFile())
 }
 
 fun TypeSpec.Builder.buildConstructor(parameters: List<Parameter?>): TypeSpec.Builder {

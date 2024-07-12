@@ -16,7 +16,7 @@ private val logger = LoggerFactory.getLogger("PathsBuilder.kt")
 
 const val PATHSFILE = "Paths"
 
-fun buildPaths(dslOperations: List<DSLOperation>) {
+fun buildPaths(dslOperations: List<DSLOperation>, destinationPath: String) {
     logger.info("Generating $PATHSFILE file")
     // Define the Paths object
     val pathsObject = TypeSpec.objectBuilder(PATHSFILE)
@@ -28,7 +28,7 @@ fun buildPaths(dslOperations: List<DSLOperation>) {
         .addType(pathsObject)
         .build()
 
-    writeFile(kotlinFile)
+    writeFile(kotlinFile, destinationPath)
 }
 
 private fun TypeSpec.Builder.addFunctions(dslOperations: List<DSLOperation>): TypeSpec.Builder {

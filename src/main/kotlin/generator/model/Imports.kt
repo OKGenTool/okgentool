@@ -22,8 +22,19 @@ enum class Imports(
     KTOR_CONTENT_NEGOTIATION("io.ktor.server.plugins.contentnegotiation", "ContentNegotiation"),
     KTOR_SERIALIZATION_JSON("io.ktor.serialization.kotlinx.json", "json"),
     KTOR_SERIALIZATION_XML("io.ktor.serialization.kotlinx.xml", "xml"),
-
-
+    KTOR_HTTP_CLIENT("io.ktor.client", "HttpClient"),
+    KTOR_CLIENT_ENGINE_CIO("io.ktor.client.engine.cio", "CIO"),
+    KTOR_CLIENT_DEFAULT_REQUEST("io.ktor.client.plugins", "defaultRequest"),
+    KTOR_CLIENT_CONTENT_NEGOTIATION("io.ktor.client.plugins.contentnegotiation", "ContentNegotiation"),
+    KTOR_CLIENT_REQUEST_GET("io.ktor.client.request", "get"),
+    KTOR_CLIENT_REQUEST_POST("io.ktor.client.request", "post"),
+    KTOR_CLIENT_REQUEST_PUT("io.ktor.client.request", "put"),
+    KTOR_CLIENT_REQUEST_DELETE("io.ktor.client.request", "delete"),
+    KTOR_CLIENT_REQUEST_SET_BODY("io.ktor.client.request", "setBody"),
+    KTOR_HTTP_APPEND_PATH_SEGMENTS("io.ktor.http", "appendPathSegments"),
+    KTOR_HTTP_CONTENT_TYPE("io.ktor.http", "ContentType"),
+    KTOR_HTTP_CONTENT_TYPE_FUNCTION("io.ktor.http", "contentType"),
+    KTOR_CLIENT_CALL_BODY("io.ktor.client.call", "body"),
 
     ;
 

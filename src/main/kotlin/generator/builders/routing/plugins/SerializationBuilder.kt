@@ -14,7 +14,7 @@ private const val SERIALIZATION_FILE = "Serialization.kt"
 
 private val logger = LoggerFactory.getLogger("SerializationBuilder")
 
-fun buildSerialization() {
+fun buildSerialization(destinationPath: String) {
     logger.info("Generating $SERIALIZATION_FILE")
 
     // Create the function
@@ -40,5 +40,5 @@ fun buildSerialization() {
         .addCustomImport(KTOR_SERIALIZATION_XML)
         .build()
 
-    writeFile(file)
+    writeFile(file, destinationPath)
 }
