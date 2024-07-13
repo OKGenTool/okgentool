@@ -17,7 +17,7 @@ fun getOkGenClientProperties(): List<PropertySpec> {
         PropertySpec.builder("client", ClassName("io.ktor.client", "HttpClient"))
         .initializer(
             """
-            |HttpClient(CIO) {
+            |HttpClient(engineFactory) {
             |    install(ContentNegotiation) {
             |        json()
             |        xml()
@@ -25,6 +25,7 @@ fun getOkGenClientProperties(): List<PropertySpec> {
             |    defaultRequest {
             |        url(baseURL)
             |    }
+            |    apply(clientAdditionalConfigurations)
             |}
             """.trimMargin())
         .addModifiers(KModifier.PRIVATE)
