@@ -29,8 +29,9 @@ fun buildDslControls(destinationPath: String) {
             """
             val found = ${DSL_CONTROLS}.find { it == operation }
             if (found == null) ${DSL_CONTROLS}.add(operation)
-            else throw RuntimeException("This operation was already created: '$'operation")
-        """.trimIndent()
+            else throw RuntimeException("This operation was already created: $%L")
+        """.trimIndent(),
+            "operation"
         )
         .build()
 
