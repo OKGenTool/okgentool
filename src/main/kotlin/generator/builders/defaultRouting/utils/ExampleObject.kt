@@ -3,6 +3,7 @@ package generator.builders.defaultRouting.utils
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.PropertySpec
+import datamodel.ArrayProperties
 import datamodel.DataType
 import datamodel.Parameter
 import datamodel.Schema
@@ -54,7 +55,11 @@ fun getInitializerBlock(schema: Schema): CodeBlock {
     schema.parameters.forEach { param ->
         codeBlock.add("\t%L = ", param.name)
 
-        if (param.example.toString().isBlank()) {
+        if (
+            param.example.toString().isBlank() &&
+            !((param.dataType == DataType.OBJECT) ||
+                    (param.properties is ArrayProperties && param.properties.arrayItemsDataType == DataType.OBJECT))
+        ) {
             codeBlock.add("null,\n")
             return@forEach
         }
@@ -66,9 +71,9 @@ fun getInitializerBlock(schema: Schema): CodeBlock {
 
             DataType.BOOLEAN -> codeBlock.add("%L,\n", param.example)
 
-            DataType.ARRAY -> codeBlock.add("%L,\n", getArrayExample(param.example.toString()))
+            DataType.ARRAY -> codeBlock.add("%L,\n", getArrayExample(param.example.toString(), param))
 
-            DataType.OBJECT -> codeBlock.add("%S,\n", param.example) //TODO()
+            DataType.OBJECT -> codeBlock.add("%L,\n", "example" + param.name.capitalize())
 
             DataType.LONG -> codeBlock.add("%L,\n", param.example)
 
@@ -141,6 +146,9 @@ private fun getStringExample(codeBlock: CodeBlock.Builder, example: String, para
     }
 }
 
-private fun getArrayExample(example: String): String {
+private fun getArrayExample(example: String, param: Parameter): String {
+    if (param.properties is ArrayProperties && param.properties.arrayItemsDataType == DataType.OBJECT) {
+        return "listOf(example${param.properties.arrayItemsSchemaName?.split('/')?.last()?.capitalize()})"
+    }
     return example.replace("[", "listOf(").replace("]", ")")
 }

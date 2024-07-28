@@ -3,6 +3,7 @@ package generator.builders.defaultRouting
 import com.squareup.kotlinpoet.*
 import datamodel.DSLOperation
 import datamodel.Schema
+import datamodel.compareSchemas
 import generator.builders.defaultRouting.utils.createOperationStatement
 import generator.builders.defaultRouting.utils.getExampleImports
 import generator.builders.defaultRouting.utils.getExampleObject
@@ -19,6 +20,26 @@ fun buildDefaultRouting(operations: List<DSLOperation>, schemas: List<Schema>, d
 
     writeDefaultRoutingExamplesFile(schemas, destinationPath)
     writeDefaultRoutingFile(operations, schemas, destinationPath)
+    writeRoutingFile(destinationPath)
+}
+
+fun writeRoutingFile(destinationPath: String) {
+    val configureGenDefaultRoutingFunction = FunSpec.builder("configureGenDefaultRouting")
+        .receiver(ClassName("io.ktor.server.application", "Application"))
+        .addCode("""
+        |routing {
+        |    OkGenDsl(this).defaultRouting()
+        |}
+    """.trimMargin())
+        .build()
+
+    val fileSpec = FileSpec.builder(Packages.PLUGINS, "Routing")
+        .addImport("io.ktor.server.routing", "routing")
+        .addImport(Packages.DSL, "OkGenDsl")
+        .addFunction(configureGenDefaultRoutingFunction)
+        .build()
+
+    writeFile(fileSpec, destinationPath)
 }
 
 private fun writeDefaultRoutingExamplesFile(schemas: List<Schema>, destinationPath: String) {
@@ -40,7 +61,9 @@ private fun writeDefaultRoutingExamplesFile(schemas: List<Schema>, destinationPa
 
     examplesFileSpec.addProperty(localDateFormaterProperty)
 
-    for (schema in schemas) {
+    val sortedSchemas = schemas.sortedWith(Comparator(::compareSchemas))
+
+    for (schema in sortedSchemas) {
         val properties = getExampleObject(schema)
         for (property in properties) {
             examplesFileSpec.addProperty(property)
