@@ -36,6 +36,7 @@ fun writeRoutingFile(destinationPath: String) {
     val fileSpec = FileSpec.builder(Packages.PLUGINS, "Routing")
         .addImport("io.ktor.server.routing", "routing")
         .addImport(Packages.DSL, "OkGenDsl")
+        .addImport(Packages.ROUTES, "defaultRouting")
         .addFunction(configureGenDefaultRoutingFunction)
         .build()
 
